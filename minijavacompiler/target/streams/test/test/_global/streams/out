@@ -1,0 +1,5 @@
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(MySuite, CustomFingerprint{suite='munit.Suite'}, false, [SuiteSelector])[0m
+[0m[[0m[0mdebug[0m] [0m[0mSummary for munit not available.[0m
+[0m[[0m[0minfo[0m] [0m[0mPassed: Total 1, Failed 0, Errors 0, Passed 1[0m
+[0m[[0m[0mdebug[0m] [0m[0mPassed tests:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	MySuite[0m

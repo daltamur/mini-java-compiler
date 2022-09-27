@@ -1,0 +1,34 @@
+[0m[[0m[31merror[0m] [0m[0m/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/src/main/scala/Main.scala:1:12: object antlr is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.antlr.v4.runtime.CharStreams[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/src/main/scala/Main.scala:2:12: object antlr is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.antlr.v4.runtime.CommonTokenStream[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/src/main/scala/Main.scala:3:12: object antlr is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.antlr.v4.runtime.tree.ParseTree[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/src/main/scala/Main.scala:10:22: not found: value CharStreams[0m
+[0m[[0m[31merror[0m] [0m[0m    val charStream = CharStreams.fromFileName("src/main/grammarImports/testFile.java")[0m
+[0m[[0m[31merror[0m] [0m[0m                     ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/src/main/scala/Main.scala:11:21: not found: type miniJavaLexer[0m
+[0m[[0m[31merror[0m] [0m[0m    val lexer = new miniJavaLexer(charStream)[0m
+[0m[[0m[31merror[0m] [0m[0m                    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/src/main/scala/Main.scala:12:27: not found: type CommonTokenStream[0m
+[0m[[0m[31merror[0m] [0m[0m    val tokenStream = new CommonTokenStream(lexer)[0m
+[0m[[0m[31merror[0m] [0m[0m                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/src/main/scala/Main.scala:13:22: not found: type miniJavaParser[0m
+[0m[[0m[31merror[0m] [0m[0m    val parser = new miniJavaParser(tokenStream)[0m
+[0m[[0m[31merror[0m] [0m[0m                     ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/src/main/scala/errorListener.scala:1:12: object antlr is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.antlr.v4.runtime.{BaseErrorListener, RecognitionException, Recognizer}[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/src/main/scala/errorListener.scala:3:29: not found: type BaseErrorListener[0m
+[0m[[0m[31merror[0m] [0m[0mclass errorListener extends BaseErrorListener{[0m
+[0m[[0m[31merror[0m] [0m[0m                            ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/src/main/scala/errorListener.scala:4:40: not found: type Recognizer[0m
+[0m[[0m[31merror[0m] [0m[0m  override def syntaxError(recognizer: Recognizer[_, _], offendingSymbol: Any, line: Int, charPositionInLine: Int, msg: String, e: RecognitionException):[0m
+[0m[[0m[31merror[0m] [0m[0m                                       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/src/main/scala/errorListener.scala:4:132: not found: type RecognitionException[0m
+[0m[[0m[31merror[0m] [0m[0m  override def syntaxError(recognizer: Recognizer[_, _], offendingSymbol: Any, line: Int, charPositionInLine: Int, msg: String, e: RecognitionException):[0m
+[0m[[0m[31merror[0m] [0m[0m                                                                                                                                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m11 errors found[0m

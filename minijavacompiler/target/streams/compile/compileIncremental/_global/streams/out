@@ -1,0 +1,41 @@
+[0m[[0m[0mdebug[0m] [0m[0m[zinc] IncrementalCompile -----------[0m
+[0m[[0m[0mdebug[0m] [0m[0mIncrementalCompile.incrementalCompile[0m
+[0m[[0m[0mdebug[0m] [0m[0mprevious = Stamps for: 3 products, 6 sources, 5 libraries[0m
+[0m[[0m[0mdebug[0m] [0m[0mcurrent source = Set(${BASE}/src/main/scala/grammarOutput/miniJavaListener.java, ${BASE}/src/main/scala/grammarOutput/miniJavaBaseListener.java, ${BASE}/src/main/scala/grammarOutput/miniJavaLexer.java, ${BASE}/src/main/scala/Main.scala, ${BASE}/src/main/scala/grammarOutput/miniJavaParser.java, ${BASE}/src/main/scala/errorListener.scala)[0m
+[0m[[0m[0mdebug[0m] [0m[0mInvalidating '${BASE}/target/scala-3.2.0/classes/miniJavaParser$GoalContext.class' because ${BASE}/target/scala-3.2.0/classes/miniJavaParser$GoalContext.class (farm(71a4b4ed237ac7b6)) != ${BASE}/target/scala-3.2.0/classes (absent)[0m
+[0m[[0m[0mdebug[0m] [0m[0mInvalidating '${BASE}/target/scala-3.2.0/classes/miniJavaParser.class' because ${BASE}/target/scala-3.2.0/classes/miniJavaParser.class (farm(16e331954bd2a283)) != ${BASE}/target/scala-3.2.0/classes (absent)[0m
+[0m[[0m[0mdebug[0m] [0m[0mInvalidating '${BASE}/target/scala-3.2.0/classes/miniJavaLexer.class' because ${BASE}/target/scala-3.2.0/classes/miniJavaLexer.class (farm(64812eddc8052a8c)) != ${BASE}/target/scala-3.2.0/classes (absent)[0m
+[0m[[0m[0mdebug[0m] [0m[0m> initialChanges = InitialChanges(Changes(added = Set(), removed = Set(), changed = Set(${BASE}/src/main/scala/Main.scala), unmodified = ...),Set(${BASE}/target/scala-3.2.0/classes/Main.class),Set(${BASE}/target/scala-3.2.0/classes/miniJavaLexer.class, ${BASE}/target/scala-3.2.0/classes/miniJavaParser.class, ${BASE}/target/scala-3.2.0/classes/miniJavaParser$GoalContext.class),API Changes: Set())[0m
+[0m[[0m[0mdebug[0m] [0m[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial source changes:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	removed: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0m	added: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0m	modified: Set(${BASE}/src/main/scala/Main.scala)[0m
+[0m[[0m[0mdebug[0m] [0m[0mInvalidated products: Set(${BASE}/target/scala-3.2.0/classes/Main.class)[0m
+[0m[[0m[0mdebug[0m] [0m[0mExternal API changes: API Changes: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mModified binary dependencies: Set(${BASE}/target/scala-3.2.0/classes/miniJavaLexer.class, ${BASE}/target/scala-3.2.0/classes/miniJavaParser.class, ${BASE}/target/scala-3.2.0/classes/miniJavaParser$GoalContext.class)[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial directly invalidated classes: Set(Main)[0m
+[0m[[0m[0mdebug[0m] [0m[0mSources indirectly invalidated by:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	product: Set(${BASE}/src/main/scala/Main.scala)[0m
+[0m[[0m[0mdebug[0m] [0m[0m	binary dep: Set(${BASE}/src/main/scala/Main.scala)[0m
+[0m[[0m[0mdebug[0m] [0m[0m	external source: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mAll initially invalidated classes: Set(Main)[0m
+[0m[[0m[0mdebug[0m] [0m[0mAll initially invalidated sources:Set(${BASE}/src/main/scala/Main.scala)[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial set of included nodes: Main[0m
+[0m[[0m[0mdebug[0m] [0m[0mcompilation cycle 1[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 1 Scala source to /home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/target/scala-3.2.0/classes ...[0m
+[0m[[0m[0mdebug[0m] [0m[0mReturning already retrieved and compiled bridge: /home/dominic/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala3-sbt-bridge/3.2.0/scala3-sbt-bridge-3.2.0.jar.[0m
+[0m[[0m[0mdebug[0m] [0m[0m[zinc] Running cached compiler 5794c58c for Scala Compiler version 3.2.0[0m
+[0m[[0m[0mdebug[0m] [0m[0m[zinc] The Scala compiler is invoked with:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	-bootclasspath[0m
+[0m[[0m[0mdebug[0m] [0m[0m	/home/dominic/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala3-library_3/3.2.0/scala3-library_3-3.2.0.jar:/home/dominic/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.8/scala-library-2.13.8.jar[0m
+[0m[[0m[0mdebug[0m] [0m[0m	-classpath[0m
+[0m[[0m[0mdebug[0m] [0m[0m	/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/target/scala-3.2.0/classes:/home/dominic/.cache/coursier/v1/https/repo1.maven.org/maven2/org/antlr/antlr4-runtime/4.10.1/antlr4-runtime-4.10.1.jar:/home/dominic/.cache/coursier/v1/https/repo1.maven.org/maven2/org/antlr/stringtemplate/3.2/stringtemplate-3.2.jar:/home/dominic/.cache/coursier/v1/https/repo1.maven.org/maven2/antlr/antlr/2.7.7/antlr-2.7.7.jar[0m
+[0m[[0m[0mdebug[0m] [0m[0mScala compilation took 2.456630149 s[0m
+[0m[[0m[0mdebug[0m] [0m[0mdone compiling[0m
+[0m[[0m[0mdebug[0m] [0m[0mNew invalidations:[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial set of included nodes: [0m
+[0m[[0m[0mdebug[0m] [0m[0mPreviously invalidated, but (transitively) depend on new invalidations:[0m
+[0m[[0m[0mdebug[0m] [0m[0mFinal step, transitive dependencies:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mNo classes were invalidated.[0m
