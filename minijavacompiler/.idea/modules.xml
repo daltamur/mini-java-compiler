@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/miniJavaCompiler.iml" filepath="$PROJECT_DIR$/.idea/modules/miniJavaCompiler.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/miniJavaCompiler-build.iml" filepath="$PROJECT_DIR$/.idea/modules/miniJavaCompiler-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/minijavacompiler.iml" filepath="$PROJECT_DIR$/.idea/modules/minijavacompiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/minijavacompiler-build.iml" filepath="$PROJECT_DIR$/.idea/modules/minijavacompiler-build.iml" />
     </modules>
   </component>
 </project>
