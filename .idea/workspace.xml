@@ -5,47 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="192cc344-ef27-4c82-b890-90e70c6e074f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/.bsp/sbt.json" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/.bsp/sbt.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/.idea/libraries/sbt__antlr_antlr_2_7_7_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/.idea/libraries/sbt__junit_junit_4_13_2_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/.idea/libraries/sbt__org_antlr_antlr4_runtime_4_10_1_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/.idea/libraries/sbt__org_antlr_stringtemplate_3_2_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/.idea/libraries/sbt__org_hamcrest_hamcrest_core_1_3_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/.idea/libraries/sbt__org_scala_lang_scala3_library_3_3_2_0_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/.idea/libraries/sbt__org_scala_lang_scala_library_2_13_8_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/.idea/libraries/sbt__org_scala_sbt_test_interface_1_0_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/.idea/libraries/sbt__org_scalameta_junit_interface_0_7_29_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/.idea/libraries/sbt__org_scalameta_munit_3_0_7_29_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/.idea/modules/miniJavaCompiler-build.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/.idea/modules/miniJavaCompiler.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/.idea/sbt.xml" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/.idea/sbt.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/.idea/scala_compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/.idea/scala_compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/project/target/scala-2.12/sbt-1.0/update/update_cache_2.12/inputs" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/project/target/scala-2.12/sbt-1.0/update/update_cache_2.12/inputs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/project/target/scala-2.12/sbt-1.0/update/update_cache_2.12/output" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/project/target/scala-2.12/sbt-1.0/update/update_cache_2.12/output" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/project/target/streams/_global/dependencyPositions/_global/streams/update_cache_2.12/input_dsp" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/project/target/streams/_global/dependencyPositions/_global/streams/update_cache_2.12/input_dsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/project/target/streams/_global/dependencyPositions/_global/streams/update_cache_2.12/output_dsp" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/project/target/streams/_global/dependencyPositions/_global/streams/update_cache_2.12/output_dsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/project/target/streams/compile/compileIncremental/_global/streams/out" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/project/target/streams/compile/compileIncremental/_global/streams/out" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/project/target/streams/compile/copyResources/_global/streams/out" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/project/target/streams/compile/copyResources/_global/streams/out" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/project/target/streams/compile/dependencyClasspath/_global/streams/export" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/project/target/streams/compile/dependencyClasspath/_global/streams/export" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/project/target/streams/compile/externalDependencyClasspath/_global/streams/export" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/project/target/streams/compile/externalDependencyClasspath/_global/streams/export" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/project/target/streams/compile/incOptions/_global/streams/out" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/project/target/streams/compile/incOptions/_global/streams/out" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/project/target/streams/compile/managedClasspath/_global/streams/export" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/project/target/streams/compile/managedClasspath/_global/streams/export" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/project/target/streams/runtime/dependencyClasspath/_global/streams/export" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/project/target/streams/runtime/dependencyClasspath/_global/streams/export" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/project/target/streams/runtime/externalDependencyClasspath/_global/streams/export" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/project/target/streams/runtime/externalDependencyClasspath/_global/streams/export" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/project/target/streams/runtime/fullClasspath/_global/streams/export" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/project/target/streams/runtime/fullClasspath/_global/streams/export" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/project/target/streams/runtime/managedClasspath/_global/streams/export" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/project/target/streams/runtime/managedClasspath/_global/streams/export" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/target/streams/_global/_global/csrLogger/_global/streams/out" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/target/streams/_global/_global/csrLogger/_global/streams/out" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/target/streams/_global/update/_global/streams/out" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/target/streams/_global/update/_global/streams/out" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/target/streams/_global/updateClassifiers/_global/streams/out" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/target/streams/_global/updateClassifiers/_global/streams/out" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/target/streams/compile/externalDependencyClasspath/_global/streams/export" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/target/streams/compile/externalDependencyClasspath/_global/streams/export" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/target/streams/compile/managedClasspath/_global/streams/export" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/target/streams/compile/managedClasspath/_global/streams/export" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/target/streams/runtime/externalDependencyClasspath/_global/streams/export" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/target/streams/runtime/externalDependencyClasspath/_global/streams/export" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/target/streams/runtime/managedClasspath/_global/streams/export" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/target/streams/runtime/managedClasspath/_global/streams/export" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/target/streams/test/externalDependencyClasspath/_global/streams/export" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/target/streams/test/externalDependencyClasspath/_global/streams/export" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/target/streams/test/managedClasspath/_global/streams/export" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/target/streams/test/managedClasspath/_global/streams/export" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/testFiles/testFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/src/main/testFiles/testFile.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -146,6 +106,7 @@
       <workItem from="1664200594092" duration="50000" />
       <workItem from="1664303624397" duration="13000" />
       <workItem from="1664303660934" duration="7000" />
+      <workItem from="1664388024197" duration="31000" />
     </task>
     <servers />
   </component>

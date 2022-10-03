@@ -2,7 +2,6 @@ class testFile {
     public static void main(String[] a) {
         {
             System.out.println(new testClass().testMethod('a'));
-            a++b;
         }
 
     }
@@ -12,8 +11,11 @@ class testFile {
         public boolean testMethod (char b){
             char wyz;
             char w;
+            char aw;
             w = '\"';
             x = ' ';
+            x = a;
+            x = aw.getHerDone();
             return true;
 
         }

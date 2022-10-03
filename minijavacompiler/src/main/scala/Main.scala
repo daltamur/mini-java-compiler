@@ -1,7 +1,6 @@
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTree
-
 import java.io.File
 import java.nio.file.{Files, Paths}
 
@@ -17,7 +16,7 @@ object Main {
         if(Files.exists(Paths.get(fileLocation))) {
           val parser = parse(fileLocation)
           val parseTree = parser.goal()
-          println(parseTree.toStringTree())
+          //println(parseTree.toStringTree())
         }else{
           println("ERROR: No file found at " + fileLocation)
         }
@@ -34,6 +33,9 @@ object Main {
     val lexer = new miniJavaLexer(charStream)
     val tokenStream = new CommonTokenStream(lexer)
     val parser = new miniJavaParser(tokenStream)
+    parser.removeErrorListeners()
+    val parserErrorListener = new errorListener()
+    parser.addErrorListener(parserErrorListener)
     parser
   }
 }

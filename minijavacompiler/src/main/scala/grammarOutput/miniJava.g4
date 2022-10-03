@@ -23,8 +23,8 @@ statement:  '{' statement* '}'
             |'if' '(' expression ')' statement 'else'  statement //if-else statement statement
             | 'while' '(' expression ')' statement //while loop
             | 'System.out.println' '(' expression ')' ';' //print statement
-            | IDENTIFIER '='  expression  ';' //assign value to variable
-            | IDENTIFIER arrayIndex '=' expression ';' //assign value to array
+            | IDENTIFIER EQUALS  expression  ';' //assign value to variable
+            | IDENTIFIER arrayIndex EQUALS expression ';' //assign value to array
             ;
 
 expression: expressionTerminal expressionTail; //expression node rewritten to get rid of left recursion
@@ -81,6 +81,7 @@ parenthesizedExpression:    '(' expression ')';
 
 //lex rules
 AND:	'&&';
+EQUALS:     '=';
 SHIFT:	'<';
 ADD:    '+';
 SUBTRACT:   '-';
