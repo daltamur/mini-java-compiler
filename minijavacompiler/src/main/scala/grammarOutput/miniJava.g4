@@ -10,21 +10,21 @@ varDeclaration: type IDENTIFIER ';';
 
 methodDeclaration:  'public' type IDENTIFIER '(' (type IDENTIFIER (',' type IDENTIFIER)*)? ')' '{' (varDeclaration)* (statement)* 'return' expression ';' '}';
 
-type:   'int' '[' ']' //int array
-        | 'boolean' //boolean type
-        | 'int' //int type
-        | 'char' //character
-        | IDENTIFIER //object
+type:   'int' '[' ']'                                       #integerArrayType
+        | 'boolean'                                         #booleanType
+        | 'int'                                             #intType
+        | 'char'                                            #charType
+        | IDENTIFIER                                        #identifierType
         ;
 
 arrayIndex: '[' expression ']';
 
-statement:  '{' statement* '}'
-            |'if' '(' expression ')' statement 'else'  statement //if-else statement statement
-            | 'while' '(' expression ')' statement //while loop
-            | 'System.out.println' '(' expression ')' ';' //print statement
-            | IDENTIFIER EQUALS  expression  ';' //assign value to variable
-            | IDENTIFIER arrayIndex EQUALS expression ';' //assign value to array
+statement:  '{' statement* '}'                                      #blockStatement
+            |'if' '(' expression ')' statement 'else'  statement    #ifStatement
+            | 'while' '(' expression ')' statement                  #whileStatement
+            | 'System.out.println' '(' expression ')' ';'           #printStatement
+            | IDENTIFIER EQUALS  expression  ';'                    #assignStatement
+            | IDENTIFIER arrayIndex EQUALS expression ';'           #arrayAssignStatement
             ;
 
 expression: expressionTerminal expressionTail; //expression node rewritten to get rid of left recursion
@@ -33,56 +33,36 @@ methodFuncCall: IDENTIFIER '(' (expression (',' expression )*)? ')';
 
 arrayLengthCall: 'length';
 
-expressionTail: andExpression
-                | shiftExpression //bitshift
-                | addExpression //add one expression to another
-                | subtractExpression //subtract one expression from another
-                | multiplyExpression //multiply one expression by another
-                | arrayIndex //getting a value from an array's index
-                | '.' arrayLengthCall //calling .length for an array
-                | '.' methodFuncCall
-                | //null
+expressionTail: AND expression              #andExpression
+                | COMPARE expression        #compareExpression
+                | ADD expression            #addExpression
+                | SUBTRACT expression       #subtractExpression
+                | MULTIPLY expression       #multiplyExpression
+                | arrayIndex                #arrayIndexCall
+                | '.' arrayLengthCall       #getArrayLength
+                | '.' methodFuncCall        #functionVallExpression
+                |                           #noExpressionTail
                 ;
 
-andExpression: AND expression;
-shiftExpression: SHIFT expression;
-addExpression: ADD expression;
-subtractExpression: SUBTRACT expression;
-multiplyExpression: MULTIPLY expression;
-
-expressionTerminal: 'this'
-                | boolVal
-                | integer //for making an int
-                | character //for making a char
-                | identifier //some variable/method/function name
-                | arrayInstantiation  //making a new int array (I think that's the only array type that minijava can do)
-                | classInstantiation //making a new class
-                | negatedExpression //negated boolean expression
-                | parenthesizedExpression //parenthesized expression
+expressionTerminal: 'this'                                              #thisKeyword
+                | boolVal                                               #booleanExpression
+                | INTEGER_LITERAL                                       #integerExpression
+                | CHARACTER_LITERAL                                     #characterExpression
+                | IDENTIFIER                                            #identifierExpression
+                | 'new' 'int' '[' expression ']'                        #newArrayExpression
+                | 'new' IDENTIFIER '(' ')'                              #newClassExpression
+                | NOT expression                                        #negatedExpression
+                | '(' expression ')'                                    #parenthesizedExpression
                 ;
 
 boolVal:   TRUE
            |FALSE
            ;
 
-integer:   INTEGER_LITERAL;
-
-character:  CHARACTER_LITERAL;
-
-identifier: IDENTIFIER;
-
-arrayInstantiation:   'new' 'int' '[' expression ']';
-
-classInstantiation:   'new' IDENTIFIER '(' ')'; //making a new class
-
-negatedExpression:  NOT expression;
-
-parenthesizedExpression:    '(' expression ')';
-
 //lex rules
 AND:	'&&';
 EQUALS:     '=';
-SHIFT:	'<';
+COMPARE:	'<';
 ADD:    '+';
 SUBTRACT:   '-';
 MULTIPLY:   '*';

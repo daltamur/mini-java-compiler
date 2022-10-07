@@ -14,7 +14,8 @@ class testFile {
             char aw;
             w = '\"';
             x = ' ';
-            x = a;
+
+            x && b;
             x = aw.getHerDone();
             return true;
 

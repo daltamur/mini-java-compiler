@@ -1,6 +1,6 @@
-import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.CommonTokenStream
-import org.antlr.v4.runtime.tree.ParseTree
+import org.antlr.v4.runtime.{CharStreams, CommonTokenStream, ParserRuleContext}
+import org.antlr.v4.runtime.tree.{ErrorNode, ParseTree, ParseTreeListener, ParseTreeWalker, TerminalNode}
+
 import java.io.File
 import java.nio.file.{Files, Paths}
 
@@ -15,8 +15,7 @@ object Main {
       if(fileLocation.endsWith(".java")) {
         if(Files.exists(Paths.get(fileLocation))) {
           val parser = parse(fileLocation)
-          val parseTree = parser.goal()
-          //println(parseTree.toStringTree())
+          buildAST(parser)
         }else{
           println("ERROR: No file found at " + fileLocation)
         }
@@ -27,7 +26,6 @@ object Main {
       println("ERROR: Please only give one filename argument to the compiler.")
     }
 
-
   def parse(fileLocation: String): miniJavaParser = {
     val charStream = CharStreams.fromFileName(fileLocation)
     val lexer = new miniJavaLexer(charStream)
@@ -37,5 +35,9 @@ object Main {
     val parserErrorListener = new errorListener()
     parser.addErrorListener(parserErrorListener)
     parser
+  }
+
+  def buildAST(parser: miniJavaParser): Unit ={
+
   }
 }

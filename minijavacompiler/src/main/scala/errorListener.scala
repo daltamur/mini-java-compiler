@@ -13,7 +13,8 @@ class errorListener extends BaseErrorListener{
         for (curTokenIndex <- 0 to e.getExpectedTokens.size()) {
           expectedTokens += " " + hashMap(e.getExpectedTokens.get(curTokenIndex).hashCode())
         }
-        println("ERROR: Expected {" + expectedTokens + " } on line " + line + ":" + charPositionInLine + ", Instead found \'" + exception.getStartToken.getText + e.getOffendingToken.getText + "\'")
+        println(Console.RED+"ERROR: Expected {" + Console.GREEN + expectedTokens + Console.RED + " } on line " + Console.BLUE + "\u001b[4m" +  line + ":" + charPositionInLine + "\u001b[0m" +Console.RED + ", Instead found" + Console.GREEN + "\'" + exception.getStartToken.getText + e.getOffendingToken.getText + "\'")
+
       case _ =>
         println(msg)
     }
