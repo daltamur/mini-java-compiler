@@ -2,12 +2,9 @@ import AST_Grammar.ASTNode
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.{ErrorNode, TerminalNode}
 
-
-
-
-
-
+import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
 import scala.collection.mutable.ListBuffer
+import scala.language.postfixOps
 
 class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
   override def visitGoal(ctx: miniJavaParser.GoalContext): Option[ASTNode] = {
@@ -26,7 +23,7 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     val ctxArgName = Option(ctx.IDENTIFIER(1))
     val ASTArgName = ctxArgName.flatMap(x => Option(AST_Grammar.identifier(x.getSymbol.getText)))
     val ctxStatement = Option(ctx.statement())
-    val ASTStatement = ctxStatement.flatMap(x => x.accept(this))
+    val ASTStatement = ctxStatement.flatMap(x => Option(x.accept(this)))
     val mainClass = AST_Grammar.mainClass(ASTClassName.orNull, ASTArgName.orNull, ASTStatement.orNull.asInstanceOf[AST_Grammar.statement])
     Some(mainClass)
   }
@@ -46,9 +43,40 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     classDec
   }
 
-  override def visitVarDeclaration(ctx: miniJavaParser.VarDeclarationContext): Option[ASTNode] = super.visitVarDeclaration(ctx)
+  override def visitVarDeclaration(ctx: miniJavaParser.VarDeclarationContext): Option[ASTNode] = {
+    val ctxType = Option(ctx.`type`())
+    val ASTType = ctxType.flatMap(x => Option(x.accept(this)))
+    val ctxIdentifier = Option(ctx.IDENTIFIER())
+    val ASTIdentifier = ctxIdentifier.flatMap(x => Option(AST_Grammar.identifier(x.getSymbol.getText)))
+    val varDec = Some(AST_Grammar.variableDecs(ASTType.orNull.asInstanceOf[AST_Grammar.dataType], ASTIdentifier.orNull))
+    varDec
+  }
 
-  override def visitMethodDeclaration(ctx: miniJavaParser.MethodDeclarationContext): Option[ASTNode] = super.visitMethodDeclaration(ctx)
+  override def visitMethodDeclaration(ctx: miniJavaParser.MethodDeclarationContext): Option[ASTNode] = {
+    val ctxType = Option(ctx.`type`(0))
+    val ASTType = ctxType.flatMap(x => Option(x.accept(this)))
+    val ctxMethodName = Option(ctx.IDENTIFIER(0))
+    val ASTMethodName = ctxMethodName.flatMap(x => Option(AST_Grammar.identifier(x.getSymbol.getText)))
+    val ctxParamTypes = ctx.`type`()
+    val ctxParamIDs = ctx.IDENTIFIER()
+    ctxParamTypes.remove(0)
+    ctxParamIDs.remove(0)
+    val ASTParams = (ctxParamTypes zip ctxParamIDs).map{case (typeVal, id) =>{
+      val ASTCurType = Option(typeVal).flatMap(x => Option(x.accept(this)))
+      val ASTCurId = Option(id).flatMap(x => Option(AST_Grammar.identifier(x.getSymbol.getText)))
+      (ASTCurType.orNull.asInstanceOf[AST_Grammar.dataType], ASTCurId.orNull.asInstanceOf[AST_Grammar.identifier])
+    }}
+    val ctxVarDecs = ctx.varDeclaration()
+    val ASTVarDecs = new ListBuffer[Any]()
+    ctxVarDecs.forEach(x => ASTVarDecs += x.accept(this))
+    val ctxStatements = ctx.statement()
+    val ASTStatements = new ListBuffer[Any]()
+    ctxStatements.forEach(x => ASTStatements += x.accept(this))
+    val ctxreturnedVal = Option(ctx.expression())
+    val ASTReturnedVal = ctxreturnedVal.flatMap(x => Option(x.accept(this)))
+    val methodDec = Some(AST_Grammar.method(ASTType.orNull.asInstanceOf[AST_Grammar.dataType],ASTMethodName.orNull, ASTParams.toList, ASTVarDecs.toList.asInstanceOf[List[AST_Grammar.variableDecs]], ASTStatements.toList.asInstanceOf[List[AST_Grammar.statement]], ASTReturnedVal.orNull.asInstanceOf[AST_Grammar.expression]))
+    methodDec
+  }
 
   override def visitIntegerArrayType(ctx: miniJavaParser.IntegerArrayTypeContext): Option[ASTNode] = super.visitIntegerArrayType(ctx)
 
@@ -102,7 +130,11 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
 
   override def visitBooleanExpression(ctx: miniJavaParser.BooleanExpressionContext): Option[ASTNode] = super.visitBooleanExpression(ctx)
 
-  override def visitIntegerExpression(ctx: miniJavaParser.IntegerExpressionContext): Option[ASTNode] = super.visitIntegerExpression(ctx)
+  override def visitIntegerExpression(ctx: miniJavaParser.IntegerExpressionContext): Option[ASTNode] = {
+    val ctxInt = Option(ctx.INTEGER_LITERAL())
+    val ASTInt = ctxInt.flatMap(x => Option(x.getSymbol.getText.toInt))
+    Some(AST_Grammar.integerExpression(ASTInt.orNull.asInstanceOf[Int]))
+  }
 
   override def visitCharacterExpression(ctx: miniJavaParser.CharacterExpressionContext): Option[ASTNode] = super.visitCharacterExpression(ctx)
 

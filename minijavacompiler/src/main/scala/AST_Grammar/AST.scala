@@ -17,7 +17,7 @@ case class mainClass(className: identifier, commandLineArgs: identifier, body: s
 case class klass(className: identifier, extendedClassName: Option[identifier], variables: List[variableDecs], methods: List[method]) extends ASTNode
 
 //method case
-case class method(returnType: dataType, methodName: identifier, params: List[(dataType, identifier)], variables: List[variableDecs], statements: List[statement]) extends ASTNode
+case class method(returnType: dataType, methodName: identifier, params: List[(dataType, identifier)], variables: List[variableDecs], statements: List[statement], returnVal: expression) extends ASTNode
 
 //type cases
 sealed trait dataType extends ASTNode
