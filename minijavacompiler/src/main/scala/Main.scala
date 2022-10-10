@@ -1,3 +1,4 @@
+import AST_Grammar.ASTNode
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream, ParserRuleContext}
 import org.antlr.v4.runtime.tree.{ErrorNode, ParseTree, ParseTreeListener, ParseTreeWalker, TerminalNode}
 
@@ -37,7 +38,9 @@ object Main {
     parser
   }
 
-  def buildAST(parser: miniJavaParser): Unit ={
-
+  def buildAST(parser: miniJavaParser): Option[ASTNode] = {
+    val visitor = new MiniJavaVisitor()
+    val program = visitor.visitGoal(parser.goal())
+    program
   }
 }
