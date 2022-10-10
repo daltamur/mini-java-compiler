@@ -45,20 +45,24 @@ case class arrayAssignStatement(idVal: identifier, arrayIndex: expression, value
 //expression cases
 sealed trait expressionTerminal() extends ASTNode
 case class thisExpression() extends expressionTerminal
-case class booleanExpression(value: boolean) extends expressionTerminal
+case class booleanExpression(value: Boolean) extends expressionTerminal
 case class integerExpression(value: Integer) extends expressionTerminal
-case class characterExpression(value: character) extends expressionTerminal
+case class characterExpression(value: String) extends expressionTerminal
 case class identifierExpression(value: identifier) extends expressionTerminal
 case class newArrayExpression(size: expression) extends expressionTerminal
 case class newClassInstanceExpression(classType: identifier) extends expressionTerminal
-case class negatedExpression(value: expression)
-case class parenthesizedExpression(value: expression)
+case class negatedExpression(value: expression) extends expressionTerminal
+case class parenthesizedExpression(value: expression) extends expressionTerminal
 
 sealed trait expressionTail() extends ASTNode
+
 case class andExpression(value: expression) extends expressionTail
+case class addExpression(value: expression) extends expressionTail
 case class compareExpression(value: expression) extends expressionTail
 case class subtractExpression(value: expression) extends expressionTail
 case class multiplyExpression(value: expression) extends expressionTail
 case class arrayLengthExpression() extends expressionTail
+
+case class arrayIndexExpression(value: expression) extends expressionTail
 case class methodFunctionCallExpression(funcName: identifier, params: List[expression]) extends expressionTail
 case class expression(expressionTerm: expressionTerminal, expressionOpt: Option[expressionTail]) extends ASTNode
