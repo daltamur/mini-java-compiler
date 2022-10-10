@@ -140,9 +140,25 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     printStatement
   }
 
-  override def visitAssignStatement(ctx: miniJavaParser.AssignStatementContext): Option[ASTNode] = super.visitAssignStatement(ctx)
+  override def visitAssignStatement(ctx: miniJavaParser.AssignStatementContext): Option[ASTNode] = {
+    val ctxVar = Option(ctx.IDENTIFIER())
+    val ASTVar = ctxVar.flatMap(x => Option(AST_Grammar.identifier(x.getSymbol.getText)))
+    val ctxVal = Option(ctx.expression())
+    val ASTVal = ctxVal.flatMap(x => x.accept(this))
+    val ASTAssign = Some(AST_Grammar.assignStatement(ASTVar.orNull, ASTVal.orNull.asInstanceOf[AST_Grammar.expression]))
+    ASTAssign
+  }
 
-  override def visitArrayAssignStatement(ctx: miniJavaParser.ArrayAssignStatementContext): Option[ASTNode] = super.visitArrayAssignStatement(ctx)
+  override def visitArrayAssignStatement(ctx: miniJavaParser.ArrayAssignStatementContext): Option[ASTNode] = {
+    val ctxArrayRef = Option(ctx.IDENTIFIER())
+    val ASTArrayRef = ctxArrayRef.flatMap(x => Option(AST_Grammar.identifier(x.getSymbol.getText)))
+    val ctxArrayIndex = Option(ctx.arrayIndex())
+    val ASTArrayIndex = ctxArrayIndex.flatMap(x => x.accept(this))
+    val ctxVal = Option(ctx.expression())
+    val ASTVal = ctxVal.flatMap(x => x.accept(this))
+    val arrayAssignment = Some(AST_Grammar.arrayAssignStatement(ASTArrayRef.orNull, ASTArrayIndex.orNull.asInstanceOf[AST_Grammar.expression], ASTVal.orNull.asInstanceOf[AST_Grammar.expression]))
+    arrayAssignment
+  }
 
   override def visitExpression(ctx: miniJavaParser.ExpressionContext): Option[ASTNode] = {
     val ctxExpressionTerminal = Option(ctx.expressionTerminal())
@@ -159,7 +175,15 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     expression
   }
 
-  override def visitMethodFuncCall(ctx: miniJavaParser.MethodFuncCallContext): Option[ASTNode] = super.visitMethodFuncCall(ctx)
+  override def visitMethodFuncCall(ctx: miniJavaParser.MethodFuncCallContext): Option[ASTNode] = {
+    val ctxMethodName = Option(ctx.IDENTIFIER())
+    val ASTMethodName = ctxMethodName.flatMap(x => Option(AST_Grammar.identifier(x.getSymbol.getText)))
+    val ctxParams = ctx.expression()
+    val ASTParams = new ListBuffer[Any]()
+    ctxParams.forEach(x => ASTParams += x.accept(this))
+    val methodFuncCall = Some(AST_Grammar.methodFunctionCallExpression(ASTMethodName.orNull, ASTParams.toList.asInstanceOf[List[AST_Grammar.expression]]))
+    methodFuncCall
+  }
 
   override def visitArrayLengthCall(ctx: miniJavaParser.ArrayLengthCallContext): Option[ASTNode] = {
     Some(AST_Grammar.arrayLengthExpression())
@@ -206,11 +230,19 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     Some(AST_Grammar.arrayIndexExpression(ASTArrIndex.orNull.asInstanceOf[AST_Grammar.expression]))
   }
 
-  override def visitGetArrayLength(ctx: miniJavaParser.GetArrayLengthContext): Option[ASTNode] = super.visitGetArrayLength(ctx)
+  override def visitGetArrayLength(ctx: miniJavaParser.GetArrayLengthContext): Option[ASTNode] = {
+    val ctxArrLengthCall = Option(ctx.arrayLengthCall())
+    val ASTArrLengthCall = ctxArrLengthCall.flatMap(x => x.accept(this))
+    ASTArrLengthCall
+  }
 
-  override def visitFunctionVallExpression(ctx: miniJavaParser.FunctionVallExpressionContext): Option[ASTNode] = super.visitFunctionVallExpression(ctx)
+  override def visitFunctionVallExpression(ctx: miniJavaParser.FunctionVallExpressionContext): Option[ASTNode] = {
+    val ctxMethodCall = Option(ctx.methodFuncCall())
+    val ASTMethodCall = ctxMethodCall.flatMap(x => x.accept(this))
+    ASTMethodCall
+  }
 
-  override def visitNoExpressionTail(ctx: miniJavaParser.NoExpressionTailContext): Option[ASTNode] = super.visitNoExpressionTail(ctx)
+  override def visitNoExpressionTail(ctx: miniJavaParser.NoExpressionTailContext): Option[ASTNode] = {None}
 
   override def visitThisKeyword(ctx: miniJavaParser.ThisKeywordContext): Option[ASTNode] = {
     Some(AST_Grammar.thisExpression())
