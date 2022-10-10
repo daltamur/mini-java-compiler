@@ -1,44 +1,64 @@
 package AST_Grammar
 
 
+sealed trait ASTNode()
 
-case class goal()
+//root node
+case class goal (main: mainClass, classes: List[klass]) extends ASTNode
 
-case class mainClass()
+//identifier case
+case class identifier(name: String) extends ASTNode
 
-case class klass()
+//variable declaration case
+case class variableDecs(typeval: dataType, name: identifier) extends ASTNode
 
-case class method()
+//class cases
+case class mainClass(className: identifier, commandLineArgs: identifier, body: statement) extends ASTNode
+case class klass(className: identifier, extendedClassName: Option[identifier], variables: List[variableDecs], methods: List[method]) extends ASTNode
 
-sealed trait binOp
+//method case
+case class method(returnType: dataType, methodName: identifier, params: List[(dataType, identifier)], variables: List[variableDecs], statements: List[statement]) extends ASTNode
 
-case object andOp extends binOp
-case object subOp extends binOp
-case object multOp extends binOp
-case object compOp extends binOp
+//type cases
+sealed trait dataType extends ASTNode
+case class intArray() extends dataType
+case class boolean() extends dataType
+case class integer() extends dataType
+case class character() extends dataType
+case class identifierType(name: identifier) extends dataType
 
-sealed trait expressionTerminal
-case class thisTerminal() extends expressionTerminal
+//statement cases
+sealed trait statement() extends ASTNode
 
-case class booleanExpression() extends expressionTerminal
+case class blockStatement(statements: List[statement]) extends statement
 
-case class integerExpression() extends expressionTerminal
+case class ifStatement(condition: expression, thenStatement: statement, elseStatement: statement) extends statement
 
-case class charExpression() extends expressionTerminal
+case class whileStatement(condition: expression, thenStatement: statement) extends statement
 
-case class identifierExpression() extends expressionTerminal
+case class printStatement(value: expression) extends statement
 
-case class intArrayExpression() extends expressionTerminal
+case class assignStatement(idVal: identifier, value: expression) extends statement
 
-case class newClassExpression() extends expressionTerminal
+case class arrayAssignStatement(idVal: identifier, arrayIndex: expression, value: expression) extends statement
 
-case class negatedExpression() extends expressionTerminal
+//expression cases
+sealed trait expressionTerminal() extends ASTNode
+case class thisExpression() extends expressionTerminal
+case class booleanExpression(value: boolean) extends expressionTerminal
+case class integerExpression(value: Integer) extends expressionTerminal
+case class characterExpression(value: character) extends expressionTerminal
+case class identifierExpression(value: identifier) extends expressionTerminal
+case class newArrayExpression(size: expression) extends expressionTerminal
+case class newClassInstanceExpression(classType: identifier) extends expressionTerminal
+case class negatedExpression(value: expression)
+case class parenthesizedExpression(value: expression)
 
-case class parenthesizedExpression() extends expressionTerminal
-
-sealed trait expressionTail
-
-case class expression(expression: expressionTerminal, expressionT: expressionTail)
-
-case class identifier(name: String)
-
+sealed trait expressionTail() extends ASTNode
+case class andExpression(value: expression) extends expressionTail
+case class compareExpression(value: expression) extends expressionTail
+case class subtractExpression(value: expression) extends expressionTail
+case class multiplyExpression(value: expression) extends expressionTail
+case class arrayLengthExpression() extends expressionTail
+case class methodFunctionCallExpression(funcName: identifier, params: List[expression]) extends expressionTail
+case class expression(expressionTerm: expressionTerminal, expressionOpt: Option[expressionTail]) extends ASTNode
