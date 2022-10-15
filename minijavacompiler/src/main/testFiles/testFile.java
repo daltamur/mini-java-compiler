@@ -21,6 +21,17 @@ class testFile {
             return true;
 
         }
+
+        public boolean testMethod2 (char b){
+            char wyz;
+            char w;
+            char aw;
+            w = '\"';
+            x = ' ';
+            x = aw.getHerDone();
+            return true;
+
+        }
     }
 
 class testClass2 {

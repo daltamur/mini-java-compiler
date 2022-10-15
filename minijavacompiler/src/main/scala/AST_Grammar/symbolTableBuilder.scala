@@ -12,7 +12,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
     a.putClassVal(goal.main.className.name, this.visit(goal.main, mainClassSymbolTable))
     val classSymbolTable = new symbolTable
     for(currentClass <- goal.classes){
-      if (classSymbolTable.checkIfClassIDExists(currentClass.get.className.name)) {
+      if (a.checkIfClassIDExists(currentClass.get.className.name)) {
         println("ERROR: " + currentClass.get.className.name + " already exists.")
         System.exit(1)
       } else {
@@ -49,26 +49,49 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
 
     //method declarations next
     for(currentMethod <- klass.methods){
-      val methodName = currentMethod.get.methodName.name
-      val methodReturnType = currentMethod.get.returnType
-      val params = currentMethod.get.params
-      //get a list of the parameter types
-      var paramTypes = new ListBuffer[AST_Grammar.varType]
       val methodSymbolTable = new symbolTable
       methodSymbolTable.setParentTable(a)
-      for(param <- params){
-        val paramType = param._1
-        val paramID = param._2.name
-        val symbolTableParam = AST_Grammar.getVarType(paramType)
-        paramTypes += symbolTableParam
-        methodSymbolTable.putVarVal(paramID, paramType)
+      val methodName = currentMethod.get.methodName.name
+      if(a.checkIfMethodIDExists(methodName)){
+        println("ERROR: " + methodName + " has already been defined in this scope")
+        System.exit(1)
       }
-      a.putMethodVal(methodName, methodVal(methodSymbolTable, paramTypes.toList, AST_Grammar.getVarType(methodReturnType)))
+      a.putMethodVal(methodName, visit(currentMethod.get, methodSymbolTable))
     }
 
     klass.extendedClassName match
       case Some(value) =>
         AST_Grammar.classVal(a, Some(value.name))
       case None =>   AST_Grammar.classVal(a, None)
+  }
+
+  override def visitMethod(method: method, a: symbolTable): symbolTableVal = {
+    val methodName = method.methodName.name
+    val methodReturnType = method.returnType
+    val params = method.params
+    //get a list of the parameter types
+    val paramTypes = new ListBuffer[AST_Grammar.varType]
+    for (param <- params) {
+      val paramType = param._1
+      val paramID = param._2.name
+      val symbolTableParam = AST_Grammar.getVarType(paramType)
+      paramTypes += symbolTableParam
+      a.putVarVal(paramID, paramType)
+    }
+
+    //check variables
+    for (currentVarDec <- method.variables) {
+      val varType = currentVarDec.get.typeval
+      val varName = currentVarDec.get.name.name
+      varType match
+        case integer() => a.putVarVal(varName, AST_Grammar.variableVal(integerType()))
+        case character() => a.putVarVal(varName, AST_Grammar.variableVal(characterType()))
+        case x: identifierType => a.putVarVal(varName, AST_Grammar.variableVal(classType(x.name.name)))
+        case intArray() => a.putVarVal(varName, AST_Grammar.variableVal(AST_Grammar.intArrayType()))
+        case boolean() => a.putVarVal(varName, AST_Grammar.variableVal(booleanType()))
+    }
+
+
+    methodVal(a, paramTypes.toList, AST_Grammar.getVarType(methodReturnType))
   }
 }

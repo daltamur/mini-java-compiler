@@ -72,7 +72,7 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     ctxStatements.forEach(x => ASTStatements += x.accept(this))
     val ctxreturnedVal = Option(ctx.expression())
     val ASTReturnedVal = ctxreturnedVal.flatMap(x => x.accept(this))
-    val methodDec = Some(AST_Grammar.method(ASTType.orNull.asInstanceOf[AST_Grammar.dataType],ASTMethodName.orNull, ASTParams.toList, ASTVarDecs.toList.asInstanceOf[List[AST_Grammar.variableDecs]], ASTStatements.toList.asInstanceOf[List[AST_Grammar.statement]], ASTReturnedVal.orNull.asInstanceOf[AST_Grammar.expression]))
+    val methodDec = Some(AST_Grammar.method(ASTType.orNull.asInstanceOf[AST_Grammar.dataType],ASTMethodName.orNull, ASTParams.toList, ASTVarDecs.toList.asInstanceOf[List[Option[AST_Grammar.variableDecs]]], ASTStatements.toList.asInstanceOf[List[AST_Grammar.statement]], ASTReturnedVal.orNull.asInstanceOf[AST_Grammar.expression]))
     methodDec
   }
 

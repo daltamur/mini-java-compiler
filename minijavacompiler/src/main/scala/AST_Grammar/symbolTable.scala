@@ -10,6 +10,8 @@ class symbolTable:
   private var parentTable = None:Option[symbolTable]
   
   def checkIfClassIDExists(key: Any): Boolean = classTable.contains(key)
+  
+  def checkIfMethodIDExists(key: Any): Boolean = methodTable.contains(key)
 
   def putVarVal(key: Any, newVal: Any): Unit = variableTable.put(key, newVal)
 

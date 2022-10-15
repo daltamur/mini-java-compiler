@@ -5,13 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="192cc344-ef27-4c82-b890-90e70c6e074f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/minijavacompiler/src/main/scala/AST_Grammar/ASTVisitor.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/minijavacompiler/src/main/scala/AST_Grammar/symbolTable.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/minijavacompiler/src/main/scala/AST_Grammar/symbolTableBuilder.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/AST_Grammar/AST.scala" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/src/main/scala/AST_Grammar/AST.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/Main.scala" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/src/main/scala/Main.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/MiniJavaVisitor.scala" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/src/main/scala/MiniJavaVisitor.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/AST_Grammar/symbolTable.scala" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/src/main/scala/AST_Grammar/symbolTable.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/AST_Grammar/symbolTableBuilder.scala" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/src/main/scala/AST_Grammar/symbolTableBuilder.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/testFiles/testFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/src/main/testFiles/testFile.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
