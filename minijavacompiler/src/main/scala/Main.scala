@@ -1,4 +1,4 @@
-import AST_Grammar.ASTNode
+import AST_Grammar.{ASTNode, symbolTable, symbolTableBuilder}
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream, ParserRuleContext}
 import org.antlr.v4.runtime.tree.{ErrorNode, ParseTree, ParseTreeListener, ParseTreeWalker, TerminalNode}
 
@@ -16,7 +16,13 @@ object Main {
       if(fileLocation.endsWith(".java")) {
         if(Files.exists(Paths.get(fileLocation))) {
           val parser = parse(fileLocation)
-          buildAST(parser)
+          //make the ast
+          val programAST = buildAST(parser)
+          //make the symbol table
+          val symbolTable = new symbolTable
+          val symbolTableBuilder = new symbolTableBuilder
+          symbolTableBuilder.visit(programAST.get, symbolTable)
+
         }else{
           println("ERROR: No file found at " + fileLocation)
         }
@@ -39,6 +45,7 @@ object Main {
   }
 
   def buildAST(parser: miniJavaParser): Option[ASTNode] = {
+    val table = new symbolTable
     val visitor = new MiniJavaVisitor()
     val program = visitor.visitGoal(parser.goal())
     program

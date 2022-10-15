@@ -1,11 +1,9 @@
 import AST_Grammar.ASTNode
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.{ErrorNode, TerminalNode}
-
 import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
 import scala.collection.mutable.ListBuffer
 import scala.language.postfixOps
-
 class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
   override def visitGoal(ctx: miniJavaParser.GoalContext): Option[ASTNode] = {
     val ctxMainClass = Option(ctx.mainClass())
@@ -13,7 +11,7 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     val ctxClasses = ctx.classDeclaration()
     val ASTClasses =  new ListBuffer[Any]()
     ctxClasses.forEach(x => ASTClasses.+=(x.accept(this)))
-    val goal = Some(AST_Grammar.goal(ASTMainClass.orNull.asInstanceOf[AST_Grammar.mainClass], ASTClasses.toList.asInstanceOf[List[AST_Grammar.klass]]))
+    val goal = Some(AST_Grammar.goal(ASTMainClass.orNull.asInstanceOf[AST_Grammar.mainClass], ASTClasses.toList.asInstanceOf[List[Option[AST_Grammar.klass]]]))
     goal
   }
 
@@ -39,7 +37,7 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     val ctxMethods = ctx.methodDeclaration()
     val ASTMethods = new ListBuffer[Any]()
     ctxMethods.forEach(x => ASTMethods += x.accept(this))
-    val classDec = Some(AST_Grammar.klass(ASTClassName.orNull, ASTArgName, ASTVarDecs.toList.asInstanceOf[List[AST_Grammar.variableDecs]], ASTMethods.toList.asInstanceOf[List[AST_Grammar.method]]))
+    val classDec = Some(AST_Grammar.klass(ASTClassName.orNull, ASTArgName, ASTVarDecs.toList.asInstanceOf[List[Option[AST_Grammar.variableDecs]]], ASTMethods.toList.asInstanceOf[List[Option[AST_Grammar.method]]]))
     classDec
   }
 
@@ -310,7 +308,6 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     }else{
       curBool = None
     }
-
     Some(AST_Grammar.booleanExpression(curBool.orNull.toBoolean))
   }
 }

@@ -1,10 +1,10 @@
 package AST_Grammar
 
 
-sealed trait ASTNode()
+sealed trait ASTNode
 
 //root node
-case class goal (main: mainClass, classes: List[klass]) extends ASTNode
+case class goal (main: mainClass, classes: List[Option[klass]]) extends ASTNode
 
 //identifier case
 case class identifier(name: String) extends ASTNode
@@ -14,7 +14,7 @@ case class variableDecs(typeval: dataType, name: identifier) extends ASTNode
 
 //class cases
 case class mainClass(className: identifier, commandLineArgs: identifier, body: statement) extends ASTNode
-case class klass(className: identifier, extendedClassName: Option[identifier], variables: List[variableDecs], methods: List[method]) extends ASTNode
+case class klass(className: identifier, extendedClassName: Option[identifier], variables: List[Option[variableDecs]], methods: List[Option[method]]) extends ASTNode
 
 //method case
 case class method(returnType: dataType, methodName: identifier, params: List[(dataType, identifier)], variables: List[variableDecs], statements: List[statement], returnVal: expression) extends ASTNode
@@ -66,3 +66,39 @@ case class arrayLengthExpression() extends expressionTail
 case class arrayIndexExpression(value: expression) extends expressionTail
 case class methodFunctionCallExpression(funcName: identifier, params: List[expression]) extends expressionTail
 case class expression(expressionTerm: expressionTerminal, expressionOpt: Option[expressionTail]) extends ASTNode
+
+
+
+
+
+
+
+
+
+//node declarations for the symbol table
+sealed trait symbolTableVal
+
+def getVarType(dType: dataType): varType = {
+  dType match
+    case x: identifierType => classType(x.name.name)
+    case x: intArray => intArrayType()
+    case x: boolean => booleanType()
+    case x: integer => intArrayType()
+    case x: character => characterType()
+}
+sealed trait varType
+case class intArrayType() extends varType
+
+case class commandLineArgs() extends varType
+case class booleanType() extends varType
+case class integerType() extends varType
+case class characterType() extends varType
+case class classType(clazz: String) extends varType
+
+case class methodVal(methodScope: symbolTable, paramTypes: List[varType], returnType: varType) extends symbolTableVal
+
+case class classVal(classScope: symbolTable, extendedClass: Option[String]) extends symbolTableVal
+
+case class variableVal(varValue: varType) extends symbolTableVal
+
+case class programVal(program: symbolTable) extends symbolTableVal
