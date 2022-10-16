@@ -1,8 +1,7 @@
 class testFile {
     public static void main(String[] a) {
-        {
+
             System.out.println(new testClass().testMethod('a'));
-        }
 
     }
 }
@@ -46,7 +45,7 @@ class testClass2{
         bool value;
         w = '\"';
         x = ' ';
-        value = x && b;
+        x & b;
         x = aw.getHerDone();
         return true;
 

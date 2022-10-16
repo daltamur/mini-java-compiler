@@ -10,14 +10,14 @@ case class goal (main: mainClass, classes: List[Option[klass]]) extends ASTNode
 case class identifier(name: String) extends ASTNode
 
 //variable declaration case
-case class variableDecs(typeval: dataType, name: identifier) extends ASTNode
+case class variableDecs(typeval: dataType, name: identifier, line: Integer) extends ASTNode
 
 //class cases
-case class mainClass(className: identifier, commandLineArgs: identifier, body: statement) extends ASTNode
-case class klass(className: identifier, extendedClassName: Option[identifier], variables: List[Option[variableDecs]], methods: List[Option[method]]) extends ASTNode
+case class mainClass(className: identifier, commandLineArgs: identifier, body: statement, line: Integer) extends ASTNode
+case class klass(className: identifier, extendedClassName: Option[identifier], variables: List[Option[variableDecs]], methods: List[Option[method]], line: Integer) extends ASTNode
 
 //method case
-case class method(returnType: dataType, methodName: identifier, params: List[(dataType, identifier)], variables: List[Option[variableDecs]], statements: List[statement], returnVal: expression) extends ASTNode
+case class method(returnType: dataType, methodName: identifier, params: List[(dataType, identifier)], variables: List[Option[variableDecs]], statements: List[statement], returnVal: expression,line: Integer) extends ASTNode
 
 //type cases
 sealed trait dataType extends ASTNode
@@ -36,23 +36,23 @@ case class ifStatement(condition: expression, thenStatement: statement, elseStat
 
 case class whileStatement(condition: expression, thenStatement: statement) extends statement
 
-case class printStatement(value: expression) extends statement
+case class printStatement(value: expression, line: Integer) extends statement
 
-case class assignStatement(idVal: identifier, value: expression) extends statement
+case class assignStatement(idVal: identifier, value: expression, line: Integer) extends statement
 
 case class arrayAssignStatement(idVal: identifier, arrayIndex: expression, value: expression) extends statement
 
 //expression cases
 sealed trait expressionTerminal() extends ASTNode
-case class thisExpression() extends expressionTerminal
-case class booleanExpression(value: Boolean) extends expressionTerminal
+case class thisExpression(line: Integer) extends expressionTerminal
+case class booleanExpression(value: Boolean, line: Integer) extends expressionTerminal
 case class integerExpression(value: Integer) extends expressionTerminal
 case class characterExpression(value: String) extends expressionTerminal
-case class identifierExpression(value: identifier) extends expressionTerminal
-case class newArrayExpression(size: expression) extends expressionTerminal
-case class newClassInstanceExpression(classType: identifier) extends expressionTerminal
-case class negatedExpression(value: expression) extends expressionTerminal
-case class parenthesizedExpression(value: expression) extends expressionTerminal
+case class identifierExpression(value: identifier, line: Integer) extends expressionTerminal
+case class newArrayExpression(size: expression, line: Integer) extends expressionTerminal
+case class newClassInstanceExpression(classType: identifier, line: Integer) extends expressionTerminal
+case class negatedExpression(value: expression, line: Integer) extends expressionTerminal
+case class parenthesizedExpression(value: expression, line: Integer) extends expressionTerminal
 
 sealed trait expressionTail() extends ASTNode
 
@@ -64,7 +64,7 @@ case class multiplyExpression(value: expression) extends expressionTail
 case class arrayLengthExpression() extends expressionTail
 
 case class arrayIndexExpression(value: expression) extends expressionTail
-case class methodFunctionCallExpression(funcName: identifier, params: List[expression]) extends expressionTail
+case class methodFunctionCallExpression(funcName: identifier, params: List[expression], line: Integer) extends expressionTail
 case class expression(expressionTerm: expressionTerminal, expressionOpt: Option[expressionTail]) extends ASTNode
 
 
@@ -96,10 +96,10 @@ case class characterType() extends varType
 case class classType(clazz: String) extends varType
 case class voidType() extends varType
 
-case class methodVal(methodScope: symbolTable, paramTypes: List[varType], returnType: varType) extends symbolTableVal
+case class methodVal(methodScope: symbolTable, paramTypes: List[varType], returnType: varType, line: Integer) extends symbolTableVal
 
-case class classVal(classScope: symbolTable, extendedClass: Option[String]) extends symbolTableVal
+case class classVal(classScope: symbolTable, extendedClass: Option[String], line: Integer) extends symbolTableVal
 
-case class variableVal(varValue: varType) extends symbolTableVal
+case class variableVal(varValue: varType, line: Integer) extends symbolTableVal
 
 case class programVal(program: symbolTable) extends symbolTableVal

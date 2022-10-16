@@ -3,6 +3,7 @@ import org.antlr.v4.runtime.{BaseErrorListener, FailedPredicateException, InputM
 
 import scala.collection.mutable
 class errorListener extends BaseErrorListener{
+  var hasError = false
   override def syntaxError(recognizer: Recognizer[_, _], offendingSymbol: Any, line: Int, charPositionInLine: Int, msg: String, e: RecognitionException):
     Unit = {
     e match {
@@ -15,15 +16,9 @@ class errorListener extends BaseErrorListener{
         }
         println(Console.RED+"ERROR: Expected {" + Console.GREEN + expectedTokens + Console.RED + " } on line " + Console.BLUE + "\u001b[4m" +  line + ":" + charPositionInLine + "\u001b[0m" +Console.RED + ", Instead found" + Console.GREEN + "\'" + exception.getStartToken.getText + e.getOffendingToken.getText + "\'")
 
-      case _ =>
-        println(msg)
+      case exception =>
+        println(Console.RED+"ERROR: "+Console.GREEN+msg+" on line "+Console.BLUE + "\u001b[4m" +  line + ":" + charPositionInLine + "\u001b[0m")
     }
-
+    hasError = true
   }
-
-  object errorListener{
-    val instance = new errorListener()
-  }
-
-
 }

@@ -44,11 +44,16 @@ object Main {
     parser.removeErrorListeners()
     val parserErrorListener = new errorListener()
     parser.addErrorListener(parserErrorListener)
+    //do a quick parse check for errors
+    val _ = parser.goal()
+    if(parserErrorListener.hasError){
+      System.exit(1)
+    }
+    parser.reset()
     parser
   }
 
   def buildAST(parser: miniJavaParser): Option[ASTNode] = {
-    val table = new symbolTable
     val visitor = new MiniJavaVisitor()
     val program = visitor.visitGoal(parser.goal())
     program

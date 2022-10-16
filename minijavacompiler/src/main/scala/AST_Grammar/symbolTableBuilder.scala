@@ -12,7 +12,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
     a.putClassVal(goal.main.className.name, this.visit(goal.main, mainClassSymbolTable))
     for(currentClass <- goal.classes){
       if (a.checkIfClassIDExists(currentClass.get.className.name)) {
-        println("ERROR: " + currentClass.get.className.name + " already exists.")
+        println(Console.RED+"ERROR "+Console.GREEN+"on line "+Console.BLUE+"\u001b[4m" +  currentClass.get.line +Console.GREEN +"\u001b[0m: Class named "+ currentClass.get.className.name + " already exists.")
         System.exit(1)
       } else {
         println(currentClass.get.className.name)
@@ -25,27 +25,27 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
   }
 
   override def visitMainClass(clazz: mainClass, a: symbolTable): AST_Grammar.symbolTableVal = {
-    val mainClassName = clazz.className.name
     val mainClassSymbolTable = new symbolTable
     mainClassSymbolTable.setParentTable(a)
     mainClassSymbolTable.putVarVal(clazz.commandLineArgs.name, AST_Grammar.commandLineArgs())
-    a.putMethodVal("main", methodVal(mainClassSymbolTable, List[varType]{commandLineArgs()}, voidType()))
-    classVal(a, None)
+    a.putMethodVal("main", methodVal(mainClassSymbolTable, List[varType]{commandLineArgs()}, voidType(), clazz.line))
+    classVal(a, None, clazz.line)
   }
 
   override def visitClass(klass: klass, a: symbolTable): AST_Grammar.symbolTableVal = {
     // we need to get the variable declarations and methods
-
+    val classLine = klass.line
     //var decs first
     for(currentVarDec <- klass.variables){
+      val varDecLine = currentVarDec.get.line
       val varType = currentVarDec.get.typeval
       val varName = currentVarDec.get.name.name
       varType match
-        case integer() => a.putVarVal(varName, AST_Grammar.variableVal(integerType()))
-        case character() => a.putVarVal(varName, AST_Grammar.variableVal(characterType()))
-        case identifierType(_) => a.putVarVal(varName, AST_Grammar.variableVal(classType(varType.asInstanceOf[AST_Grammar.identifier].name)))
-        case intArray() => a.putVarVal(varName, AST_Grammar.variableVal(AST_Grammar.intArrayType()))
-        case boolean() => a.putVarVal(varName, AST_Grammar.variableVal(booleanType()))
+        case integer() => a.putVarVal(varName, AST_Grammar.variableVal(integerType(), varDecLine))
+        case character() => a.putVarVal(varName, AST_Grammar.variableVal(characterType(), varDecLine))
+        case identifierType(_) => a.putVarVal(varName, AST_Grammar.variableVal(classType(varType.asInstanceOf[AST_Grammar.identifier].name), varDecLine))
+        case intArray() => a.putVarVal(varName, AST_Grammar.variableVal(AST_Grammar.intArrayType(), varDecLine))
+        case boolean() => a.putVarVal(varName, AST_Grammar.variableVal(booleanType(), varDecLine))
     }
 
     //method declarations next
@@ -54,7 +54,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
       methodSymbolTable.setParentTable(a)
       val methodName = currentMethod.get.methodName.name
       if(a.checkIfMethodIDExists(methodName)){
-        println("ERROR: " + methodName + " has already been defined in this scope")
+        println("ERROR on line "+currentMethod.get.line+": " + methodName + " has already been defined in this scope")
         System.exit(1)
       }
       a.putMethodVal(methodName, visit(currentMethod.get, methodSymbolTable))
@@ -62,12 +62,12 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
 
     klass.extendedClassName match
       case Some(value) =>
-        AST_Grammar.classVal(a, Some(value.name))
-      case None =>   AST_Grammar.classVal(a, None)
+        AST_Grammar.classVal(a, Some(value.name), classLine)
+      case None =>   AST_Grammar.classVal(a, None, classLine)
   }
 
   override def visitMethod(method: method, a: symbolTable): symbolTableVal = {
-    val methodName = method.methodName.name
+    val methodLine = method.line
     val methodReturnType = method.returnType
     val params = method.params
     //get a list of the parameter types
@@ -82,21 +82,23 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
 
     //check variables
     for (currentVarDec <- method.variables) {
+      val varLine = currentVarDec.get.line
       val varType = currentVarDec.get.typeval
       val varName = currentVarDec.get.name.name
       if(a.checkIfVarIDExists(varName)){
-        println("ERROR: "+varName+ " is already defined in the current scope")
+        println("ERROR on line "+varLine+": "+varName+ " is already defined in the current scope")
+        System.exit(1)
       }
       varType match
-        case integer() => a.putVarVal(varName, AST_Grammar.variableVal(integerType()))
-        case character() => a.putVarVal(varName, AST_Grammar.variableVal(characterType()))
-        case x: identifierType => a.putVarVal(varName, AST_Grammar.variableVal(classType(x.name.name)))
-        case intArray() => a.putVarVal(varName, AST_Grammar.variableVal(AST_Grammar.intArrayType()))
-        case boolean() => a.putVarVal(varName, AST_Grammar.variableVal(booleanType()))
+        case integer() => a.putVarVal(varName, AST_Grammar.variableVal(integerType(), varLine))
+        case character() => a.putVarVal(varName, AST_Grammar.variableVal(characterType(), varLine))
+        case x: identifierType => a.putVarVal(varName, AST_Grammar.variableVal(classType(x.name.name), varLine))
+        case intArray() => a.putVarVal(varName, AST_Grammar.variableVal(AST_Grammar.intArrayType(), varLine))
+        case boolean() => a.putVarVal(varName, AST_Grammar.variableVal(booleanType(), varLine))
     }
 
 
-    methodVal(a, paramTypes.toList, AST_Grammar.getVarType(methodReturnType))
+    methodVal(a, paramTypes.toList, AST_Grammar.getVarType(methodReturnType), methodLine)
   }
 
   def checkForCircularInheritance(programSymbolTable: symbolTable): Unit = {
@@ -107,17 +109,17 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
         case Some(parentClass) =>
           val currentClassList = new ListBuffer[String]
           currentClassList += classID.asInstanceOf[String]
-          if(checkParentClassType(programSymbolTable, parentClass, currentClassList)){
-            println("ERROR: Circular Inheritance happening at class " + classID + " extending " + parentClass)
+          if(checkParentClassType(programSymbolTable, parentClass, currentClassList, curClass)){
+            println("ERROR on line "+curClass.line+": Circular Inheritance happening at Class " + classID + " extending " + parentClass)
             System.exit(1)
           }
         case None =>
     }
   }
 
-  def checkParentClassType(programSymbolTable: symbolTable, curClassID: String, currentClasses: ListBuffer[String]): Boolean = {
+  def checkParentClassType(programSymbolTable: symbolTable, curClassID: String, currentClasses: ListBuffer[String], childClass: classVal): Boolean = {
     if(!programSymbolTable.getClassKeys.contains(curClassID)){
-      println("ERROR: Extended class "+curClassID+" does not exist")
+      println("ERROR on line "+childClass.line+": Extended class "+curClassID+" does not exist")
       System.exit(1)
       false
     }else{
@@ -128,7 +130,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
             true
           }else{
             currentClasses += extendedClass
-            checkParentClassType(programSymbolTable, extendedClass, currentClasses)
+            checkParentClassType(programSymbolTable, extendedClass, currentClasses, curClass.get.asInstanceOf[classVal])
           }
         case None => false
     }
@@ -147,7 +149,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
         methodReturnType match
           case x: classType =>
             if(!programSymbolTable.checkIfClassIDExists(x.clazz)){
-              println("ERROR: method "+methodID.asInstanceOf[String]+" of class "+classID.asInstanceOf[String]+" has an undefined return type of "+x.clazz)
+              println("ERROR on line "+currentMethod.line+": method "+methodID.asInstanceOf[String]+" of class "+classID.asInstanceOf[String]+" has an undefined return type of "+x.clazz)
             }
           case _ =>
       }
