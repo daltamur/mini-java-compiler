@@ -25,6 +25,10 @@ object Main {
           //check for circular inheritance
           symbolTableBuilder.checkForCircularInheritance(symbolTable)
           symbolTableBuilder.checkMethodReturnTypes(symbolTable)
+          if(symbolTableBuilder.getError.isDefined){
+            println(symbolTableBuilder.getError.get.errorVal)
+            System.exit(1)
+          }
 
         }else{
           println("ERROR: No file found at " + fileLocation)

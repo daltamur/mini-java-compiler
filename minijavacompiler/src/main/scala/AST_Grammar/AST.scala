@@ -83,8 +83,17 @@ def getVarType(dType: dataType): varType = {
     case x: identifierType => classType(x.name.name)
     case x: intArray => intArrayType()
     case x: boolean => booleanType()
-    case x: integer => intArrayType()
+    case x: integer => integerType()
     case x: character => characterType()
+}
+
+def varTypeToString(vType: varType): String = {
+  vType match
+    case x: classType => x.clazz
+    case x: intArrayType => "Integer"
+    case x: booleanType => "boolean"
+    case x: integerType => "int"
+    case x: characterType => "char"
 }
 sealed trait varType extends symbolTableVal
 case class intArrayType() extends varType
@@ -103,3 +112,21 @@ case class classVal(classScope: symbolTable, extendedClass: Option[String], line
 case class variableVal(varValue: varType, line: Integer) extends symbolTableVal
 
 case class programVal(program: symbolTable) extends symbolTableVal
+
+
+
+//symbol table errors
+sealed trait error{
+  val errorVal: String
+}
+case class circularInheritanceError(className: String, parentClassName: String, line: Integer) extends error {
+  val errorVal: String = "ERROR on line "+line+": Circular Inheritance happening at Class " + className + " extending " + parentClassName
+}
+
+case class noSuchParentMethodError(parentClassName: String, line: Integer) extends error {
+  val errorVal: String = "ERROR on line "+line+": Extended class "+parentClassName+" does not exist"
+}
+
+case class noSuchReturnType(className: String, methodName: String, returnVal: String, line: Integer) extends error{
+  val errorVal: String = "ERROR on line "+line+": method "+methodName+" of class "+className+" has an undefined return type of "+returnVal
+}

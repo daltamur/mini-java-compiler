@@ -2,9 +2,12 @@ package AST_Grammar
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import scala.util.control._
 
 class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTableVal] {
+  private var curError:Option[error] = None
 
+  def getError: Option[error] = curError
   override def visitGoal(goal: goal, a: symbolTable): AST_Grammar.symbolTableVal = {
     //get the symbolTable for the main class and put it in the goal symbol table
     val mainClassSymbolTable = new symbolTable
@@ -53,11 +56,21 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
       val methodSymbolTable = new symbolTable
       methodSymbolTable.setParentTable(a)
       val methodName = currentMethod.get.methodName.name
-      if(a.checkIfMethodIDExists(methodName)){
-        println("ERROR on line "+currentMethod.get.line+": " + methodName + " has already been defined in this scope")
+      val curMethodVal = visit(currentMethod.get, methodSymbolTable).asInstanceOf[methodVal]
+      val methodKey = (methodName, curMethodVal.paramTypes)
+      if (a.checkIfMethodIDExists(methodKey)) {
+        var curError = "ERROR on line " + currentMethod.get.line + ": " + methodName + "("
+        for(typeVal <- methodKey._2){
+          curError+=varTypeToString(typeVal)
+          if(methodKey._2.last != typeVal){
+            curError+=", "
+          }
+        }
+        curError += ") has already been defined in this scope"
+        println(curError)
         System.exit(1)
       }
-      a.putMethodVal(methodName, visit(currentMethod.get, methodSymbolTable))
+      a.putMethodVal(methodKey, curMethodVal)
     }
 
     klass.extendedClassName match
@@ -103,24 +116,29 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
 
   def checkForCircularInheritance(programSymbolTable: symbolTable): Unit = {
     val classIDs = programSymbolTable.getClassKeys
-    for(classID <- classIDs){
-      val curClass = programSymbolTable.getClassVal(classID).get.asInstanceOf[AST_Grammar.classVal]
-      curClass.extendedClass match
-        case Some(parentClass) =>
-          val currentClassList = new ListBuffer[String]
-          currentClassList += classID.asInstanceOf[String]
-          if(checkParentClassType(programSymbolTable, parentClass, currentClassList, curClass)){
-            println("ERROR on line "+curClass.line+": Circular Inheritance happening at Class " + classID + " extending " + parentClass)
-            System.exit(1)
-          }
-        case None =>
+    val loop = new Breaks;
+    loop.breakable {
+      for (classID <- classIDs) {
+        if (curError.isDefined) {
+          loop.break()
+        }
+        val curClass = programSymbolTable.getClassVal(classID).get.asInstanceOf[AST_Grammar.classVal]
+        curClass.extendedClass match
+          case Some(parentClass) =>
+            val currentClassList = new ListBuffer[String]
+            currentClassList += classID.asInstanceOf[String]
+            if (checkParentClassType(programSymbolTable, parentClass, currentClassList, curClass)) {
+              curError = Some(circularInheritanceError(classID.asInstanceOf[String], parentClass, curClass.line))
+              loop.break()
+            }
+          case None =>
+      }
     }
   }
 
   def checkParentClassType(programSymbolTable: symbolTable, curClassID: String, currentClasses: ListBuffer[String], childClass: classVal): Boolean = {
     if(!programSymbolTable.getClassKeys.contains(curClassID)){
-      println("ERROR on line "+childClass.line+": Extended class "+curClassID+" does not exist")
-      System.exit(1)
+      curError = Some(noSuchParentMethodError(curClassID, childClass.line))
       false
     }else{
       val curClass = programSymbolTable.getClassVal(curClassID)
@@ -138,21 +156,31 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
   }
 
   def checkMethodReturnTypes(programSymbolTable: symbolTable): Unit = {
+    val outloop = new Breaks;
+    val inloop = new Breaks;
     val classIDs = programSymbolTable.getClassKeys
-    for(classID <- classIDs){
+    outloop.breakable{
+    for (classID <- classIDs) {
       val currentClass = programSymbolTable.getClassVal(classID).get.asInstanceOf[classVal]
       //iterate through the methods of the current class, make sure the return type is defined if it returns a class
       val methodKeys = currentClass.classScope.getMethodKeys
-      for(methodID <- methodKeys){
+      inloop.breakable{
+      for (methodID <- methodKeys) {
         val currentMethod = currentClass.classScope.getMethodVal(methodID).get.asInstanceOf[methodVal]
         val methodReturnType = currentMethod.returnType
         methodReturnType match
           case x: classType =>
-            if(!programSymbolTable.checkIfClassIDExists(x.clazz)){
-              println("ERROR on line "+currentMethod.line+": method "+methodID.asInstanceOf[String]+" of class "+classID.asInstanceOf[String]+" has an undefined return type of "+x.clazz)
+            if (!programSymbolTable.checkIfClassIDExists(x.clazz)) {
+              curError = Some(noSuchReturnType(classID.asInstanceOf[String], methodID.asInstanceOf[String], x.clazz, currentMethod.line))
+              inloop.break
             }
           case _ =>
       }
     }
+      if (curError.isDefined) {
+        outloop.break
+      }
+    }
+  }
   }
 }

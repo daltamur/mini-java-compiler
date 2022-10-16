@@ -6,8 +6,13 @@ class Main{
 
 class class1{
 
-    public invalidClass GetAge(){
+    public int method1(char x, int y){
 //        //some stuff here
-        return something;
+        return 1;
     }
+    public int method1(){
+//        //some stuff here
+        return 1;
+    }
+
 }
