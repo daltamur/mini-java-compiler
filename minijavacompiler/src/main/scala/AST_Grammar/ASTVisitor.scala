@@ -111,7 +111,4 @@ abstract class ASTVisitor[A, B] {
   def visitMethodFunctionCallExpression(expression: methodFunctionCallExpression, a: A): B = ???
 
   def visitNoTail: B = ???
-
-
-
 }
