@@ -130,3 +130,18 @@ case class noSuchParentMethodError(parentClassName: String, line: Integer) exten
 case class noSuchReturnType(className: String, methodName: String, returnVal: String, line: Integer) extends error{
   val errorVal: String = "ERROR on line "+line+": method "+methodName+" of class "+className+" has an undefined return type of "+returnVal
 }
+
+case class methodOverLoadingError(className: String, methodName: String, varType: List[varType], returnType: varType, line: Integer) extends error{
+  val errorVal: String = Error
+  private def Error: String = {
+    var curError = "ERROR on line "+line+": method "+methodName+"("
+    for (typeVal <- varType) {
+      curError += varTypeToString(typeVal)
+      if (varType.last != typeVal) {
+        curError += ", "
+      }
+    }
+    curError += ") returning " + varTypeToString(returnType) + " has already been defined in Class " + className
+    curError
+  }
+}

@@ -6,11 +6,11 @@ class Main{
 
 class class1{
 
-    public int method1(char x, int y){
+    public int[] method1(int x, int y){
 //        //some stuff here
         return 1;
     }
-    public int method1(){
+    public int[] method1(char x, int y){
 //        //some stuff here
         return 1;
     }

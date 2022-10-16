@@ -57,17 +57,10 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
       methodSymbolTable.setParentTable(a)
       val methodName = currentMethod.get.methodName.name
       val curMethodVal = visit(currentMethod.get, methodSymbolTable).asInstanceOf[methodVal]
-      val methodKey = (methodName, curMethodVal.paramTypes)
+      val methodKey = (methodName, curMethodVal.paramTypes, curMethodVal.returnType)
       if (a.checkIfMethodIDExists(methodKey)) {
-        var curError = "ERROR on line " + currentMethod.get.line + ": " + methodName + "("
-        for(typeVal <- methodKey._2){
-          curError+=varTypeToString(typeVal)
-          if(methodKey._2.last != typeVal){
-            curError+=", "
-          }
-        }
-        curError += ") has already been defined in this scope"
-        println(curError)
+        curError = Some(methodOverLoadingError(klass.className.name, methodName, methodKey._2, methodKey._3, currentMethod.get.line))
+        println(curError.get.errorVal)
         System.exit(1)
       }
       a.putMethodVal(methodKey, curMethodVal)
