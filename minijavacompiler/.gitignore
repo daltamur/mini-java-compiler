@@ -32,4 +32,4 @@ metals.sbt
 /.worksheet/
 
 # Compiled ANTLR Parsing Files
-src/main/scala/grammarOutput/
+/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/src/main/scala/grammarOutput
