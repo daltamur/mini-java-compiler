@@ -10,7 +10,6 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
     val mainClassSymbolTable = new symbolTable
     mainClassSymbolTable.setParentTable(a)
     a.putClassVal(goal.main.className.name, this.visit(goal.main, mainClassSymbolTable))
-    val classSymbolTable = new symbolTable
     for(currentClass <- goal.classes){
       if (a.checkIfClassIDExists(currentClass.get.className.name)) {
         println("ERROR: " + currentClass.get.className.name + " already exists.")
@@ -19,8 +18,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
         println(currentClass.get.className.name)
         val curClassSymbolTable = new symbolTable
         curClassSymbolTable.setParentTable(a)
-        //change the None to what the actual extended class is at some point
-        a.putClassVal(currentClass.get.className.name, (visit(currentClass.get, curClassSymbolTable), None))
+        a.putClassVal(currentClass.get.className.name, visit(currentClass.get, curClassSymbolTable))
       }
     }
     AST_Grammar.programVal(a)
@@ -28,7 +26,10 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
 
   override def visitMainClass(clazz: mainClass, a: symbolTable): AST_Grammar.symbolTableVal = {
     val mainClassName = clazz.className.name
-    a.putVarVal(clazz.commandLineArgs.name, AST_Grammar.commandLineArgs)
+    val mainClassSymbolTable = new symbolTable
+    mainClassSymbolTable.setParentTable(a)
+    mainClassSymbolTable.putVarVal(clazz.commandLineArgs.name, AST_Grammar.commandLineArgs())
+    a.putMethodVal("main", methodVal(mainClassSymbolTable, List[varType]{commandLineArgs()}, voidType()))
     classVal(a, None)
   }
 
@@ -76,13 +77,16 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
       val paramID = param._2.name
       val symbolTableParam = AST_Grammar.getVarType(paramType)
       paramTypes += symbolTableParam
-      a.putVarVal(paramID, paramType)
+      a.putVarVal(paramID, symbolTableParam)
     }
 
     //check variables
     for (currentVarDec <- method.variables) {
       val varType = currentVarDec.get.typeval
       val varName = currentVarDec.get.name.name
+      if(a.checkIfVarIDExists(varName)){
+        println("ERROR: "+varName+ " is already defined in the current scope")
+      }
       varType match
         case integer() => a.putVarVal(varName, AST_Grammar.variableVal(integerType()))
         case character() => a.putVarVal(varName, AST_Grammar.variableVal(characterType()))
@@ -93,5 +97,60 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
 
 
     methodVal(a, paramTypes.toList, AST_Grammar.getVarType(methodReturnType))
+  }
+
+  def checkForCircularInheritance(programSymbolTable: symbolTable): Unit = {
+    val classIDs = programSymbolTable.getClassKeys
+    for(classID <- classIDs){
+      val curClass = programSymbolTable.getClassVal(classID).get.asInstanceOf[AST_Grammar.classVal]
+      curClass.extendedClass match
+        case Some(parentClass) =>
+          val currentClassList = new ListBuffer[String]
+          currentClassList += classID.asInstanceOf[String]
+          if(checkParentClassType(programSymbolTable, parentClass, currentClassList)){
+            println("ERROR: Circular Inheritance happening at class " + classID + " extending " + parentClass)
+            System.exit(1)
+          }
+        case None =>
+    }
+  }
+
+  def checkParentClassType(programSymbolTable: symbolTable, curClassID: String, currentClasses: ListBuffer[String]): Boolean = {
+    if(!programSymbolTable.getClassKeys.contains(curClassID)){
+      println("ERROR: Extended class "+curClassID+" does not exist")
+      System.exit(1)
+      false
+    }else{
+      val curClass = programSymbolTable.getClassVal(curClassID)
+      curClass.get.asInstanceOf[classVal].extendedClass match
+        case Some(extendedClass) =>
+          if(currentClasses.toList.contains(extendedClass)){
+            true
+          }else{
+            currentClasses += extendedClass
+            checkParentClassType(programSymbolTable, extendedClass, currentClasses)
+          }
+        case None => false
+    }
+
+  }
+
+  def checkMethodReturnTypes(programSymbolTable: symbolTable): Unit = {
+    val classIDs = programSymbolTable.getClassKeys
+    for(classID <- classIDs){
+      val currentClass = programSymbolTable.getClassVal(classID).get.asInstanceOf[classVal]
+      //iterate through the methods of the current class, make sure the return type is defined if it returns a class
+      val methodKeys = currentClass.classScope.getMethodKeys
+      for(methodID <- methodKeys){
+        val currentMethod = currentClass.classScope.getMethodVal(methodID).get.asInstanceOf[methodVal]
+        val methodReturnType = currentMethod.returnType
+        methodReturnType match
+          case x: classType =>
+            if(!programSymbolTable.checkIfClassIDExists(x.clazz)){
+              println("ERROR: method "+methodID.asInstanceOf[String]+" of class "+classID.asInstanceOf[String]+" has an undefined return type of "+x.clazz)
+            }
+          case _ =>
+      }
+    }
   }
 }

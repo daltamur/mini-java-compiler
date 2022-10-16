@@ -7,7 +7,8 @@ class testFile {
     }
 }
 
-    class testClass {
+
+    class testClass extends testClass3{
         char wyz;
         char w;
         char aw;
@@ -34,7 +35,25 @@ class testFile {
         }
     }
 
-class testClass2 {
+class testClass2{
+    char wyz;
+    char w;
+    char aw;
+    public testClass3 testFile (char b, int y, int q){
+        char wyz;
+        char w;
+        char aw;
+        bool value;
+        w = '\"';
+        x = ' ';
+        value = x && b;
+        x = aw.getHerDone();
+        return true;
+
+    }
+}
+
+class testClass3{
     char wyz;
     char w;
     char aw;
@@ -51,4 +70,5 @@ class testClass2 {
 
     }
 }
+
 

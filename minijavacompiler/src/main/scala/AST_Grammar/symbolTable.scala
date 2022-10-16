@@ -4,40 +4,44 @@ import scala.collection.mutable
 import scala.collection.mutable.HashMap
 
 class symbolTable:
-  private var variableTable = new mutable.HashMap[Any, Any]()
-  private var classTable = new mutable.HashMap[Any, Any]()
-  private var methodTable = new mutable.HashMap[Any, Any]()
+  private var variableTable = new mutable.HashMap[Any, symbolTableVal]()
+  private var classTable = new mutable.HashMap[Any, symbolTableVal]()
+  private var methodTable = new mutable.HashMap[Any, symbolTableVal]()
   private var parentTable = None:Option[symbolTable]
-  
+
+  def getClassKeys: List[Any] = classTable.keys.toList
+  def getMethodKeys: List[Any] = methodTable.keys.toList
   def checkIfClassIDExists(key: Any): Boolean = classTable.contains(key)
   
   def checkIfMethodIDExists(key: Any): Boolean = methodTable.contains(key)
+  def checkIfVarIDExists(key: Any): Boolean = variableTable.contains(key)
+  
 
-  def putVarVal(key: Any, newVal: Any): Unit = variableTable.put(key, newVal)
+  def putVarVal(key: Any, newVal: symbolTableVal): Unit = variableTable.put(key, newVal)
 
-  def putClassVal(key: Any, newVal: Any): Unit = classTable.put(key, newVal)
+  def putClassVal(key: Any, newVal: symbolTableVal): Unit = classTable.put(key, newVal)
 
-  def putMethodVal(key: Any, newVal: Any): Unit = methodTable.put(key, newVal)
+  def putMethodVal(key: Any, newVal: symbolTableVal): Unit = methodTable.put(key, newVal)
 
-  def getVariableVal(key: Any): Option[Any] = {
+  def getVariableVal(key: Any): Option[symbolTableVal] = {
     if(variableTable.contains(key)){
-      Some(variableTable.get(key))
+      Some(variableTable(key))
     }else{
       None
     }
   }
 
-  def getMethodVal(key: Any): Option[Any] = {
+  def getMethodVal(key: Any): Option[symbolTableVal] = {
     if (methodTable.contains(key)) {
-      Some(methodTable.get(key))
+      Some(methodTable(key))
     } else {
       None
     }
   }
 
-  def getClassVal(key: Any): Option[Any] = {
+  def getClassVal(key: Any): Option[symbolTableVal] = {
     if (classTable.contains(key)) {
-      Some(classTable.get(key))
+      Some(classTable(key))
     } else {
       None
     }

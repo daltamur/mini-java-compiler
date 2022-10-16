@@ -22,6 +22,9 @@ object Main {
           val symbolTable = new symbolTable
           val symbolTableBuilder = new symbolTableBuilder
           symbolTableBuilder.visit(programAST.get, symbolTable)
+          //check for circular inheritance
+          symbolTableBuilder.checkForCircularInheritance(symbolTable)
+          symbolTableBuilder.checkMethodReturnTypes(symbolTable)
 
         }else{
           println("ERROR: No file found at " + fileLocation)

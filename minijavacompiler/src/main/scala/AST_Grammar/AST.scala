@@ -86,7 +86,7 @@ def getVarType(dType: dataType): varType = {
     case x: integer => intArrayType()
     case x: character => characterType()
 }
-sealed trait varType
+sealed trait varType extends symbolTableVal
 case class intArrayType() extends varType
 
 case class commandLineArgs() extends varType
@@ -94,6 +94,7 @@ case class booleanType() extends varType
 case class integerType() extends varType
 case class characterType() extends varType
 case class classType(clazz: String) extends varType
+case class voidType() extends varType
 
 case class methodVal(methodScope: symbolTable, paramTypes: List[varType], returnType: varType) extends symbolTableVal
 
