@@ -13,15 +13,21 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
     val mainClassSymbolTable = new symbolTable
     mainClassSymbolTable.setParentTable(a)
     a.putClassVal(goal.main.className.name, this.visit(goal.main, mainClassSymbolTable))
-    for(currentClass <- goal.classes){
-      if (a.checkIfClassIDExists(currentClass.get.className.name)) {
-        println(Console.RED+"ERROR "+Console.GREEN+"on line "+Console.BLUE+"\u001b[4m" +  currentClass.get.line +Console.GREEN +"\u001b[0m: Class named "+ currentClass.get.className.name + " already exists.")
-        System.exit(1)
-      } else {
-        println(currentClass.get.className.name)
-        val curClassSymbolTable = new symbolTable
-        curClassSymbolTable.setParentTable(a)
-        a.putClassVal(currentClass.get.className.name, visit(currentClass.get, curClassSymbolTable))
+    val loop = Breaks
+    loop.breakable {
+      for (currentClass <- goal.classes) {
+        if(curError.isDefined){
+          loop.break()
+        }
+        if (a.checkIfClassIDExists(currentClass.get.className.name)) {
+          curError = Some(classAlreadyDefinedError(currentClass.get.className.name, currentClass.get.line))
+          loop.break
+        } else {
+          println(currentClass.get.className.name)
+          val curClassSymbolTable = new symbolTable
+          curClassSymbolTable.setParentTable(a)
+          a.putClassVal(currentClass.get.className.name, visit(currentClass.get, curClassSymbolTable))
+        }
       }
     }
     AST_Grammar.programVal(a)
@@ -38,32 +44,45 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
   override def visitClass(klass: klass, a: symbolTable): AST_Grammar.symbolTableVal = {
     // we need to get the variable declarations and methods
     val classLine = klass.line
+    val loop1 = Breaks
     //var decs first
-    for(currentVarDec <- klass.variables){
-      val varDecLine = currentVarDec.get.line
-      val varType = currentVarDec.get.typeval
-      val varName = currentVarDec.get.name.name
-      varType match
-        case integer() => a.putVarVal(varName, AST_Grammar.variableVal(integerType(), varDecLine))
-        case character() => a.putVarVal(varName, AST_Grammar.variableVal(characterType(), varDecLine))
-        case identifierType(_) => a.putVarVal(varName, AST_Grammar.variableVal(classType(varType.asInstanceOf[AST_Grammar.identifier].name), varDecLine))
-        case intArray() => a.putVarVal(varName, AST_Grammar.variableVal(AST_Grammar.intArrayType(), varDecLine))
-        case boolean() => a.putVarVal(varName, AST_Grammar.variableVal(booleanType(), varDecLine))
+    loop1.breakable {
+      for (currentVarDec <- klass.variables) {
+        val varDecLine = currentVarDec.get.line
+        val varType = currentVarDec.get.typeval
+        val varName = currentVarDec.get.name.name
+        if (a.checkIfVarIDExists(varName)) {
+          curError = Some(variableAlreadyDefinedError(varName, varDecLine))
+        }
+        varType match
+          case integer() => a.putVarVal(varName, AST_Grammar.variableVal(integerType(), varDecLine))
+          case character() => a.putVarVal(varName, AST_Grammar.variableVal(characterType(), varDecLine))
+          case identifierType(_) => a.putVarVal(varName, AST_Grammar.variableVal(classType(varType.asInstanceOf[AST_Grammar.identifier].name), varDecLine))
+          case intArray() => a.putVarVal(varName, AST_Grammar.variableVal(AST_Grammar.intArrayType(), varDecLine))
+          case boolean() => a.putVarVal(varName, AST_Grammar.variableVal(booleanType(), varDecLine))
+      }
     }
 
     //method declarations next
-    for(currentMethod <- klass.methods){
-      val methodSymbolTable = new symbolTable
-      methodSymbolTable.setParentTable(a)
-      val methodName = currentMethod.get.methodName.name
-      val curMethodVal = visit(currentMethod.get, methodSymbolTable).asInstanceOf[methodVal]
-      val methodKey = (methodName, curMethodVal.paramTypes, curMethodVal.returnType)
-      if (a.checkIfMethodIDExists(methodKey)) {
-        curError = Some(methodOverLoadingError(klass.className.name, methodName, methodKey._2, methodKey._3, currentMethod.get.line))
-        println(curError.get.errorVal)
-        System.exit(1)
+    if(curError.isEmpty) {
+      val loop = Breaks
+      loop.breakable {
+        for (currentMethod <- klass.methods) {
+          if(curError.isDefined){
+            loop.break()
+          }
+          val methodSymbolTable = new symbolTable
+          methodSymbolTable.setParentTable(a)
+          val methodName = currentMethod.get.methodName.name
+          val curMethodVal = visit(currentMethod.get, methodSymbolTable).asInstanceOf[methodVal]
+          val methodKey = (methodName, curMethodVal.paramTypes, curMethodVal.returnType)
+          if (a.checkIfMethodIDExists(methodKey)) {
+            curError = Some(methodOverLoadingError(klass.className.name, methodName, methodKey._2, methodKey._3, currentMethod.get.line))
+            loop.break()
+          }
+          a.putMethodVal(methodKey, curMethodVal)
+        }
       }
-      a.putMethodVal(methodKey, curMethodVal)
     }
 
     klass.extendedClassName match
@@ -87,20 +106,23 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
     }
 
     //check variables
-    for (currentVarDec <- method.variables) {
-      val varLine = currentVarDec.get.line
-      val varType = currentVarDec.get.typeval
-      val varName = currentVarDec.get.name.name
-      if(a.checkIfVarIDExists(varName)){
-        println("ERROR on line "+varLine+": "+varName+ " is already defined in the current scope")
-        System.exit(1)
+    val loop = Breaks
+    loop.breakable {
+      for (currentVarDec <- method.variables) {
+        val varLine = currentVarDec.get.line
+        val varType = currentVarDec.get.typeval
+        val varName = currentVarDec.get.name.name
+        if (a.checkIfVarIDExists(varName)) {
+          curError = Some(variableAlreadyDefinedError(varName, varLine))
+          loop.break()
+        }
+        varType match
+          case integer() => a.putVarVal(varName, AST_Grammar.variableVal(integerType(), varLine))
+          case character() => a.putVarVal(varName, AST_Grammar.variableVal(characterType(), varLine))
+          case x: identifierType => a.putVarVal(varName, AST_Grammar.variableVal(classType(x.name.name), varLine))
+          case intArray() => a.putVarVal(varName, AST_Grammar.variableVal(AST_Grammar.intArrayType(), varLine))
+          case boolean() => a.putVarVal(varName, AST_Grammar.variableVal(booleanType(), varLine))
       }
-      varType match
-        case integer() => a.putVarVal(varName, AST_Grammar.variableVal(integerType(), varLine))
-        case character() => a.putVarVal(varName, AST_Grammar.variableVal(characterType(), varLine))
-        case x: identifierType => a.putVarVal(varName, AST_Grammar.variableVal(classType(x.name.name), varLine))
-        case intArray() => a.putVarVal(varName, AST_Grammar.variableVal(AST_Grammar.intArrayType(), varLine))
-        case boolean() => a.putVarVal(varName, AST_Grammar.variableVal(booleanType(), varLine))
     }
 
 

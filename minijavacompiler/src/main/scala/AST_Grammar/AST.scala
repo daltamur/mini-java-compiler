@@ -90,7 +90,7 @@ def getVarType(dType: dataType): varType = {
 def varTypeToString(vType: varType): String = {
   vType match
     case x: classType => x.clazz
-    case x: intArrayType => "Integer"
+    case x: intArrayType => "int[]"
     case x: booleanType => "boolean"
     case x: integerType => "int"
     case x: characterType => "char"
@@ -144,4 +144,12 @@ case class methodOverLoadingError(className: String, methodName: String, varType
     curError += ") returning " + varTypeToString(returnType) + " has already been defined in Class " + className
     curError
   }
+}
+
+case class classAlreadyDefinedError(className: String, line: Integer) extends error {
+  val errorVal: String = "ERROR on line "+line+": Class "+className+" has already been defined"
+}
+
+case class variableAlreadyDefinedError(varName: String, line: Integer) extends error {
+  val errorVal: String = "ERROR on line " + line + ": Variable "+varName+" has already been defined in the current scope"
 }
