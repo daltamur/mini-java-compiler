@@ -1,4 +1,4 @@
-import AST_Grammar.{ASTNode, symbolTable, symbolTableBuilder}
+import AST_Grammar.{ASTNode, symbolTable, symbolTableBuilder, typeCheckingVisitor}
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream, ParserRuleContext}
 import org.antlr.v4.runtime.tree.{ErrorNode, ParseTree, ParseTreeListener, ParseTreeWalker, TerminalNode}
 
@@ -18,10 +18,18 @@ object Main {
           val parser = parse(fileLocation)
           //make the ast
           val programAST = buildAST(parser)
+
           //make the symbol table
           val symbolTable = new symbolTable
           val symbolTableBuilder = new symbolTableBuilder
           symbolTableBuilder.visit(programAST.get, symbolTable)
+
+          //make sure there were no var dec or method errors
+          if (symbolTableBuilder.getError.isDefined) {
+            println(symbolTableBuilder.getError.get.errorVal)
+            System.exit(1)
+          }
+
           //check for circular inheritance
           symbolTableBuilder.checkForCircularInheritance(symbolTable)
           symbolTableBuilder.checkMethodReturnTypes(symbolTable)
@@ -29,6 +37,17 @@ object Main {
             println(symbolTableBuilder.getError.get.errorVal)
             System.exit(1)
           }
+
+          //type check statements & method return values now, this ends symbol resolution & type checking
+          val statementTypeChecker = new typeCheckingVisitor
+          if(statementTypeChecker.getCurError.isDefined){
+            println(symbolTableBuilder.getError.get.errorVal)
+            System.exit(1)
+          }
+
+          //Code Generation
+
+          //Code Optimization
 
         }else{
           println("ERROR: No file found at " + fileLocation)
