@@ -19,14 +19,14 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     val loop = Breaks
     var hasError = hasErrorResult(false)
     //first type check the main class statement
-    hasError = visit(goal.main, a).asInstanceOf[hasErrorResult]
+    hasError = visit(goal.main, a.getClassVal(goal.main.className.name).get.asInstanceOf[classVal].classScope).asInstanceOf[hasErrorResult]
     loop.breakable {
       for (curClass <- goal.classes) {
         if(hasError.errorVal){
           loop.break()
         }
         //type check each class' statement
-        hasError = visit(curClass.get, a).asInstanceOf[hasErrorResult]
+        hasError = visit(curClass.get, a.getClassVal(curClass.get.className.name).get.asInstanceOf[classVal].classScope).asInstanceOf[hasErrorResult]
       }
     }
     hasError
@@ -53,7 +53,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
         if (hasError.errorVal) {
           loop.break()
         }
-        hasError = visit(method.get, a).asInstanceOf[hasErrorResult]
+        hasError = visit(method.get, a.getMethodVal(method.get.methodName.name).get.asInstanceOf[methodVal].methodScope).asInstanceOf[hasErrorResult]
       }
     }
     hasError
@@ -74,29 +74,160 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     }
     hasError
   }
-  
+
   //each statement visit method will return true or false indicating that a type check failed
 
   //type check each statement in the block
-  override def visitBlockStatement(statement: blockStatement, a: symbolTable): typeCheckResult = super.visitBlockStatement(statement, a)
+  override def visitBlockStatement(statement: blockStatement, a: symbolTable): typeCheckResult = {
+    //assume we have no errors to begin with, only change is the main class or class throw an error
+    val loop = Breaks
+    var hasError = hasErrorResult(false)
+    loop.breakable{
+      for(curStatement <- statement.statements){
+        if (hasError.errorVal) {
+          loop.break()
+        }
+        hasError = visit(curStatement, a).asInstanceOf[hasErrorResult]
+      }
+    }
+
+    hasError
+  }
 
 
   //make sure conditional is a boolean, type check the statements in the bodies
-  override def visitIfStatement(statement: ifStatement, a: symbolTable): typeCheckResult = super.visitIfStatement(statement, a)
+  override def visitIfStatement(statement: ifStatement, a: symbolTable): typeCheckResult = {
+    var hasError = hasErrorResult(false)
+    val ifCondVal = visit(statement.condition, a)
+    ifCondVal match {
+      //if it is a variable result, make sure it is a boolean
+      case result: varValResult =>
+        if (result.varVal != booleanType) {
+          hasError.errorVal = true
+        }else{
+          //now type check the then and else statements
+          hasError = visit(statement.thenStatement, a).asInstanceOf[hasErrorResult]
+          //only check the else if we didn't already find an error in the then statement
+          if(!hasError.errorVal) {
+            hasError = visit(statement.elseStatement, a).asInstanceOf[hasErrorResult]
+          }
+        }
+
+      //this means an error resulted from typechecking the expression
+      case _ => hasError = ifCondVal.asInstanceOf[hasErrorResult]
+    }
+
+    hasError
+  }
 
   //make sure conditional is a boolean, type check the statement in the body
-  override def visitWhileStatement(statement: whileStatement, a: symbolTable): typeCheckResult = super.visitWhileStatement(statement, a)
+  override def visitWhileStatement(statement: whileStatement, a: symbolTable): typeCheckResult = {
+    var hasError = hasErrorResult(false)
+    val whileCondVal = visit(statement.condition, a)
+    whileCondVal match
+      case result: varValResult =>
+        if (result.varVal != booleanType) {
+          hasError.errorVal = true
+        } else {
+          //now type check the then and else statements
+          hasError = visit(statement.thenStatement, a).asInstanceOf[hasErrorResult]
+
+        }
+      //this means it was false
+      case _ => hasError = whileCondVal.asInstanceOf[hasErrorResult]
+    hasError
+  }
 
   //make sure expresison in print statement is an integer
-  override def visitPrintStatement(statement: printStatement, a: symbolTable): typeCheckResult = super.visitPrintStatement(statement, a)
+  override def visitPrintStatement(statement: printStatement, a: symbolTable): typeCheckResult = {
+    var hasError = hasErrorResult(false)
+    val printedVal = visit(statement.value, a)
+    printedVal match
+      case result: varValResult =>
+        if(result.varVal != integerType) {
+          hasError.errorVal = true
+        }
+
+      //this means it was false
+      case _ => hasError = printedVal.asInstanceOf[hasErrorResult]
+
+    hasError
+  }
 
   //get type of left side of assign statement, make sure right side is of the same type
-  override def visitAssignStatement(statement: assignStatement, a: symbolTable): typeCheckResult = super.visitAssignStatement(statement, a)
+  override def visitAssignStatement(statement: assignStatement, a: symbolTable): typeCheckResult = {
+    var hasError = hasErrorResult(false)
+    //first we make sure that the variable getting assigned exists.
+    val leftVal = statement.idVal
 
+    //if the variable is not defined in the method scope, check the current class scope. If that fails,
+    //check the extended classes for the variable. If THAT fails, then the variable does not exist so change
+    //hasError to true
+    if(!a.checkIfVarIDExists(leftVal.name)){
+      a.getParentTable match
+        case Some(parent) =>
+          //checking the class that the method is a child of
+          if(!parent.checkIfVarIDExists(leftVal.name)){
+            //now check any extend class to see if the variable might reside in the extended class
+            val variableType = checkExtendedClassesForVar(leftVal.name, parent)
+            variableType match
+              case result: hasErrorResult => hasError = result
+              case result: varValResult =>
+                //we were able to find the variable type
+                //result now is of type varType
+                //check the right expression and make sure it is not an hasError node or an unequivalent type
+                val rightSide = visit(statement.value, a)
+                rightSide match
+                  case rightVal: hasErrorResult => hasError = rightVal
+                  case rightVal: varValResult =>
+                    if(!result.varVal.equals(rightVal.varVal)){
+                      hasError.errorVal = true
+                    }
+
+          }
+        case _ => hasError.errorVal = true
+          println("Something went wrong...Ill-defined method")
+          System.exit(1)
+    }
+
+    hasError
+  }
+
+  def checkExtendedClassesForVar(variable: String, a: symbolTable): typeCheckResult = {
+    var returnedVal:typeCheckResult = hasErrorResult(false)
+    //remember that we are in a class, so get the classVal from the parent of the current symbol table
+    val extendedClass = a.getParentTable.get.getClassVal(a.getName).get.asInstanceOf[classVal].extendedClass
+    extendedClass match
+      case Some(clazz) =>
+        //get that class's symbol table, if it has the variable letter, return its type, otherwise check for
+        //that class's extended class
+        val extendedClassSymbolTable = a.getParentTable.get.getClassVal(clazz).get.asInstanceOf[classVal].classScope
+        if(extendedClassSymbolTable.checkIfVarIDExists(variable)){
+          returnedVal = varValResult(extendedClassSymbolTable.getVariableVal(variable).get.asInstanceOf[variableVal].varValue)
+        }else{
+          returnedVal = checkExtendedClassesForVar(variable, extendedClassSymbolTable)
+        }
+
+      case None => returnedVal.asInstanceOf[hasErrorResult].errorVal = true
+
+    returnedVal
+  }
+
+  //make sure the array identifier is actually of type array
   //make sure the expression in the brackets is an int, make sure the assigned value is an int
-  override def visitArrayAssignStatement(statement: arrayAssignStatement, a: symbolTable): typeCheckResult = super.visitArrayAssignStatement(statement, a)
-  
-  
+  override def visitArrayAssignStatement(statement: arrayAssignStatement, a: symbolTable): typeCheckResult = {
+    var hasError = hasErrorResult(false)
+    //first get the array identifier
+    val arrayID = statement.idVal
+
+    //just like the assignment statement, we have to check and make sure the identifier is defined in either the current
+    //class or an extended class. If it is not, we have an error on our hands
+    //if it is found, make sure it is of type int array
+
+    hasError
+  }
+
+
   //
   //return whatever the name of the current class is
   override def visitThisExpression(expression: thisExpression, a: symbolTable): typeCheckResult = super.visitThisExpression(expression, a)

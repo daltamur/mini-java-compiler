@@ -115,7 +115,7 @@ case class programVal(program: symbolTable) extends symbolTableVal
 
 sealed trait typeCheckResult
 
-case class hasErrorResult(errorVal: Boolean) extends typeCheckResult
+case class hasErrorResult(var errorVal: Boolean) extends typeCheckResult
 
 case class varValResult(varVal: varType) extends typeCheckResult
 
