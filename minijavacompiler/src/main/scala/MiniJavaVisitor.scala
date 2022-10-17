@@ -165,6 +165,8 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
   }
 
   override def visitExpression(ctx: miniJavaParser.ExpressionContext): Option[ASTNode] = {
+    val expressionLine = ctx.getStart.getLine
+    val expressionIndex = ctx.getStart.getCharPositionInLine
     val ctxExpressionTerminal = Option(ctx.expressionTerminal())
     var ASTExpressionTerminal = ctxExpressionTerminal.flatMap(x => x.accept(this))
     if (ASTExpressionTerminal == null){
@@ -175,7 +177,7 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     if (ASTExpressionTail == null){
       ASTExpressionTail = None
     }
-    val expression = Some(AST_Grammar.expression(ASTExpressionTerminal.orNull.asInstanceOf[AST_Grammar.expressionTerminal], ASTExpressionTail.asInstanceOf[Option[AST_Grammar.expressionTail]]))
+    val expression = Some(AST_Grammar.expression(ASTExpressionTerminal.orNull.asInstanceOf[AST_Grammar.expressionTerminal], ASTExpressionTail.asInstanceOf[Option[AST_Grammar.expressionTail]], expressionLine, expressionIndex))
     expression
   }
 

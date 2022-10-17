@@ -171,7 +171,9 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
             //now check any extend class to see if the variable might reside in the extended class
             val variableType = checkExtendedClassesForVar(leftVal.name, parent)
             variableType match
-              case result: hasErrorResult => hasError = result
+              case result: hasErrorResult =>
+                curError = Some(noSuchVariableUnknownTypeDefinedError(leftVal.name, statement.line))
+                hasError = result
               case result: varValResult =>
                 //we were able to find the variable type
                 //result now is of type varType
@@ -181,13 +183,35 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
                   case rightVal: hasErrorResult => hasError = rightVal
                   case rightVal: varValResult =>
                     if(!result.varVal.equals(rightVal.varVal)){
+                      curError = Some(noSuchVariableDefinedError(leftVal.name, rightVal.varVal, statement.line))
                       hasError.errorVal = true
                     }
-
+          }else{
+            //the variable is defined as a global value in the class, get it and perform the rest of the checks
+            val variableType = parent.getVariableVal(leftVal.name).asInstanceOf[variableVal]
+            //check right side
+            val rightSide = visit(statement.value, a)
+            rightSide match
+              case rightVal: hasErrorResult => hasError = rightVal
+              case rightVal: varValResult =>
+                if (!variableType.varValue.equals(rightVal.varVal)) {
+                  curError = Some(noSuchVariableDefinedError(leftVal.name, rightVal.varVal, statement.line))
+                  hasError.errorVal = true
+                }
           }
         case _ => hasError.errorVal = true
-          println("Something went wrong...Ill-defined method")
+          println("Something went wrong...Ill-defined statement")
           System.exit(1)
+    }else{
+      val variableType = a.getVariableVal(leftVal.name).get.asInstanceOf[variableVal]
+      val rightSide = visit(statement.value, a)
+      rightSide match
+        case rightVal: hasErrorResult => hasError = rightVal
+        case rightVal: varValResult =>
+          if (!variableType.varValue.equals(rightVal.varVal)) {
+            curError = Some(noSuchVariableDefinedError(leftVal.name, rightVal.varVal, statement.line))
+            hasError.errorVal = true
+          }
     }
 
     hasError
@@ -223,6 +247,46 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     //just like the assignment statement, we have to check and make sure the identifier is defined in either the current
     //class or an extended class. If it is not, we have an error on our hands
     //if it is found, make sure it is of type int array
+    if(!a.checkIfVarIDExists(arrayID.name)){
+      //if we're here, then the array identifier does not exist in the current scope, check the current class &
+      //its parent classes
+      a.getParentTable match
+        case Some(parent) =>
+          //checking the class that the method is a child of
+          if (!parent.checkIfVarIDExists(arrayID.name)) {
+
+          }else{//DO NOT FORGET THE ELSE HERE
+
+          }
+        case _ => hasError.errorVal = true
+          println("Something went wrong...Ill-defined statement")
+          System.exit(1)
+
+    }else{
+      //the array exists in the current method
+      //check and make sure the array index is of type int
+      val arrIndex = visit(statement.arrayIndex, a)
+      arrIndex match
+        case result:hasErrorResult =>
+          hasError = result
+        case result: varValResult =>
+          if(!result.varVal.equals(integerType)){
+            curError = Some(typeInconformitiyError(result.varVal, integerType(), statement.arrayIndex.line, statement.arrayIndex.index))
+            hasError.errorVal = true
+          }
+      //so long as the previous check passed, we'll type check the assigned expression now to make sure it is an integer
+      if(!hasError.errorVal){
+        val assignedExpression = visit(statement.value, a)
+        assignedExpression match
+          case result: hasErrorResult =>
+            hasError = result
+          case result: varValResult =>
+            if (!result.varVal.equals(integerType)) {
+              curError = Some(typeInconformitiyError(result.varVal, integerType(), statement.arrayIndex.line, statement.arrayIndex.index))
+              hasError.errorVal = true
+            }
+      }
+    }
 
     hasError
   }
@@ -280,4 +344,5 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
   //make sure the method exists either in the current class or some class in its hierarchy, if it does, return whatever the method's return type is
   override def visitMethodFunctionCallExpression(expression: methodFunctionCallExpression, a: symbolTable): typeCheckResult = super.visitMethodFunctionCallExpression(expression, a)
 
+  override def visitNoTail: typeCheckResult = hasErrorResult(false)
 }

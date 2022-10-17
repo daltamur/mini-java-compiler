@@ -65,7 +65,7 @@ case class arrayLengthExpression() extends expressionTail
 
 case class arrayIndexExpression(value: expression) extends expressionTail
 case class methodFunctionCallExpression(funcName: identifier, params: List[expression], line: Integer) extends expressionTail
-case class expression(expressionTerm: expressionTerminal, expressionOpt: Option[expressionTail]) extends ASTNode
+case class expression(expressionTerm: expressionTerminal, expressionOpt: Option[expressionTail], line: Integer, index: Integer) extends ASTNode
 
 
 
@@ -156,4 +156,18 @@ case class classAlreadyDefinedError(className: String, line: Integer) extends er
 
 case class variableAlreadyDefinedError(varName: String, line: Integer) extends error {
   val errorVal: String = "ERROR on line " + line + ": Variable "+varName+" has already been defined in the current scope"
+}
+
+case class noSuchVariableDefinedError(varName: String, typeIns: varType,line: Integer) extends error {
+  val errorVal: String = "ERROR on line " + line + ": No variable named " + varName + " of type " + varTypeToString(typeIns) + " has been declared in neither the current scope or any inherited scope"
+}
+
+case class noSuchVariableUnknownTypeDefinedError(varName: String, line: Integer) extends error {
+  val errorVal: String = "ERROR on line " + line + ": No variable named " + varName + " has been declared in neither the current scope or any inherited scope"
+}
+
+case class typeInconformitiyError(gotType: varType, expectedType: varType, line: Integer, index: Integer) extends error {
+  val errorVal: String = "ERROR on line " + line + ":" +index+ " :expected type " + varTypeToString(expectedType) + ", instead got type " + varTypeToString(gotType)
+
+
 }
