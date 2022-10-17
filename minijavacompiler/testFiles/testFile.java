@@ -45,7 +45,7 @@ class testClass2{
         bool value;
         w = '\"';
         x = ' ';
-        x & b;
+        //x & b;
         x = aw.getHerDone();
         return true;
 

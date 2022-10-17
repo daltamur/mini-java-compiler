@@ -10,7 +10,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
   def getError: Option[error] = curError
   override def visitGoal(goal: goal, a: symbolTable): AST_Grammar.symbolTableVal = {
     //get the symbolTable for the main class and put it in the goal symbol table
-    val mainClassSymbolTable = new symbolTable
+    val mainClassSymbolTable = new symbolTable(goal.main.className.name)
     mainClassSymbolTable.setParentTable(a)
     a.putClassVal(goal.main.className.name, this.visit(goal.main, mainClassSymbolTable))
     val loop = Breaks
@@ -24,7 +24,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
           loop.break
         } else {
           println(currentClass.get.className.name)
-          val curClassSymbolTable = new symbolTable
+          val curClassSymbolTable = new symbolTable(currentClass.get.className.name)
           curClassSymbolTable.setParentTable(a)
           a.putClassVal(currentClass.get.className.name, visit(currentClass.get, curClassSymbolTable))
         }
@@ -34,7 +34,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
   }
 
   override def visitMainClass(clazz: mainClass, a: symbolTable): AST_Grammar.symbolTableVal = {
-    val mainClassSymbolTable = new symbolTable
+    val mainClassSymbolTable = new symbolTable("main")
     mainClassSymbolTable.setParentTable(a)
     mainClassSymbolTable.putVarVal(clazz.commandLineArgs.name, AST_Grammar.commandLineArgs())
     a.putMethodVal("main", methodVal(mainClassSymbolTable, List[varType]{commandLineArgs()}, voidType(), clazz.line))
@@ -71,7 +71,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
           if(curError.isDefined){
             loop.break()
           }
-          val methodSymbolTable = new symbolTable
+          val methodSymbolTable = new symbolTable(currentMethod.get.methodName.name)
           methodSymbolTable.setParentTable(a)
           val methodName = currentMethod.get.methodName.name
           val curMethodVal = visit(currentMethod.get, methodSymbolTable).asInstanceOf[methodVal]

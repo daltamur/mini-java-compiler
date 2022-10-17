@@ -20,7 +20,7 @@ object Main {
           val programAST = buildAST(parser)
 
           //make the symbol table
-          val symbolTable = new symbolTable
+          val symbolTable = new symbolTable("goal")
           val symbolTableBuilder = new symbolTableBuilder
           symbolTableBuilder.visit(programAST.get, symbolTable)
 
@@ -40,6 +40,7 @@ object Main {
 
           //type check statements & method return values now, this ends symbol resolution & type checking
           val statementTypeChecker = new typeCheckingVisitor
+          statementTypeChecker.visit(programAST.get, symbolTable)
           if(statementTypeChecker.getCurError.isDefined){
             println(symbolTableBuilder.getError.get.errorVal)
             System.exit(1)

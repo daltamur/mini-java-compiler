@@ -113,9 +113,13 @@ case class variableVal(varValue: varType, line: Integer) extends symbolTableVal
 
 case class programVal(program: symbolTable) extends symbolTableVal
 
+sealed trait typeCheckResult
 
+case class hasErrorResult(errorVal: Boolean) extends typeCheckResult
 
-//symbol table errors
+case class varValResult(varVal: varType) extends typeCheckResult
+
+//error types
 sealed trait error{
   val errorVal: String
 }

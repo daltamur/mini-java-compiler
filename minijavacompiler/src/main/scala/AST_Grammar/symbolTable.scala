@@ -3,7 +3,8 @@ package AST_Grammar
 import scala.collection.mutable
 import scala.collection.mutable.HashMap
 
-class symbolTable:
+class symbolTable(tableName: String):
+  private val name = tableName
   private var variableTable = new mutable.HashMap[Any, symbolTableVal]()
   private var classTable = new mutable.HashMap[Any, symbolTableVal]()
   private var methodTable = new mutable.HashMap[Any, symbolTableVal]()
@@ -12,6 +13,8 @@ class symbolTable:
   def getClassKeys: List[Any] = classTable.keys.toList
   def getMethodKeys: List[Any] = methodTable.keys.toList
   def checkIfClassIDExists(key: Any): Boolean = classTable.contains(key)
+
+  def getName: String = name
   
   def checkIfMethodIDExists(key: Any): Boolean = methodTable.contains(key)
   def checkIfVarIDExists(key: Any): Boolean = variableTable.contains(key)
