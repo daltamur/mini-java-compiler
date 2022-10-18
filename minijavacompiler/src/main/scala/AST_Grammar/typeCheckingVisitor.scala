@@ -6,14 +6,6 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
 
   private var curError: Option[error] = None
   def getCurError: Option[error] = curError
-
-  //get the expression terminal var type. Only certain expression tails can follow specific expression terminals
-  //(for example, if we have a 'this' expression terminal, the only possible tails could be a method function call
-  //or no tail). If we don't get the proper pattern, throw the proper error
-  override def visitExpression(expressionVal: expression, a: symbolTable): typeCheckResult = super.visitExpression(expressionVal, a)
-
-  //check all the statements in the methods in each class (make sure the print statement is an integer)
-  //returns true if there is an error, otherwise returns false
   override def visitGoal(goal: goal, a: symbolTable): typeCheckResult = {
     //assume we have no errors to begin with, only change is the main class or class throw an error
     val loop = Breaks
@@ -39,7 +31,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
   //just make sure the statement has no type check errors
   override def visitMainClass(clazz: mainClass, a: symbolTable): typeCheckResult = {
     var hasError = hasErrorResult(false)
-    hasError = visit(clazz.body, a).asInstanceOf[hasErrorResult]
+    hasError = visit(clazz.body, a.getMethodVal("main").get.asInstanceOf[methodVal].methodScope).asInstanceOf[hasErrorResult]
     hasError
   }
 
@@ -255,8 +247,9 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
           //checking the class that the method is a child of
           if (!parent.checkIfVarIDExists(arrayID.name)) {
 
+            //fill this body in later
           }else{//DO NOT FORGET THE ELSE HERE
-
+            //fill this body in later
           }
         case _ => hasError.errorVal = true
           println("Something went wrong...Ill-defined statement")
@@ -294,7 +287,9 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
 
   //
   //return whatever the name of the current class is
-  override def visitThisExpression(expression: thisExpression, a: symbolTable): typeCheckResult = super.visitThisExpression(expression, a)
+  override def visitThisExpression(expression: thisExpression, a: symbolTable): typeCheckResult = {
+    varValResult(classType(a.getParentTable.get.getName))
+  }
 
   //just return boolean var type
   override def visitBooleanExpression(expression: booleanExpression, a: symbolTable): typeCheckResult = super.visitBooleanExpression(expression, a)
@@ -320,29 +315,21 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
   //get type of expression
   override def visitParenthesizedExpression(expression: parenthesizedExpression, a: symbolTable): typeCheckResult = super.visitParenthesizedExpression(expression, a)
 
-  // make sure expression is of type boolean, if it is, return var type bool
-  override def visitAndExpression(expression: andExpression, a: symbolTable): typeCheckResult = super.visitAndExpression(expression, a)
+  override def visitNoTail(previousExpressionVal: typeCheckResult): typeCheckResult = previousExpressionVal
 
-  //make sure the expression is of type int. If it is, return var type int
-  override def visitAddExpression(expression: addExpression, a: symbolTable): typeCheckResult = super.visitAddExpression(expression, a)
+  override def visitAndExpression(expression: andExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitAndExpression(expression, a, b)
 
-  //make sure the expression is of type book, If it is, return var type bool
-  override def visitCompareExpression(expression: compareExpression, a: symbolTable): typeCheckResult = super.visitCompareExpression(expression, a)
+  override def visitAddExpression(expression: addExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitAddExpression(expression, a, b)
 
-  //make sure the expression is of type int. If it is, return var type int
-  override def visitSubtractExpression(expression: subtractExpression, a: symbolTable): typeCheckResult = super.visitSubtractExpression(expression, a)
+  override def visitCompareExpression(expression: compareExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitCompareExpression(expression, a, b)
 
- ////make sure the expression is of type int. If it is, return var type int
-  override def visitMultiplyExpression(expression: multiplyExpression, a: symbolTable): typeCheckResult = super.visitMultiplyExpression(expression, a)
+  override def visitSubtractExpression(expression: subtractExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitSubtractExpression(expression, a, b)
 
-  //return type int
-  override def visitArrayLengthExpression(expression: arrayLengthExpression, a: symbolTable): typeCheckResult = super.visitArrayLengthExpression(expression, a)
+  override def visitMultiplyExpression(expression: multiplyExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitMultiplyExpression(expression, a, b)
 
-  //make sure the expression, is of type int. If it is, return true, else return false
-  override def visitArrayIndexExpression(expression: arrayIndexExpression, a: symbolTable): typeCheckResult = super.visitArrayIndexExpression(expression, a)
+  override def visitArrayLengthExpression(expression: arrayLengthExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitArrayLengthExpression(expression, a, b)
 
-  //make sure the method exists either in the current class or some class in its hierarchy, if it does, return whatever the method's return type is
-  override def visitMethodFunctionCallExpression(expression: methodFunctionCallExpression, a: symbolTable): typeCheckResult = super.visitMethodFunctionCallExpression(expression, a)
+  override def visitArrayIndexExpression(expression: arrayIndexExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitArrayIndexExpression(expression, a, b)
 
-  override def visitNoTail: typeCheckResult = hasErrorResult(false)
+  override def visitMethodFunctionCallExpression(expression: methodFunctionCallExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitMethodFunctionCallExpression(expression, a, b)
 }

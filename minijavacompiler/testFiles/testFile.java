@@ -1,7 +1,7 @@
 class testFile {
     public static void main(String[] a) {
 
-            System.out.println(new testClass().testMethod('a'));
+            System.out.println(this);
 
     }
 }

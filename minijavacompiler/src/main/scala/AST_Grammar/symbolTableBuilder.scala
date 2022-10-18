@@ -124,8 +124,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
           case boolean() => a.putVarVal(varName, AST_Grammar.variableVal(booleanType(), varLine))
       }
     }
-
-
+    
     methodVal(a, paramTypes.toList, AST_Grammar.getVarType(methodReturnType), methodLine)
   }
 
@@ -167,7 +166,6 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
           }
         case None => false
     }
-
   }
 
   def checkMethodReturnTypes(programSymbolTable: symbolTable): Unit = {

@@ -25,7 +25,8 @@ abstract class ASTVisitor[A, B] {
   }
 
   def visitExpression(expressionVal: expression, a:A): B = {
-    expressionVal.expressionTerm match
+    val expressionTerminalVal = {
+      expressionVal.expressionTerm match
       case x: thisExpression => visitThisExpression(x, a)
       case x: booleanExpression => visitBooleanExpression(x, a)
       case x: integerExpression => visitIntegerExpression(x, a)
@@ -35,19 +36,21 @@ abstract class ASTVisitor[A, B] {
       case x: newClassInstanceExpression => visitNewClassInstanceExpression(x, a)
       case x: negatedExpression => visitNegatedExpression(x, a)
       case x: parenthesizedExpression => visitParenthesizedExpression(x, a)
-
+    }
+    
+    
     expressionVal.expressionOpt match
       case Some(value) =>
         value match
-          case x: andExpression => visitAndExpression(x, a)
-          case x: addExpression => visitAddExpression(x, a)
-          case x: compareExpression => visitCompareExpression(x, a)
-          case x: subtractExpression => visitSubtractExpression(x, a)
-          case x: multiplyExpression => visitMultiplyExpression(x, a)
-          case x: arrayLengthExpression => visitArrayLengthExpression(x, a)
-          case x: arrayIndexExpression => visitArrayIndexExpression(x, a)
-          case x: methodFunctionCallExpression => visitMethodFunctionCallExpression(x, a)
-      case _ => visitNoTail
+          case x: andExpression => visitAndExpression(x, a, expressionTerminalVal)
+          case x: addExpression => visitAddExpression(x, a, expressionTerminalVal)
+          case x: compareExpression => visitCompareExpression(x, a, expressionTerminalVal)
+          case x: subtractExpression => visitSubtractExpression(x, a, expressionTerminalVal)
+          case x: multiplyExpression => visitMultiplyExpression(x, a, expressionTerminalVal)
+          case x: arrayLengthExpression => visitArrayLengthExpression(x, a, expressionTerminalVal)
+          case x: arrayIndexExpression => visitArrayIndexExpression(x, a, expressionTerminalVal)
+          case x: methodFunctionCallExpression => visitMethodFunctionCallExpression(x, a, expressionTerminalVal)
+      case _ => visitNoTail(expressionTerminalVal)
   }
 
   def visitGoal(goal: goal, a: A): B = ???
@@ -94,21 +97,21 @@ abstract class ASTVisitor[A, B] {
 
   def visitParenthesizedExpression(expression: parenthesizedExpression, a: A): B = ???
 
-  def visitAndExpression(expression: andExpression, a: A): B = ???
+  def visitAndExpression(expression: andExpression, a: A, b: B): B = ???
 
-  def visitAddExpression(expression: addExpression, a: A): B = ???
+  def visitAddExpression(expression: addExpression, a: A, b: B): B = ???
 
-  def visitCompareExpression(expression: compareExpression, a: A): B = ???
+  def visitCompareExpression(expression: compareExpression, a: A, b: B): B = ???
 
-  def visitSubtractExpression(expression: subtractExpression, a: A): B = ???
+  def visitSubtractExpression(expression: subtractExpression, a: A, b: B): B = ???
 
-  def visitMultiplyExpression(expression: multiplyExpression, a: A): B = ???
+  def visitMultiplyExpression(expression: multiplyExpression, a: A, b: B): B = ???
 
-  def visitArrayLengthExpression(expression: arrayLengthExpression, a: A): B = ???
+  def visitArrayLengthExpression(expression: arrayLengthExpression, a: A, b: B): B = ???
 
-  def visitArrayIndexExpression(expression: arrayIndexExpression, a: A): B = ???
+  def visitArrayIndexExpression(expression: arrayIndexExpression, a: A, b: B): B = ???
 
-  def visitMethodFunctionCallExpression(expression: methodFunctionCallExpression, a: A): B = ???
+  def visitMethodFunctionCallExpression(expression: methodFunctionCallExpression, a: A, b: B): B = ???
 
-  def visitNoTail: B = ???
+  def visitNoTail(previousExpressionVal: B): B = ???
 }
