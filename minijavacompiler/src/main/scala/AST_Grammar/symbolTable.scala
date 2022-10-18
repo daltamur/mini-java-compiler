@@ -9,7 +9,6 @@ class symbolTable(tableName: String):
   private var classTable = new mutable.HashMap[Any, symbolTableVal]()
   private var methodTable = new mutable.HashMap[Any, symbolTableVal]()
   private var parentTable = None:Option[symbolTable]
-
   def getClassKeys: List[Any] = classTable.keys.toList
   def getMethodKeys: List[Any] = methodTable.keys.toList
   def checkIfClassIDExists(key: Any): Boolean = classTable.contains(key)

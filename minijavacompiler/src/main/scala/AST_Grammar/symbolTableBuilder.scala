@@ -57,7 +57,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
         varType match
           case integer() => a.putVarVal(varName, AST_Grammar.variableVal(integerType(), varDecLine))
           case character() => a.putVarVal(varName, AST_Grammar.variableVal(characterType(), varDecLine))
-          case identifierType(_) => a.putVarVal(varName, AST_Grammar.variableVal(classType(varType.asInstanceOf[AST_Grammar.identifier].name), varDecLine))
+          case identifierType(_) => a.putVarVal(varName, AST_Grammar.variableVal(classType(varType.asInstanceOf[AST_Grammar.identifierType].name.name), varDecLine))
           case intArray() => a.putVarVal(varName, AST_Grammar.variableVal(AST_Grammar.intArrayType(), varDecLine))
           case boolean() => a.putVarVal(varName, AST_Grammar.variableVal(booleanType(), varDecLine))
       }

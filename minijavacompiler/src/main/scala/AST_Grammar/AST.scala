@@ -61,7 +61,7 @@ case class addExpression(value: expression) extends expressionTail
 case class compareExpression(value: expression) extends expressionTail
 case class subtractExpression(value: expression) extends expressionTail
 case class multiplyExpression(value: expression) extends expressionTail
-case class arrayLengthExpression() extends expressionTail
+case class arrayLengthExpression(line: Integer, index: Integer) extends expressionTail
 
 case class arrayIndexExpression(value: expression) extends expressionTail
 case class methodFunctionCallExpression(funcName: identifier, params: List[expression], line: Integer) extends expressionTail
@@ -171,5 +171,33 @@ case class typeInconformitiyError(gotType: varType, expectedType: varType, line:
 }
 
 case class noSuchTypeError(givenType: varType, line: Integer, index: Integer) extends  error {
-  val errorVal: String = "ERROR on line " + line + ":" + index + " : no such data type of " + varTypeToString(givenType)
+  val errorVal: String = "ERROR on line " + line + ":" + index + " :no such data type of " + varTypeToString(givenType)
+}
+
+case class noSuchMethodError(methodName: String, types: List[varType], line: Integer) extends error {
+  val errorVal: String = Error
+
+  private def Error: String = {
+    var curError = "ERROR on line " + line + ": method " + methodName + "("
+    for (typeVal <- types) {
+      curError += varTypeToString(typeVal)
+      if (types.last != typeVal) {
+        curError += ", "
+      }
+    }
+    curError += ") does not exist in this scope or any inherited scope"
+    curError
+  }
+}
+
+case class noSuchClassError(className: String, line: Integer, index: Integer) extends  error {
+  val errorVal: String = "ERROR on line " + line + ":" + index + " :no such class named" + className
+}
+
+case class callMethodOnPrimitve(primitive: varType, line: Integer) extends  error {
+  val errorVal: String = "ERROR on line " + line + ": cannot call functions on primitives"
+}
+
+case class returnTypeError(expectedVal: varType, gotVal: varType, line: Integer) extends error{
+  val errorVal: String = "ERROR on line " + line + ": bad method return type, expected "+varTypeToString(expectedVal)+ " and got "+varTypeToString(gotVal)
 }

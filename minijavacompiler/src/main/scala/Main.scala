@@ -21,6 +21,10 @@ object Main {
 
           //make the symbol table
           val symbolTable = new symbolTable("goal")
+          symbolTable.putClassVal("int", AST_Grammar.classVal(new symbolTable("int"), None, 0))
+          symbolTable.putClassVal("boolean", AST_Grammar.classVal(new symbolTable("boolean"), None, 0))
+          symbolTable.putClassVal("char", AST_Grammar.classVal(new symbolTable("char"), None, 0))
+          symbolTable.putClassVal("int[]", AST_Grammar.classVal(new symbolTable("int[]"), None, 0))
           val symbolTableBuilder = new symbolTableBuilder
           symbolTableBuilder.visit(programAST.get, symbolTable)
 

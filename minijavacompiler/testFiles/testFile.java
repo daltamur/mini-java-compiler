@@ -10,37 +10,28 @@ class testFile {
     class testClass extends testClass3{
         char wyz;
         char w;
-        char aw;
+        int aw;
         char x;
+        boolean i;
         public boolean testMethod (char b){
             char wyz;
             char w;
-            char aw;
+            boolean y;
+            //char aw;
             w = '\"';
             x = ' ';
-            x = aw.getHerDone();
-            return true;
-
-        }
-
-        public boolean testMethod (char b){
-            char wyz;
-            char w;
-            char aw;
-            w = '\"';
-            x = ' ';
-            x = aw.getHerDone();
-            return true;
+            //i = aw;
+            return y;
 
         }
 
         public boolean testMethod2 (char b){
             char wyz;
             char w;
-            char aw;
+            testClass aw;
             w = '\"';
             x = ' ';
-            x = aw.getHerDone();
+            i = aw.getHerDone();
             return true;
 
         }
@@ -50,7 +41,8 @@ class testClass2{
     char wyz;
     char w;
     char aw;
-    public testClass3 testFile (char b, int y, int q){
+    char x;
+    public boolean testFile (char b, int y, int q){
         char wyz;
         char w;
         char aw;
@@ -58,7 +50,7 @@ class testClass2{
         w = '\"';
         x = ' ';
         //x & b;
-        x = aw.getHerDone();
+        //x = aw.getHerDone();
         return true;
 
     }
@@ -68,6 +60,7 @@ class testClass3{
     char wyz;
     char w;
     char aw;
+    char x;
     public boolean testMethod (char b, int y, int q){
         char wyz;
         char w;
@@ -75,10 +68,14 @@ class testClass3{
         bool value;
         w = '\"';
         x = ' ';
-        value = x && b;
-        x = aw.getHerDone();
+        //value = x && b;
+        //x = aw.getHerDone();
         return true;
 
+    }
+
+    public boolean getHerDone(){
+        return true;
     }
 }
 

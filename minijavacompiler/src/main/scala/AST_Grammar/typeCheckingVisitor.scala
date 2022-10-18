@@ -2,6 +2,7 @@ package AST_Grammar
 
 import scala.collection.mutable.ListBuffer
 import scala.util.control.Breaks
+import scala.util.control.NonLocalReturns.*
 
 class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
 
@@ -72,6 +73,16 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
         hasError = visit(statement.get, a).asInstanceOf[hasErrorResult]
       }
     }
+    if(!hasError.errorVal){
+      val returnValue = visit(method.returnVal, a)
+      returnValue match
+        case result:hasErrorResult => hasError = result
+        case result:varValResult =>
+          if(!result.varVal.equals(AST_Grammar.getVarType(method.returnType))){
+            hasError.errorVal = true
+            curError = Some(returnTypeError(AST_Grammar.getVarType(method.returnType), result.varVal, method.line))
+          }
+    }
     hasError
   }
 
@@ -93,7 +104,6 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
 
     hasError
   }
-
 
   //make sure conditional is a boolean, type check the statements in the bodies
   override def visitIfStatement(statement: ifStatement, a: symbolTable): typeCheckResult = {
@@ -242,6 +252,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
 
   //make sure the array identifier is actually of type array
   //make sure the expression in the brackets is an int, make sure the assigned value is an int
+  //NOT FINISHED
   override def visitArrayAssignStatement(statement: arrayAssignStatement, a: symbolTable): typeCheckResult = {
     var hasError = hasErrorResult(false)
     //first get the array identifier
@@ -317,26 +328,52 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     varValResult(characterType())
   }
 
-  //just return a class var type
+  //just return the var type
   override def visitIdentiferExpression(expression: identifierExpression, a: symbolTable): typeCheckResult = {
-    //have to check and make sure this class actually exists
-    var curParent = a.getParentTable
-    while(curParent.get.getParentTable.isDefined){
-      curParent = curParent.get.getParentTable
+    var returnedVal: typeCheckResult = hasErrorResult(false)
+    //check from inside out for the scope
+    //currentMethod Scope -> Class Scope -> Extended Class Scope
+    //return they type of the variable
+    val variableID = expression.value.name
+    //first checking the current method
+    if(a.checkIfVarIDExists(variableID)){
+      returnedVal = varValResult(a.getVariableVal(variableID).get.asInstanceOf[variableVal].varValue)
+    }else if(a.getParentTable.get.checkIfVarIDExists(variableID)){
+      returnedVal =  varValResult(a.getParentTable.get.getVariableVal(variableID).get.asInstanceOf[variableVal].varValue)
     }
-    if(curParent.get.checkIfClassIDExists(expression.value.name)){
-      varValResult(classType(expression.value.name))
-    }else{
-      curError = Some(noSuchTypeError(classType(expression.value.name), expression.line, expression.index))
-      hasErrorResult(true)
-    }
+    returnedVal
   }
 
-  //just return array type
-  override def visitNewArrayExpression(expression: newArrayExpression, a: symbolTable): typeCheckResult = super.visitNewArrayExpression(expression, a)
+  //just return array type, make sure the size is of type int.
+  override def visitNewArrayExpression(expression: newArrayExpression, a: symbolTable): typeCheckResult = {
+    var returnedVal: typeCheckResult = hasErrorResult(false)
+    //just check the size expression and make sure it is an integer
+    returnedVal = visit(expression.size, a)
+    returnedVal match
+      case result: varValResult =>
+        if(!result.varVal.equals(integerType())){
+          curError = Some(typeInconformitiyError(result.varVal, integerType(), expression.line, expression.index))
+          returnedVal = hasErrorResult(true)
+        }
 
-  //just return class var type
-  override def visitNewClassInstanceExpression(expression: newClassInstanceExpression, a: symbolTable): typeCheckResult = super.visitNewClassInstanceExpression(expression, a)
+      case _ =>
+    returnedVal
+  }
+
+  //just return class var type, make sure the class actually exists
+  override def visitNewClassInstanceExpression(expression: newClassInstanceExpression, a: symbolTable): typeCheckResult = {
+    var returnedVal: typeCheckResult = hasErrorResult(false)
+    //we know if we're in an expression that we're in a method, so just get the parent of the current parent to see if the class exists
+    val programTable = a.getParentTable.get.getParentTable.get
+    if(programTable.checkIfClassIDExists(expression.classType.name)){
+      returnedVal = varValResult(classType(expression.classType.name))
+    }else{
+      //no such class
+      curError = Some(noSuchClassError(expression.classType.name, expression.line, expression.index))
+    }
+
+    returnedVal
+  }
 
   //just make sure the expression is of type boolean
   override def visitNegatedExpression(expression: negatedExpression, a: symbolTable): typeCheckResult = {
@@ -351,7 +388,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     expressionType
   }
 
-  //get type of expression
+  //get returned type of parenthesized expression
   override def visitParenthesizedExpression(expression: parenthesizedExpression, a: symbolTable): typeCheckResult = {
     visit(expression, a)
   }
@@ -360,28 +397,230 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
   override def visitNoTail(previousExpressionVal: typeCheckResult): typeCheckResult = previousExpressionVal
 
   //make sure all expressions are booleans
-  override def visitAndExpression(expression: andExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitAndExpression(expression, a, b)
+  override def visitAndExpression(expression: andExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = {
+    if(b.isInstanceOf[hasErrorResult]){
+      b
+    }else{
+      //now just make sure b is a boolean
+      if(b.asInstanceOf[varValResult].varVal.equals(booleanType())){
+        val rightExpressionType = visit(expression.value, a)
+        rightExpressionType match
+          case result:varValResult =>
+            if(!result.varVal.equals(booleanType())){
+              curError = Some(typeInconformitiyError(result.asInstanceOf[varValResult].varVal, booleanType(), expression.value.line, expression.value.index))
+              hasErrorResult(true)
+            }else{
+              result
+            }
+          case _ => rightExpressionType
+      }else{
+        curError=Some(typeInconformitiyError(b.asInstanceOf[varValResult].varVal, booleanType(), expression.value.line, expression.value.index-1))
+        hasErrorResult(true)
+      }
+    }
+  }
 
   //make sure all expressions are ints
-  override def visitAddExpression(expression: addExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitAddExpression(expression, a, b)
+  override def visitAddExpression(expression: addExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = {
+    if (b.isInstanceOf[hasErrorResult]) {
+      b
+    } else {
+      //now just make sure b is a boolean
+      if (b.asInstanceOf[varValResult].varVal.equals(integerType())) {
+        val rightExpressionType = visit(expression.value, a)
+        rightExpressionType match
+          case result: varValResult =>
+            if (!result.varVal.equals(integerType())) {
+              curError = Some(typeInconformitiyError(result.varVal, integerType(), expression.value.line, expression.value.index))
+              hasErrorResult(true)
+            } else {
+              result
+            }
+          case _ => rightExpressionType
+      } else {
+        curError = Some(typeInconformitiyError(b.asInstanceOf[varValResult].varVal, integerType(), expression.value.line, expression.value.index - 1))
+        hasErrorResult(true)
+      }
+    }
+  }
 
   //make sure all expressions are booleans
-  override def visitCompareExpression(expression: compareExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitCompareExpression(expression, a, b)
+  override def visitCompareExpression(expression: compareExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = {
+    if (b.isInstanceOf[hasErrorResult]) {
+      b
+    } else {
+      //now just make sure b is a boolean
+      if (b.asInstanceOf[varValResult].varVal.equals(booleanType())) {
+        val rightExpressionType = visit(expression.value, a)
+        rightExpressionType match
+          case result: varValResult =>
+            if (!result.varVal.equals(booleanType())) {
+              curError = Some(typeInconformitiyError(result.asInstanceOf[varValResult].varVal, booleanType(), expression.value.line, expression.value.index))
+              hasErrorResult(true)
+            } else {
+              result
+            }
+          case _ => rightExpressionType
+      } else {
+        curError = Some(typeInconformitiyError(b.asInstanceOf[varValResult].varVal, booleanType(), expression.value.line, expression.value.index - 1))
+        hasErrorResult(true)
+      }
+    }
+  }
 
   //make sure all expressions are ints
-  override def visitSubtractExpression(expression: subtractExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitSubtractExpression(expression, a, b)
+  override def visitSubtractExpression(expression: subtractExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = {
+    if (b.isInstanceOf[hasErrorResult]) {
+      b
+    } else {
+      //now just make sure b is a boolean
+      if (b.asInstanceOf[varValResult].varVal.equals(integerType())) {
+        val rightExpressionType = visit(expression.value, a)
+        rightExpressionType match
+          case result: varValResult =>
+            if (!result.varVal.equals(integerType())) {
+              curError = Some(typeInconformitiyError(result.varVal, integerType(), expression.value.line, expression.value.index))
+              hasErrorResult(true)
+            } else {
+              result
+            }
+          case _ => rightExpressionType
+      } else {
+        curError = Some(typeInconformitiyError(b.asInstanceOf[varValResult].varVal, integerType(), expression.value.line, expression.value.index - 1))
+        hasErrorResult(true)
+      }
+    }
+
+  }
 
   //make sure all expressions are ints
-  override def visitMultiplyExpression(expression: multiplyExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitMultiplyExpression(expression, a, b)
+  override def visitMultiplyExpression(expression: multiplyExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = {
+    if (b.isInstanceOf[hasErrorResult]) {
+      b
+    } else {
+      //now just make sure b is a boolean
+      if (b.asInstanceOf[varValResult].varVal.equals(integerType())) {
+        val rightExpressionType = visit(expression.value, a)
+        rightExpressionType match
+          case result: varValResult =>
+            if (!result.varVal.equals(integerType())) {
+              curError = Some(typeInconformitiyError(result.varVal, integerType(), expression.value.line, expression.value.index))
+              hasErrorResult(true)
+            } else {
+              result
+            }
+          case _ => rightExpressionType
+      } else {
+        curError = Some(typeInconformitiyError(b.asInstanceOf[varValResult].varVal, integerType(), expression.value.line, expression.value.index - 1))
+        hasErrorResult(true)
+      }
+    }
+  }
 
   //make sure b is an int array type. If it is, return an integer type
-  override def visitArrayLengthExpression(expression: arrayLengthExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitArrayLengthExpression(expression, a, b)
+  override def visitArrayLengthExpression(expression: arrayLengthExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = {
+    var returnVal: typeCheckResult = hasErrorResult(false)
+    if (b.isInstanceOf[hasErrorResult]) {
+      returnVal = b
+    }else if(b.asInstanceOf[varValResult].varVal.equals(intArrayType())){
+      returnVal = varValResult(integerType())
+    }else{
+      curError = Some(typeInconformitiyError(b.asInstanceOf[varValResult].varVal, integerType(), expression.line, expression.index))
+      returnVal = hasErrorResult(true)
+    }
+
+    returnVal
+  }
 
   //make sure b is an int array type. If it is, make sure the index is an integer. If these checks pass, return an integer type
-  override def visitArrayIndexExpression(expression: arrayIndexExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitArrayIndexExpression(expression, a, b)
+  override def visitArrayIndexExpression(expression: arrayIndexExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = {
+    var returnVal: typeCheckResult = hasErrorResult(false)
+    if(b.isInstanceOf[hasErrorResult]){
+      returnVal = b
+    }else{
+      val indexVal = visit(expression.value, a)
+      indexVal match
+        case result: hasErrorResult => returnVal = result
+        case result: varValResult =>
+          if(!result.varVal.equals(integerType())){
+            curError = Some(typeInconformitiyError(result.varVal, integerType(), expression.value.line, expression.value.index))
+            returnVal = hasErrorResult(true)
+          }else{
+            returnVal = result
+          }
+    }
+    returnVal
+  }
 
   //check if b is actually of a class type. If it is, gather a list of the operands and the method name. Check and make sure
   //the method exists either in the class type of the variable calling the method or in one of the variable's inherited classes.
   //if it does exist, return the return type of the visited method call
-  override def visitMethodFunctionCallExpression(expression: methodFunctionCallExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitMethodFunctionCallExpression(expression, a, b)
+  override def visitMethodFunctionCallExpression(expression: methodFunctionCallExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = {
+    var returnedVal: typeCheckResult = hasErrorResult(false)
+    val loop = Breaks
+    val methodName = expression.funcName.name
+    val methodParams = expression.params
+    val paramVarTypes = new ListBuffer[varType]
+    if(b.isInstanceOf[hasErrorResult]){
+      return b
+    }else{
+      b.asInstanceOf[varValResult].varVal match
+        case result:classType =>
+        case _ =>
+          curError = Some(callMethodOnPrimitve(b.asInstanceOf[varValResult].varVal, expression.line))
+          returnedVal = hasErrorResult(true)
+          return returnedVal
+    }
+
+    loop.breakable {
+      for (curParam <- methodParams) {
+        val returnedParamVal = visit(curParam, a)
+        if (returnedParamVal.isInstanceOf[hasErrorResult]) {
+          returnedVal = returnedParamVal
+          loop.break()
+        } else {
+          paramVarTypes += returnedParamVal.asInstanceOf[varValResult].varVal
+        }
+      }
+    }
+    //if there was some error going through the expressions, we're not going to bother looking for the method
+    if(!returnedVal.asInstanceOf[hasErrorResult].errorVal) {
+      val methodKey = (methodName, paramVarTypes.toList)
+      //method exists in th current scope
+      if (a.getParentTable.get.checkIfMethodIDExists(methodKey)) {
+        returnedVal = varValResult(a.getParentTable.get.getMethodVal(methodKey).get.asInstanceOf[methodVal].returnType)
+        returnedVal
+      } else {
+        //look at the extended class if one exists and look for the method there
+        val curClassName = a.getParentTable.get.getName
+        val extendedClass = a.getParentTable.get.getParentTable.get.getClassVal(curClassName).get.asInstanceOf[classVal].extendedClass
+        extendedClass match
+          //there is an extended class, so try and find the method in the scope of the extended class
+          case Some(extended) =>
+            returnedVal = checkForMethod(methodKey, extended, a.getParentTable.get.getParentTable.get)
+            if(returnedVal.isInstanceOf[hasErrorResult]){
+              curError = Some(noSuchMethodError(expression.funcName.name, paramVarTypes.toList, expression.line))
+            }
+          case None =>
+            curError = Some(noSuchMethodError(expression.funcName.name, paramVarTypes.toList, expression.line))
+            returnedVal.asInstanceOf[hasErrorResult].errorVal = true
+        returnedVal
+      }
+    }else{
+      returnedVal
+    }
+  }
+
+  def checkForMethod(key: (String, List[varType]), curClassName: String, programTable: symbolTable): typeCheckResult ={
+    var returnedVal: typeCheckResult = hasErrorResult(false)
+    val classVal = programTable.getClassVal(curClassName).get.asInstanceOf[AST_Grammar.classVal]
+    if(classVal.classScope.checkIfMethodIDExists(key)){
+      returnedVal = varValResult(classVal.classScope.getMethodVal(key).get.asInstanceOf[methodVal].returnType)
+    }else if(classVal.extendedClass.isDefined){
+      returnedVal = checkForMethod(key, classVal.extendedClass.get, programTable)
+    }else{
+      returnedVal = hasErrorResult(true)
+    }
+    returnedVal
+  }
 }

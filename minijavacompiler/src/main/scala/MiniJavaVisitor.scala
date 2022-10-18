@@ -194,7 +194,9 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
   }
 
   override def visitArrayLengthCall(ctx: miniJavaParser.ArrayLengthCallContext): Option[ASTNode] = {
-    Some(AST_Grammar.arrayLengthExpression())
+    val lineNum = ctx.getStart.getLine
+    val expressionIndex = ctx.getStart.getCharPositionInLine
+    Some(AST_Grammar.arrayLengthExpression(lineNum, expressionIndex))
   }
 
   override def visitAndExpression(ctx: miniJavaParser.AndExpressionContext): Option[ASTNode] = {
