@@ -102,7 +102,8 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     ifCondVal match {
       //if it is a variable result, make sure it is a boolean
       case result: varValResult =>
-        if (result.varVal != booleanType) {
+        if (result.varVal != booleanType()) {
+          curError = Some(typeInconformitiyError(result.varVal, booleanType(), statement.condition.line,statement.condition.index))
           hasError.errorVal = true
         }else{
           //now type check the then and else statements
@@ -126,7 +127,8 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     val whileCondVal = visit(statement.condition, a)
     whileCondVal match
       case result: varValResult =>
-        if (result.varVal != booleanType) {
+        if (result.varVal != booleanType()) {
+          curError = Some(typeInconformitiyError(result.varVal, booleanType(), statement.condition.line, statement.condition.index))
           hasError.errorVal = true
         } else {
           //now type check the then and else statements
@@ -350,23 +352,36 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
   }
 
   //get type of expression
-  override def visitParenthesizedExpression(expression: parenthesizedExpression, a: symbolTable): typeCheckResult = super.visitParenthesizedExpression(expression, a)
+  override def visitParenthesizedExpression(expression: parenthesizedExpression, a: symbolTable): typeCheckResult = {
+    visit(expression, a)
+  }
 
+  //just return what the left side had
   override def visitNoTail(previousExpressionVal: typeCheckResult): typeCheckResult = previousExpressionVal
 
+  //make sure all expressions are booleans
   override def visitAndExpression(expression: andExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitAndExpression(expression, a, b)
 
+  //make sure all expressions are ints
   override def visitAddExpression(expression: addExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitAddExpression(expression, a, b)
 
+  //make sure all expressions are booleans
   override def visitCompareExpression(expression: compareExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitCompareExpression(expression, a, b)
 
+  //make sure all expressions are ints
   override def visitSubtractExpression(expression: subtractExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitSubtractExpression(expression, a, b)
 
+  //make sure all expressions are ints
   override def visitMultiplyExpression(expression: multiplyExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitMultiplyExpression(expression, a, b)
 
+  //make sure b is an int array type. If it is, return an integer type
   override def visitArrayLengthExpression(expression: arrayLengthExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitArrayLengthExpression(expression, a, b)
 
+  //make sure b is an int array type. If it is, make sure the index is an integer. If these checks pass, return an integer type
   override def visitArrayIndexExpression(expression: arrayIndexExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitArrayIndexExpression(expression, a, b)
 
+  //check if b is actually of a class type. If it is, gather a list of the operands and the method name. Check and make sure
+  //the method exists either in the class type of the variable calling the method or in one of the variable's inherited classes.
+  //if it does exist, return the return type of the visited method call
   override def visitMethodFunctionCallExpression(expression: methodFunctionCallExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = super.visitMethodFunctionCallExpression(expression, a, b)
 }
