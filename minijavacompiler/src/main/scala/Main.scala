@@ -42,7 +42,7 @@ object Main {
           val statementTypeChecker = new typeCheckingVisitor
           statementTypeChecker.visit(programAST.get, symbolTable)
           if(statementTypeChecker.getCurError.isDefined){
-            println(symbolTableBuilder.getError.get.errorVal)
+            println(statementTypeChecker.getCurError.get.errorVal)
             System.exit(1)
           }
 

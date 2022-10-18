@@ -37,7 +37,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
     val mainClassSymbolTable = new symbolTable("main")
     mainClassSymbolTable.setParentTable(a)
     mainClassSymbolTable.putVarVal(clazz.commandLineArgs.name, AST_Grammar.commandLineArgs())
-    a.putMethodVal("main", methodVal(mainClassSymbolTable, List[varType]{commandLineArgs()}, voidType(), clazz.line))
+    a.putMethodVal(("main", List{commandLineArgs}), methodVal(mainClassSymbolTable, List[varType]{commandLineArgs()}, voidType(), clazz.line))
     classVal(a, None, clazz.line)
   }
 
@@ -75,9 +75,9 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
           methodSymbolTable.setParentTable(a)
           val methodName = currentMethod.get.methodName.name
           val curMethodVal = visit(currentMethod.get, methodSymbolTable).asInstanceOf[methodVal]
-          val methodKey = (methodName, curMethodVal.paramTypes, curMethodVal.returnType)
+          val methodKey = (methodName, curMethodVal.paramTypes)
           if (a.checkIfMethodIDExists(methodKey)) {
-            curError = Some(methodOverLoadingError(klass.className.name, methodName, methodKey._2, methodKey._3, currentMethod.get.line))
+            curError = Some(methodOverLoadingError(klass.className.name, methodName, methodKey._2, curMethodVal.returnType, currentMethod.get.line))
             loop.break()
           }
           a.putMethodVal(methodKey, curMethodVal)
@@ -124,7 +124,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
           case boolean() => a.putVarVal(varName, AST_Grammar.variableVal(booleanType(), varLine))
       }
     }
-    
+
     methodVal(a, paramTypes.toList, AST_Grammar.getVarType(methodReturnType), methodLine)
   }
 

@@ -1,7 +1,7 @@
 class testFile {
     public static void main(String[] a) {
 
-            System.out.println(this);
+            System.out.println(15);
 
     }
 }
@@ -11,6 +11,7 @@ class testFile {
         char wyz;
         char w;
         char aw;
+        char x;
         public boolean testMethod (char b){
             char wyz;
             char w;

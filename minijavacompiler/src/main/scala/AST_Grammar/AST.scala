@@ -17,7 +17,7 @@ case class mainClass(className: identifier, commandLineArgs: identifier, body: s
 case class klass(className: identifier, extendedClassName: Option[identifier], variables: List[Option[variableDecs]], methods: List[Option[method]], line: Integer) extends ASTNode
 
 //method case
-case class method(returnType: dataType, methodName: identifier, params: List[(dataType, identifier)], variables: List[Option[variableDecs]], statements: List[statement], returnVal: expression,line: Integer) extends ASTNode
+case class method(returnType: dataType, methodName: identifier, params: List[(dataType, identifier)], variables: List[Option[variableDecs]], statements: List[Option[statement]], returnVal: expression,line: Integer) extends ASTNode
 
 //type cases
 sealed trait dataType extends ASTNode
@@ -44,15 +44,15 @@ case class arrayAssignStatement(idVal: identifier, arrayIndex: expression, value
 
 //expression cases
 sealed trait expressionTerminal() extends ASTNode
-case class thisExpression(line: Integer) extends expressionTerminal
-case class booleanExpression(value: Boolean, line: Integer) extends expressionTerminal
-case class integerExpression(value: Integer) extends expressionTerminal
-case class characterExpression(value: String) extends expressionTerminal
-case class identifierExpression(value: identifier, line: Integer) extends expressionTerminal
-case class newArrayExpression(size: expression, line: Integer) extends expressionTerminal
-case class newClassInstanceExpression(classType: identifier, line: Integer) extends expressionTerminal
-case class negatedExpression(value: expression, line: Integer) extends expressionTerminal
-case class parenthesizedExpression(value: expression, line: Integer) extends expressionTerminal
+case class thisExpression(line: Integer, index: Integer) extends expressionTerminal
+case class booleanExpression(value: Boolean, line: Integer, index: Integer) extends expressionTerminal
+case class integerExpression(value: Integer, line: Integer, index: Integer) extends expressionTerminal
+case class characterExpression(value: String, line: Integer, index: Integer) extends expressionTerminal
+case class identifierExpression(value: identifier, line: Integer, index: Integer) extends expressionTerminal
+case class newArrayExpression(size: expression, line: Integer, index: Integer) extends expressionTerminal
+case class newClassInstanceExpression(classType: identifier, line: Integer, index: Integer) extends expressionTerminal
+case class negatedExpression(value: expression, line: Integer, index: Integer) extends expressionTerminal
+case class parenthesizedExpression(value: expression, line: Integer, index: Integer) extends expressionTerminal
 
 sealed trait expressionTail() extends ASTNode
 
@@ -168,6 +168,8 @@ case class noSuchVariableUnknownTypeDefinedError(varName: String, line: Integer)
 
 case class typeInconformitiyError(gotType: varType, expectedType: varType, line: Integer, index: Integer) extends error {
   val errorVal: String = "ERROR on line " + line + ":" +index+ " :expected type " + varTypeToString(expectedType) + ", instead got type " + varTypeToString(gotType)
+}
 
-
+case class noSuchTypeError(givenType: varType, line: Integer, index: Integer) extends  error {
+  val errorVal: String = "ERROR on line " + line + ":" + index + " : no such data type of " + varTypeToString(givenType)
 }

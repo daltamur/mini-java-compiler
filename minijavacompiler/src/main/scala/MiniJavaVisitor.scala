@@ -1,9 +1,10 @@
 import AST_Grammar.ASTNode
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.{ErrorNode, TerminalNode}
+
 import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
 import scala.collection.mutable.ListBuffer
-import scala.language.postfixOps
+import scala.language.{existentials, postfixOps}
 class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
   override def visitGoal(ctx: miniJavaParser.GoalContext): Option[ASTNode] = {
     val ctxMainClass = Option(ctx.mainClass())
@@ -76,7 +77,7 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     ctxStatements.forEach(x => ASTStatements += x.accept(this))
     val ctxreturnedVal = Option(ctx.expression())
     val ASTReturnedVal = ctxreturnedVal.flatMap(x => x.accept(this))
-    val methodDec = Some(AST_Grammar.method(ASTType.orNull.asInstanceOf[AST_Grammar.dataType],ASTMethodName.orNull, ASTParams.toList, ASTVarDecs.toList.asInstanceOf[List[Option[AST_Grammar.variableDecs]]], ASTStatements.toList.asInstanceOf[List[AST_Grammar.statement]], ASTReturnedVal.orNull.asInstanceOf[AST_Grammar.expression], lineNum))
+    val methodDec = Some(AST_Grammar.method(ASTType.orNull.asInstanceOf[AST_Grammar.dataType],ASTMethodName.orNull, ASTParams.toList, ASTVarDecs.toList.asInstanceOf[List[Option[AST_Grammar.variableDecs]]], ASTStatements.toList.asInstanceOf[List[Option[AST_Grammar.statement]]], ASTReturnedVal.orNull.asInstanceOf[AST_Grammar.expression], lineNum))
     methodDec
   }
 
@@ -253,7 +254,8 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
 
   override def visitThisKeyword(ctx: miniJavaParser.ThisKeywordContext): Option[ASTNode] = {
     val lineNum = ctx.getStart.getLine
-    Some(AST_Grammar.thisExpression(lineNum))
+    val expressionIndex = ctx.getStart.getCharPositionInLine
+    Some(AST_Grammar.thisExpression(lineNum, expressionIndex))
   }
 
   override def visitBooleanExpression(ctx: miniJavaParser.BooleanExpressionContext): Option[ASTNode] = {
@@ -264,58 +266,68 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
 
   override def visitIntegerExpression(ctx: miniJavaParser.IntegerExpressionContext): Option[ASTNode] = {
     val ctxInt = Option(ctx.INTEGER_LITERAL())
+    val expressionLine = ctx.getStart.getLine
+    val expressionIndex = ctx.getStart.getCharPositionInLine
     val ASTInt = ctxInt.flatMap(x => Option(x.getSymbol.getText.toInt))
-    Some(AST_Grammar.integerExpression(ASTInt.orNull.asInstanceOf[Int]))
+    Some(AST_Grammar.integerExpression(ASTInt.orNull.asInstanceOf[Int], expressionLine, expressionIndex))
   }
 
   override def visitCharacterExpression(ctx: miniJavaParser.CharacterExpressionContext): Option[ASTNode] = {
+    val expressionLine = ctx.getStart.getLine
+    val expressionIndex = ctx.getStart.getCharPositionInLine
     val ctxChar = Option(ctx.CHARACTER_LITERAL())
-    val ASTChar = ctxChar.flatMap(x => Option(AST_Grammar.characterExpression(x.getSymbol.getText)))
+    val ASTChar = ctxChar.flatMap(x => Option(AST_Grammar.characterExpression(x.getSymbol.getText, expressionLine, expressionIndex)))
     ASTChar
   }
 
   override def visitIdentifierExpression(ctx: miniJavaParser.IdentifierExpressionContext): Option[ASTNode] = {
     val lineNum = ctx.getStart.getLine
+    val expressionIndex = ctx.getStart.getCharPositionInLine
     val ctxID = Option(ctx.IDENTIFIER())
     val ASTID = ctxID.flatMap(x => Option(AST_Grammar.identifier(x.getSymbol.getText)))
-    val IDExpression = Some(AST_Grammar.identifierExpression(ASTID.orNull, lineNum))
+    val IDExpression = Some(AST_Grammar.identifierExpression(ASTID.orNull, lineNum, expressionIndex))
     IDExpression
   }
 
   override def visitNewArrayExpression(ctx: miniJavaParser.NewArrayExpressionContext): Option[ASTNode] = {
     val lineNum = ctx.getStart.getLine
+    val expressionIndex = ctx.getStart.getCharPositionInLine
     val ctxSize = Option(ctx.expression())
     val ASTSize = ctxSize.flatMap(x => x.accept(this))
-    val newArray = Some(AST_Grammar.newArrayExpression(ASTSize.orNull.asInstanceOf[AST_Grammar.expression], lineNum))
+    val newArray = Some(AST_Grammar.newArrayExpression(ASTSize.orNull.asInstanceOf[AST_Grammar.expression], lineNum, expressionIndex))
     newArray
   }
 
   override def visitNewClassExpression(ctx: miniJavaParser.NewClassExpressionContext): Option[ASTNode] = {
     val lineNum = ctx.getStart.getLine
+    val expressionIndex = ctx.getStart.getCharPositionInLine
     val ctxClassID = Option(ctx.IDENTIFIER())
     val ASTClassID = ctxClassID.flatMap(x => Option(AST_Grammar.identifier(x.getSymbol.getText)))
-    val newClass = Some(AST_Grammar.newClassInstanceExpression(ASTClassID.orNull, lineNum))
+    val newClass = Some(AST_Grammar.newClassInstanceExpression(ASTClassID.orNull, lineNum, expressionIndex))
     newClass
   }
 
   override def visitNegatedExpression(ctx: miniJavaParser.NegatedExpressionContext): Option[ASTNode] = {
     val lineNum = ctx.getStart.getLine
+    val expressionIndex = ctx.getStart.getCharPositionInLine
     val ctxExpression = Option(ctx.expression())
     val ASTExpression = ctxExpression.flatMap(x => x.accept(this))
-    val negatedExpression = Some(AST_Grammar.negatedExpression(ASTExpression.orNull.asInstanceOf[AST_Grammar.expression], lineNum))
+    val negatedExpression = Some(AST_Grammar.negatedExpression(ASTExpression.orNull.asInstanceOf[AST_Grammar.expression], lineNum, expressionIndex))
     negatedExpression
   }
 
   override def visitParenthesizedExpression(ctx: miniJavaParser.ParenthesizedExpressionContext): Option[ASTNode] = {
     val lineNum = ctx.getStart.getLine
+    val expressionIndex = ctx.getStart.getCharPositionInLine
     val ctxInnerVal = Option(ctx.expression())
     val ASTInnerVal = ctxInnerVal.flatMap(x => x.accept(this))
-    val parenthesizedExpression = Some(AST_Grammar.parenthesizedExpression(ASTInnerVal.orNull.asInstanceOf[AST_Grammar.expression], lineNum))
+    val parenthesizedExpression = Some(AST_Grammar.parenthesizedExpression(ASTInnerVal.orNull.asInstanceOf[AST_Grammar.expression], lineNum, expressionIndex))
     parenthesizedExpression
   }
 
   override def visitBoolVal(ctx: miniJavaParser.BoolValContext): Option[ASTNode] = {
     val lineNum = ctx.getStart.getLine
+    val expressionIndex = ctx.getStart.getCharPositionInLine
     var curBool: Option[String] = null
     if(ctx.TRUE() != null){
       curBool = Some(ctx.TRUE().getSymbol.getText)
@@ -324,6 +336,6 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     }else{
       curBool = None
     }
-    Some(AST_Grammar.booleanExpression(curBool.orNull.toBoolean, lineNum))
+    Some(AST_Grammar.booleanExpression(curBool.orNull.toBoolean, lineNum, expressionIndex))
   }
 }

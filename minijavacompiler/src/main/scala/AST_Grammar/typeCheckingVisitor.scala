@@ -1,5 +1,6 @@
 package AST_Grammar
 
+import scala.collection.mutable.ListBuffer
 import scala.util.control.Breaks
 
 class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
@@ -31,7 +32,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
   //just make sure the statement has no type check errors
   override def visitMainClass(clazz: mainClass, a: symbolTable): typeCheckResult = {
     var hasError = hasErrorResult(false)
-    hasError = visit(clazz.body, a.getMethodVal("main").get.asInstanceOf[methodVal].methodScope).asInstanceOf[hasErrorResult]
+    hasError = visit(clazz.body, a.getMethodVal(("main", List{commandLineArgs})).get.asInstanceOf[methodVal].methodScope).asInstanceOf[hasErrorResult]
     hasError
   }
 
@@ -45,7 +46,14 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
         if (hasError.errorVal) {
           loop.break()
         }
-        hasError = visit(method.get, a.getMethodVal(method.get.methodName.name).get.asInstanceOf[methodVal].methodScope).asInstanceOf[hasErrorResult]
+        
+        //remember the method key is a tuple of the method and the list of params ;)
+        val methodParams = new ListBuffer[varType]
+        for(param <- method.get.params){
+          methodParams += AST_Grammar.getVarType(param._1)
+        }
+
+        hasError = visit(method.get, a.getMethodVal((method.get.methodName.name, methodParams.toList)).get.asInstanceOf[methodVal].methodScope).asInstanceOf[hasErrorResult]
       }
     }
     hasError
@@ -61,7 +69,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
         if (hasError.errorVal) {
           loop.break()
         }
-        hasError = visit(statement, a).asInstanceOf[hasErrorResult]
+        hasError = visit(statement.get, a).asInstanceOf[hasErrorResult]
       }
     }
     hasError
@@ -136,7 +144,8 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     val printedVal = visit(statement.value, a)
     printedVal match
       case result: varValResult =>
-        if(result.varVal != integerType) {
+        if(result.varVal != integerType()) {
+          curError = Some(typeInconformitiyError(result.varVal, integerType(), statement.value.line, statement.value.index))
           hasError.errorVal = true
         }
 
@@ -180,7 +189,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
                     }
           }else{
             //the variable is defined as a global value in the class, get it and perform the rest of the checks
-            val variableType = parent.getVariableVal(leftVal.name).asInstanceOf[variableVal]
+            val variableType = parent.getVariableVal(leftVal.name).get.asInstanceOf[variableVal]
             //check right side
             val rightSide = visit(statement.value, a)
             rightSide match
@@ -292,16 +301,34 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
   }
 
   //just return boolean var type
-  override def visitBooleanExpression(expression: booleanExpression, a: symbolTable): typeCheckResult = super.visitBooleanExpression(expression, a)
+  override def visitBooleanExpression(expression: booleanExpression, a: symbolTable): typeCheckResult = {
+    varValResult(booleanType())
+  }
 
   //just return integer var type
-  override def visitIntegerExpression(expression: integerExpression, a: symbolTable): typeCheckResult = super.visitIntegerExpression(expression, a)
+  override def visitIntegerExpression(expression: integerExpression, a: symbolTable): typeCheckResult = {
+    varValResult(integerType())
+  }
 
   //just return character var type
-  override def visitCharacterExpression(expression: characterExpression, a: symbolTable): typeCheckResult = super.visitCharacterExpression(expression, a)
+  override def visitCharacterExpression(expression: characterExpression, a: symbolTable): typeCheckResult = {
+    varValResult(characterType())
+  }
 
   //just return a class var type
-  override def visitIdentiferExpression(expression: identifierExpression, a: symbolTable): typeCheckResult = super.visitIdentiferExpression(expression, a)
+  override def visitIdentiferExpression(expression: identifierExpression, a: symbolTable): typeCheckResult = {
+    //have to check and make sure this class actually exists
+    var curParent = a.getParentTable
+    while(curParent.get.getParentTable.isDefined){
+      curParent = curParent.get.getParentTable
+    }
+    if(curParent.get.checkIfClassIDExists(expression.value.name)){
+      varValResult(classType(expression.value.name))
+    }else{
+      curError = Some(noSuchTypeError(classType(expression.value.name), expression.line, expression.index))
+      hasErrorResult(true)
+    }
+  }
 
   //just return array type
   override def visitNewArrayExpression(expression: newArrayExpression, a: symbolTable): typeCheckResult = super.visitNewArrayExpression(expression, a)
@@ -310,7 +337,17 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
   override def visitNewClassInstanceExpression(expression: newClassInstanceExpression, a: symbolTable): typeCheckResult = super.visitNewClassInstanceExpression(expression, a)
 
   //just make sure the expression is of type boolean
-  override def visitNegatedExpression(expression: negatedExpression, a: symbolTable): typeCheckResult = super.visitNegatedExpression(expression, a)
+  override def visitNegatedExpression(expression: negatedExpression, a: symbolTable): typeCheckResult = {
+    var expressionType:typeCheckResult = visit(expression, a)
+    if(!expressionType.isInstanceOf[hasErrorResult]){
+      if(!expressionType.asInstanceOf[varValResult].varVal.equals(booleanType)){
+        curError = Some(typeInconformitiyError(expressionType.asInstanceOf[varValResult].varVal, booleanType(), expression.line, expression.index))
+        expressionType = hasErrorResult(true)
+      }
+    }
+
+    expressionType
+  }
 
   //get type of expression
   override def visitParenthesizedExpression(expression: parenthesizedExpression, a: symbolTable): typeCheckResult = super.visitParenthesizedExpression(expression, a)
