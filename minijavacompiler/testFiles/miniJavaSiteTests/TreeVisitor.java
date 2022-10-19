@@ -314,7 +314,7 @@ class Tree{
 	    ntb = this.RecPrint(node.GetRight());
 	} else ntb = true ;
 	return true ;
-    }visitMeth
+    }
     
     public int accept(Visitor v){
 	int nti ;
@@ -355,15 +355,15 @@ class MyVisitor extends Visitor {
 	int nti ;
 
 	if (n.GetHas_Right()){
-	    r = n.GetRight() ; }
-	    //nti = r.accept(this) ; }
+	    r = n.GetRight() ;
+	    nti = r.accept(this) ; }
 	else nti = 0 ;
 
 	System.out.println(n.GetKey());
 
 	if (n.GetHas_Left()) {
-	    l = n.GetLeft(); }
-	    //nti =l.accept(this) ; }
+	    l = n.GetLeft();
+	    nti =l.accept(this) ; }
 	else nti = 0 ;
 
 	return 0;

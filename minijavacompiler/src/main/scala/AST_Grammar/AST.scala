@@ -1,5 +1,7 @@
 package AST_Grammar
 
+import scala.collection.mutable.ListBuffer
+
 
 sealed trait ASTNode
 
@@ -102,11 +104,8 @@ case class commandLineArgs() extends varType
 case class booleanType() extends varType
 case class integerType() extends varType
 case class characterType() extends varType
-case class classType(clazz: String) extends varType
+case class classType(clazz: String) extends varType 
 case class voidType() extends varType
-
-case class classTypeChoice(clazzes: Option[List[classType]])
-
 case class methodVal(methodScope: symbolTable, paramTypes: List[varType], returnType: varType, line: Integer) extends symbolTableVal
 
 case class classVal(classScope: symbolTable, extendedClass: Option[String], line: Integer) extends symbolTableVal

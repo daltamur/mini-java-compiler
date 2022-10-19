@@ -267,10 +267,43 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
         case Some(parent) =>
           //checking the class that the method is a child of
           if (!parent.checkIfVarIDExists(arrayID.name)) {
-            //no
+            //need to check the extended classes for an int array
+            val idType = checkExtendedClassesForVar(arrayID.name, a.getParentTable.get)
+            idType match
+              case hasErrorResult =>
+                hasError.errorVal = true
 
+              case x:intArrayType => {
+                // we found the identifier and it was an array
+                //check and make sure the array index is of type int
+                val arrIndex = visit(statement.arrayIndex, a)
+                arrIndex match
+                  case result: hasErrorResult =>
+                    hasError = result
+                  case result: varValResult =>
+                    if (!result.varVal.equals(integerType)) {
+                      curError = Some(typeInconformitiyError(result.varVal, integerType(), statement.arrayIndex.line, statement.arrayIndex.index))
+                      hasError.errorVal = true
+                    }
+                //so long as the previous check passed, we'll type check the assigned expression now to make sure it is an integer
+                if (!hasError.errorVal) {
+                  val assignedExpression = visit(statement.value, a)
+                  assignedExpression match
+                    case result: hasErrorResult =>
+                      hasError = result
+                    case result: varValResult =>
+                      if (!result.varVal.equals(integerType)) {
+                        curError = Some(typeInconformitiyError(result.varVal, integerType(), statement.arrayIndex.line, statement.arrayIndex.index))
+                        hasError.errorVal = true
+                      }
+                }
+              }
 
-            //fill this body in later
+              case _ =>
+                //we found the identifier and it was not an array
+                curError = Some(typeInconformitiyError(idType.asInstanceOf[varValResult].varVal, intArrayType(), statement.value.line, statement.value.index))
+                hasError.errorVal = true
+
           }else{//DO NOT FORGET THE ELSE HERE
             //the array exists as a global within the class
           }
@@ -394,7 +427,11 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
         }
 
       case _ =>
-    returnedVal
+    if(!returnedVal.isInstanceOf[hasErrorResult]){
+      varValResult(intArrayType())
+    }else{
+      returnedVal
+    }
   }
 
   //just return class var type, make sure the class actually exists
@@ -626,34 +663,97 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     if(!returnedVal.asInstanceOf[hasErrorResult].errorVal) {
       val methodKey = (methodName, paramVarTypes.toList)
       //method exists in th current scope
+      //get method keys for current class
       if (a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].classScope.checkIfMethodIDExists(methodKey)) {
         returnedVal = varValResult(a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].classScope.getMethodVal(methodKey).get.asInstanceOf[methodVal].returnType)
         returnedVal
       } else {
-        //look at the extended class if one exists and look for the method there
-        val extendedClass = a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].extendedClass
-        extendedClass match
-          //there is an extended class, so try and find the method in the scope of the extended class
-          case Some(extended) =>
-            returnedVal = checkForMethod(methodKey, extended, a.getParentTable.get.getParentTable.get)
-            if(returnedVal.isInstanceOf[hasErrorResult]){
-              curError = Some(noSuchMethodError(expression.funcName.name, paramVarTypes.toList, expression.line))
+        //possible that the method requires parent types, making the method signature valid. check this and  return as
+        //necessary
+        val methodKeys = a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].classScope.getMethodKeys
+        for (possibleKey <- methodKeys) {
+          if (possibleKey.asInstanceOf[(String, List[varType])]._1.equals(methodKey._1)) {
+            val varsMatch = checkForParentTypes(methodKey._2, possibleKey.asInstanceOf[(String, List[varType])]._2, a.getParentTable.get.getParentTable.get)
+            if (varsMatch) {
+              returnedVal = varValResult(a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].classScope.getMethodVal(possibleKey).get.asInstanceOf[methodVal].returnType)
             }
-          case None =>
-            curError = Some(noSuchMethodError(expression.funcName.name, paramVarTypes.toList, expression.line))
-            returnedVal.asInstanceOf[hasErrorResult].errorVal = true
+          }
+        }
+
+        returnedVal match {
+          case result: hasErrorResult =>
+            //look at the extended class if one exists and look for the method there
+            val extendedClass = a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].extendedClass
+            extendedClass match
+              //there is an extended class, so try and find the method in the scope of the extended class
+              case Some(extended) =>
+                returnedVal = checkForMethod(methodKey, extended, a.getParentTable.get.getParentTable.get)
+                if (returnedVal.isInstanceOf[hasErrorResult]) {
+                  curError = Some(noSuchMethodError(expression.funcName.name, paramVarTypes.toList, expression.line))
+                }
+              case None =>
+                curError = Some(noSuchMethodError(expression.funcName.name, paramVarTypes.toList, expression.line))
+                result.errorVal = true
+          case _ =>
+        }
         returnedVal
       }
     }else{
       returnedVal
     }
   }
+  
+  def isChild(givenParam: varType, neededParam: varType, table: symbolTable): Boolean = {
+    val givenParamExtendedVal = table.getClassVal(givenParam.asInstanceOf[classType].clazz).get.asInstanceOf[classVal].extendedClass
+    givenParamExtendedVal match
+      case Some(value) =>
+        isChild(classType(value), neededParam, table)
+      case _ => false
+  }
+  
+  def matchParams(givenParam: varType, neededParam: varType, table: symbolTable): Boolean = {
+    if(givenParam.equals(neededParam)){
+      true
+    }else{
+      //check if givenParam is just a child of neededParam
+      if(neededParam.isInstanceOf[classType] && givenParam.isInstanceOf[classType]){
+        isChild(givenParam, neededParam, table)
+      }else{
+        false
+      }
+    }
+  }
+  def checkForParentTypes(givenParamList: List[varType], neededParamList: List[varType], a: symbolTable):Boolean = {
+    //assume the given table is the outermost table
+    if(givenParamList.length == neededParamList.length) {
+      val pairs = givenParamList.zip(neededParamList)
+      val paramMatch = for ((givenParam, neededParam) <- pairs)
+        yield matchParams(givenParam, neededParam, a)
+      paramMatch.contains(false)
+    }else{
+      false
+    }
+  }
+  
+  
 
   def checkForMethod(key: (String, List[varType]), curClassName: String, programTable: symbolTable): typeCheckResult ={
     var returnedVal: typeCheckResult = hasErrorResult(false)
     val classVal = programTable.getClassVal(curClassName).get.asInstanceOf[AST_Grammar.classVal]
     if(classVal.classScope.checkIfMethodIDExists(key)){
       returnedVal = varValResult(classVal.classScope.getMethodVal(key).get.asInstanceOf[methodVal].returnType)
+    }else if(!classVal.classScope.checkIfMethodIDExists(key)){
+      //possible that the method requires parent types, making the method signature valid. check this and  return as
+      //necessary
+      val methodKeys = classVal.classScope.getMethodKeys
+      for (possibleKey <- methodKeys) {
+        if (possibleKey.asInstanceOf[(String, List[varType])]._1.equals(key._1)) {
+          val varsMatch = checkForParentTypes(key._2, possibleKey.asInstanceOf[(String, List[varType])]._2, programTable)
+          if (varsMatch) {
+            returnedVal = varValResult(classVal.classScope.getMethodVal(possibleKey).get.asInstanceOf[methodVal].returnType)
+          }
+        }
+      }
     }else if(classVal.extendedClass.isDefined){
       returnedVal = checkForMethod(key, classVal.extendedClass.get, programTable)
     }else{
