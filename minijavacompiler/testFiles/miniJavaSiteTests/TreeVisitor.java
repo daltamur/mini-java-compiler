@@ -3,7 +3,9 @@
 // in the Tree class
 
 class TreeVisitor{
-
+	public static void main(String[] args) {
+		System.out.println(1);
+	}
 }
 
 class TV {
@@ -17,7 +19,7 @@ class TV {
 	root = new Tree();
 	ntb = root.Init(16);
 	ntb = root.Print();
-	ntb = (5+x).dothedamnFunction();
+	//ntb = v.dothedamnFunction();
 	System.out.println(100000000);
 	ntb = root.Insert(8) ;
 	ntb = root.Insert(24) ;
@@ -30,7 +32,7 @@ class TV {
 	System.out.println(100000000);
 	v = new MyVisitor();
 	System.out.println(50000000);
-	nti = root.accept(v);
+	//nti = root.accept(v);
 	System.out.println(100000000);
 	System.out.println(root.Search(24));
 	System.out.println(root.Search(12));
@@ -40,7 +42,6 @@ class TV {
 	ntb = root.Delete(12);
 	ntb = root.Print();
 	System.out.println(root.Search(12));
-
 	return 0 ;
     }
 
@@ -78,7 +79,7 @@ class Tree{
 	return true ;
     }
 
-    public boolean SetRight(Tree rn)
+    public boolean SetRight(Tree rn){
 	right = rn ;
 	return true ;
     }
@@ -313,12 +314,10 @@ class Tree{
 	    ntb = this.RecPrint(node.GetRight());
 	} else ntb = true ;
 	return true ;
-    }
+    }visitMeth
     
     public int accept(Visitor v){
 	int nti ;
-
-	System.out.println(333);
 	nti = v.visit(this) ;
 	return 0 ;
     }
@@ -356,15 +355,15 @@ class MyVisitor extends Visitor {
 	int nti ;
 
 	if (n.GetHas_Right()){
-	    r = n.GetRight() ;
-	    nti = r.accept(this) ; }
+	    r = n.GetRight() ; }
+	    //nti = r.accept(this) ; }
 	else nti = 0 ;
 
 	System.out.println(n.GetKey());
 
 	if (n.GetHas_Left()) {
-	    l = n.GetLeft(); 
-	    nti =l.accept(this) ; }
+	    l = n.GetLeft(); }
+	    //nti =l.accept(this) ; }
 	else nti = 0 ;
 
 	return 0;

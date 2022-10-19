@@ -17,7 +17,7 @@ class testFile {
             char wyz;
             char w;
             boolean y;
-            //char aw;
+            z = 1;
             w = '\"';
             x = ' ';
             //i = aw;
@@ -42,6 +42,7 @@ class testClass2{
     char w;
     char aw;
     char x;
+    int z;
     public boolean testFile (char b, int y, int q){
         char wyz;
         char w;
@@ -56,7 +57,7 @@ class testClass2{
     }
 }
 
-class testClass3{
+class testClass3 extends testClass2{
     char wyz;
     char w;
     char aw;

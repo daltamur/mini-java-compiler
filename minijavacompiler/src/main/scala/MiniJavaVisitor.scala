@@ -112,7 +112,7 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
   override def visitBlockStatement(ctx: miniJavaParser.BlockStatementContext): Option[ASTNode] = {
     val ctxStatements = ctx.statement()
     val ASTStatements = new ListBuffer[Any]
-    ctxStatements.forEach(x => ASTStatements += x.accept(this))
+    ctxStatements.forEach(x => ASTStatements += x.accept(this).get)
     Some(AST_Grammar.blockStatement(ASTStatements.toList.asInstanceOf[List[AST_Grammar.statement]]))
   }
 
@@ -188,7 +188,7 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     val ASTMethodName = ctxMethodName.flatMap(x => Option(AST_Grammar.identifier(x.getSymbol.getText)))
     val ctxParams = ctx.expression()
     val ASTParams = new ListBuffer[Any]()
-    ctxParams.forEach(x => ASTParams += x.accept(this))
+    ctxParams.forEach(x => ASTParams += x.accept(this).get)
     val methodFuncCall = Some(AST_Grammar.methodFunctionCallExpression(ASTMethodName.orNull, ASTParams.toList.asInstanceOf[List[AST_Grammar.expression]], lineNum))
     methodFuncCall
   }

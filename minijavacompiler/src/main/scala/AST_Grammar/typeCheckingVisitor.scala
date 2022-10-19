@@ -172,7 +172,6 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     var hasError = hasErrorResult(false)
     //first we make sure that the variable getting assigned exists.
     val leftVal = statement.idVal
-
     //if the variable is not defined in the method scope, check the current class scope. If that fails,
     //check the extended classes for the variable. If THAT fails, then the variable does not exist so change
     //hasError to true
@@ -268,17 +267,19 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
         case Some(parent) =>
           //checking the class that the method is a child of
           if (!parent.checkIfVarIDExists(arrayID.name)) {
+            //no
+
 
             //fill this body in later
           }else{//DO NOT FORGET THE ELSE HERE
-            //fill this body in later
+            //the array exists as a global within the class
           }
         case _ => hasError.errorVal = true
           println("Something went wrong...Ill-defined statement")
           System.exit(1)
 
     }else{
-      //the array exists in the current method
+      //the array exists in the current method if we get here
       //check and make sure the array index is of type int
       val arrIndex = visit(statement.arrayIndex, a)
       arrIndex match
@@ -307,7 +308,6 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
   }
 
 
-  //
   //return whatever the name of the current class is
   override def visitThisExpression(expression: thisExpression, a: symbolTable): typeCheckResult = {
     varValResult(classType(a.getParentTable.get.getName))
@@ -340,7 +340,44 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
       returnedVal = varValResult(a.getVariableVal(variableID).get.asInstanceOf[variableVal].varValue)
     }else if(a.getParentTable.get.checkIfVarIDExists(variableID)){
       returnedVal =  varValResult(a.getParentTable.get.getVariableVal(variableID).get.asInstanceOf[variableVal].varValue)
+    }else{
+      //now we will look at the extended classes and see if we can find a variable with the given ID
+      //if we don't find it, throw an error saying that the variable does not exist in any inherited scope
+      returnedVal
+      val curClassname = a.getParentTable.get.getName
+      val curClassExtension = a.getParentTable.get.getParentTable.get.getClassVal(curClassname).get.asInstanceOf[classVal].extendedClass
+      curClassExtension match
+        case Some(value) =>
+          //we have an extended class, run our function to look for the identifier in the inherited class
+          returnedVal = visitExtendedClassForVariable(value, variableID, a.getParentTable.get.getParentTable.get, expression.line)
+
+        case None =>
+          //no extended class, variable does not possibly exist
+          curError = Some(noSuchVariableUnknownTypeDefinedError(variableID, expression.line))
+          returnedVal.asInstanceOf[hasErrorResult].errorVal = true
     }
+    returnedVal
+  }
+
+  def visitExtendedClassForVariable(extendedClassID: String, varID: String, a: symbolTable, line:Integer): typeCheckResult = {
+    var returnedVal: typeCheckResult = hasErrorResult(false)
+    if(a.getClassVal(extendedClassID).get.asInstanceOf[classVal].classScope.checkIfVarIDExists(varID)){
+      //variable exists at this point, so set returnedVal to the return type
+      returnedVal = varValResult(a.getClassVal(extendedClassID).get.asInstanceOf[classVal].classScope.getVariableVal(varID).get.asInstanceOf[variableVal].varValue)
+    }else{
+      val curClassname = a.getParentTable.get.getParentTable.get.getName
+      val curClassExtension = a.getParentTable.get.getParentTable.get.getClassVal(curClassname).get.asInstanceOf[classVal].extendedClass
+      curClassExtension match
+        case Some(value) =>
+          //we have an extended class, run our function to look for the identifier in the inherited class
+          returnedVal = visitExtendedClassForVariable(value, varID, a.getParentTable.get.getParentTable.get, line)
+
+        case None =>
+          //no extended class, variable does not possibly exist
+          curError = Some(noSuchVariableUnknownTypeDefinedError(varID, line))
+          returnedVal.asInstanceOf[hasErrorResult].errorVal = true
+    }
+
     returnedVal
   }
 
@@ -377,9 +414,9 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
 
   //just make sure the expression is of type boolean
   override def visitNegatedExpression(expression: negatedExpression, a: symbolTable): typeCheckResult = {
-    var expressionType:typeCheckResult = visit(expression, a)
+    var expressionType:typeCheckResult = visit(expression.value, a)
     if(!expressionType.isInstanceOf[hasErrorResult]){
-      if(!expressionType.asInstanceOf[varValResult].varVal.equals(booleanType)){
+      if(!expressionType.asInstanceOf[varValResult].varVal.equals(booleanType())){
         curError = Some(typeInconformitiyError(expressionType.asInstanceOf[varValResult].varVal, booleanType(), expression.line, expression.index))
         expressionType = hasErrorResult(true)
       }
@@ -390,7 +427,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
 
   //get returned type of parenthesized expression
   override def visitParenthesizedExpression(expression: parenthesizedExpression, a: symbolTable): typeCheckResult = {
-    visit(expression, a)
+    visit(expression.value, a)
   }
 
   //just return what the left side had
@@ -444,25 +481,25 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     }
   }
 
-  //make sure all expressions are booleans
+  //make sure all expressions are ints
   override def visitCompareExpression(expression: compareExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = {
     if (b.isInstanceOf[hasErrorResult]) {
       b
     } else {
       //now just make sure b is a boolean
-      if (b.asInstanceOf[varValResult].varVal.equals(booleanType())) {
+      if (b.asInstanceOf[varValResult].varVal.equals(integerType())) {
         val rightExpressionType = visit(expression.value, a)
         rightExpressionType match
           case result: varValResult =>
-            if (!result.varVal.equals(booleanType())) {
-              curError = Some(typeInconformitiyError(result.asInstanceOf[varValResult].varVal, booleanType(), expression.value.line, expression.value.index))
+            if (!result.varVal.equals(integerType())) {
+              curError = Some(typeInconformitiyError(result.asInstanceOf[varValResult].varVal, integerType(), expression.value.line, expression.value.index))
               hasErrorResult(true)
             } else {
-              result
+              varValResult(booleanType())
             }
-          case _ => rightExpressionType
+          case _ => varValResult(booleanType())
       } else {
-        curError = Some(typeInconformitiyError(b.asInstanceOf[varValResult].varVal, booleanType(), expression.value.line, expression.value.index - 1))
+        curError = Some(typeInconformitiyError(b.asInstanceOf[varValResult].varVal, integerType(), expression.value.line, expression.value.index - 1))
         hasErrorResult(true)
       }
     }
@@ -561,11 +598,13 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     val methodName = expression.funcName.name
     val methodParams = expression.params
     val paramVarTypes = new ListBuffer[varType]
+    var className: String = null
     if(b.isInstanceOf[hasErrorResult]){
       return b
     }else{
       b.asInstanceOf[varValResult].varVal match
-        case result:classType =>
+        //we're ok so long as the var type is a class
+        case result:classType => className = result.clazz
         case _ =>
           curError = Some(callMethodOnPrimitve(b.asInstanceOf[varValResult].varVal, expression.line))
           returnedVal = hasErrorResult(true)
@@ -587,13 +626,12 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     if(!returnedVal.asInstanceOf[hasErrorResult].errorVal) {
       val methodKey = (methodName, paramVarTypes.toList)
       //method exists in th current scope
-      if (a.getParentTable.get.checkIfMethodIDExists(methodKey)) {
-        returnedVal = varValResult(a.getParentTable.get.getMethodVal(methodKey).get.asInstanceOf[methodVal].returnType)
+      if (a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].classScope.checkIfMethodIDExists(methodKey)) {
+        returnedVal = varValResult(a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].classScope.getMethodVal(methodKey).get.asInstanceOf[methodVal].returnType)
         returnedVal
       } else {
         //look at the extended class if one exists and look for the method there
-        val curClassName = a.getParentTable.get.getName
-        val extendedClass = a.getParentTable.get.getParentTable.get.getClassVal(curClassName).get.asInstanceOf[classVal].extendedClass
+        val extendedClass = a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].extendedClass
         extendedClass match
           //there is an extended class, so try and find the method in the scope of the extended class
           case Some(extended) =>

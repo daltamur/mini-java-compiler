@@ -102,7 +102,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
       val paramID = param._2.name
       val symbolTableParam = AST_Grammar.getVarType(paramType)
       paramTypes += symbolTableParam
-      a.putVarVal(paramID, symbolTableParam)
+      a.putVarVal(paramID, variableVal(symbolTableParam, methodLine))
     }
 
     //check variables
