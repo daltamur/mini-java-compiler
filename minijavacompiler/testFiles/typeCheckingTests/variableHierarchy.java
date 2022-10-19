@@ -13,7 +13,10 @@ class grandDaughterClass extends daughterClass{}
 class doWork{
 
     public int methodRun(baseClass x){
-        return 0;
+        int[] a;
+        int w;
+        a = new int[new int[new int[5*6-12+18-(5-65*54-new int[45].length)].length].length];
+        return this;
     }
 
 }
