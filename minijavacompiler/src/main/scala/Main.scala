@@ -34,8 +34,20 @@ object Main {
             System.exit(1)
           }
 
+          //make sure no undefined method parameters were made
+          symbolTableBuilder.checkMethodParams(symbolTable)
+          if (symbolTableBuilder.getError.isDefined) {
+            println(symbolTableBuilder.getError.get.errorVal)
+            System.exit(1)
+          }
+
           //check for circular inheritance
           symbolTableBuilder.checkForCircularInheritance(symbolTable)
+          if (symbolTableBuilder.getError.isDefined) {
+            println(symbolTableBuilder.getError.get.errorVal)
+            System.exit(1)
+          }
+
           symbolTableBuilder.checkMethodReturnTypes(symbolTable)
           if(symbolTableBuilder.getError.isDefined){
             println(symbolTableBuilder.getError.get.errorVal)

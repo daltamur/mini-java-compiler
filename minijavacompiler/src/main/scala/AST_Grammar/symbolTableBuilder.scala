@@ -168,6 +168,39 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
     }
   }
 
+  def checkMethodParams(programSymbolTable: symbolTable): Unit = {
+    val outloop = new Breaks;
+    val inloop = new Breaks;
+    val classIDs = programSymbolTable.getClassKeys
+    outloop.breakable{
+      for(classID <- classIDs){
+        val currentClass = programSymbolTable.getClassVal(classID).get.asInstanceOf[classVal]
+        //iterate through the methods of the current class, make sure the return type is defined if it returns a class
+        val methodKeys = currentClass.classScope.getMethodKeys
+        inloop.breakable {
+          for (methodID <- methodKeys) {
+            val currentMethod = currentClass.classScope.getMethodVal(methodID).get.asInstanceOf[methodVal]
+            val methodParams = currentMethod.paramTypes
+            for(paramVal <- methodParams){
+              paramVal match
+                case x:classType =>
+                  if(!programSymbolTable.checkIfClassIDExists(x.clazz)){
+                    curError = Some(noSuchTypeError(paramVal, currentMethod.line, 0))
+                    inloop.break()
+                  }
+
+                case _ =>
+            }
+          }
+        }
+        if (curError.isDefined) {
+          outloop.break
+        }
+      }
+
+    }
+  }
+
   def checkMethodReturnTypes(programSymbolTable: symbolTable): Unit = {
     val outloop = new Breaks;
     val inloop = new Breaks;
@@ -184,7 +217,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
         methodReturnType match
           case x: classType =>
             if (!programSymbolTable.checkIfClassIDExists(x.clazz)) {
-              curError = Some(noSuchReturnType(classID.asInstanceOf[String], methodID.asInstanceOf[String], x.clazz, currentMethod.line))
+              curError = Some(noSuchReturnType(classID.asInstanceOf[String], methodID.asInstanceOf[(String, List[varType])]._1, x.clazz, currentMethod.line))
               inloop.break
             }
           case _ =>

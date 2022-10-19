@@ -9,6 +9,8 @@ class Fac {
 
     public int ComputeFac(int num){
 		int num_aux ;
+		int[] test;
+		test = new int[new int[num_aux].length];
 		if (num < 1)
 		    num_aux = 1;
 		else

@@ -707,7 +707,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     val givenParamExtendedVal = table.getClassVal(givenParam.asInstanceOf[classType].clazz).get.asInstanceOf[classVal].extendedClass
     givenParamExtendedVal match
       case Some(value) =>
-        isChild(classType(value), neededParam, table)
+        matchParams(classType(value), neededParam, table)
       case _ => false
   }
   
@@ -729,7 +729,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
       val pairs = givenParamList.zip(neededParamList)
       val paramMatch = for ((givenParam, neededParam) <- pairs)
         yield matchParams(givenParam, neededParam, a)
-      paramMatch.contains(false)
+      !paramMatch.contains(false)
     }else{
       false
     }
