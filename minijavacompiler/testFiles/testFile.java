@@ -1,8 +1,6 @@
 class testFile {
     public static void main(String[] a) {
-
             System.out.println(15);
-
     }
 }
 
@@ -13,16 +11,23 @@ class testFile {
         int aw;
         char x;
         boolean i;
+        testFile test;
         public boolean testMethod (char b){
             char wyz;
             char w;
             boolean y;
+            test = new testFile();
+            System.out.println(this.main(w));
             z = 1;
             w = '\"';
             x = ' ';
             //i = aw;
             return y;
 
+        }
+
+        public int main (char x){
+            return 1;
         }
 
         public boolean testMethod2 (char b){

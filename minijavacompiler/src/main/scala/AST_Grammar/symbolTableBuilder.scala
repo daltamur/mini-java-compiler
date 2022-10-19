@@ -38,7 +38,9 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
     mainClassSymbolTable.setParentTable(a)
     mainClassSymbolTable.putVarVal(clazz.commandLineArgs.name, AST_Grammar.commandLineArgs())
     a.putMethodVal(("main", List{commandLineArgs}), methodVal(mainClassSymbolTable, List[varType]{commandLineArgs()}, voidType(), clazz.line))
-    classVal(a, None, clazz.line)
+    val mainClass = classVal(a, None, clazz.line)
+    mainClass.isMainClass = true
+    mainClass
   }
 
   override def visitClass(klass: klass, a: symbolTable): AST_Grammar.symbolTableVal = {

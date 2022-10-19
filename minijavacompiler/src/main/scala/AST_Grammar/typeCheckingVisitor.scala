@@ -343,7 +343,9 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
 
   //return whatever the name of the current class is
   override def visitThisExpression(expression: thisExpression, a: symbolTable): typeCheckResult = {
-    varValResult(classType(a.getParentTable.get.getName))
+    val classVal = classType(a.getParentTable.get.getName)
+    classVal.isMainClass = a.getParentTable.get.getParentTable.get.getClassVal(classVal.clazz).get.asInstanceOf[classVal].isMainClass
+    varValResult(classVal)
   }
 
   //just return boolean var type
@@ -393,17 +395,18 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
   }
 
   def visitExtendedClassForVariable(extendedClassID: String, varID: String, a: symbolTable, line:Integer): typeCheckResult = {
+    //assume the symbol table we have exists on the outermost scope
     var returnedVal: typeCheckResult = hasErrorResult(false)
     if(a.getClassVal(extendedClassID).get.asInstanceOf[classVal].classScope.checkIfVarIDExists(varID)){
       //variable exists at this point, so set returnedVal to the return type
       returnedVal = varValResult(a.getClassVal(extendedClassID).get.asInstanceOf[classVal].classScope.getVariableVal(varID).get.asInstanceOf[variableVal].varValue)
     }else{
-      val curClassname = a.getParentTable.get.getParentTable.get.getName
-      val curClassExtension = a.getParentTable.get.getParentTable.get.getClassVal(curClassname).get.asInstanceOf[classVal].extendedClass
+      val curClassname = a.getClassVal(extendedClassID).get.asInstanceOf[classVal].classScope.getName
+      val curClassExtension = a.getClassVal(extendedClassID).get.asInstanceOf[classVal].extendedClass
       curClassExtension match
         case Some(value) =>
           //we have an extended class, run our function to look for the identifier in the inherited class
-          returnedVal = visitExtendedClassForVariable(value, varID, a.getParentTable.get.getParentTable.get, line)
+          returnedVal = visitExtendedClassForVariable(value, varID, a, line)
 
         case None =>
           //no extended class, variable does not possibly exist

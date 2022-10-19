@@ -2,7 +2,7 @@ grammar miniJava;
 
 goal:   mainClass (classDeclaration)* EOF;
 
-mainClass:  'class' IDENTIFIER '{' 'public' 'static' 'void' 'main' '(' 'String' '[' ']' IDENTIFIER ')' '{' statement '}' '}';
+mainClass:  'class' IDENTIFIER '{' 'public' 'static' 'void' IDENTIFIER '(' 'String' '[' ']' IDENTIFIER ')' '{' statement '}' '}';
 
 classDeclaration:   'class' IDENTIFIER ('extends' IDENTIFIER)? '{' (varDeclaration)* (methodDeclaration)* '}';
 
@@ -68,7 +68,8 @@ SUBTRACT:   '-';
 MULTIPLY:   '*';
 TRUE:   'true';
 FALSE:  'false';
-IDENTIFIER: [a-zA-Z]+[a-zA-Z0-9_]*; //any string that starts with a letter followed by any collection of letters, numbers, and underscores
+IDENTIFIER:    [a-zA-Z]+[a-zA-Z0-9_]*
+               ; //any string that starts with a letter followed by any collection of letters, numbers, and underscores
 NOT:    '!'; //not symbol
 INTEGER_LITERAL:    [0-9]+; //any number of integers
 WS: [ \t\r\n]+ -> skip; //whitespace regex

@@ -8,6 +8,7 @@ import AST_Grammar.symbolTableBuilder
 // https://scalameta.org/munit/docs/getting-started.html
 class TypeCheckingTests extends munit.FunSuite {
   test("Binary Search Test") {
+    println("Running ")
     val parser = parse("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/miniJavaSiteTests/BinarySearch.java")
     //make the ast
     val programAST = buildAST(parser)
@@ -16,26 +17,16 @@ class TypeCheckingTests extends munit.FunSuite {
     val symbolTable = new symbolTable("goal")
     val symbolTableBuilder = new symbolTableBuilder
     symbolTableBuilder.visit(programAST.get, symbolTable)
-    var obtained = symbolTableBuilder.getError
-    var expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodParams(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkForCircularInheritance(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodReturnTypes(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     val statementTypeChecker = new typeCheckingVisitor
     statementTypeChecker.visit(programAST.get, symbolTable)
-    obtained = statementTypeChecker.getCurError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(statementTypeChecker.getCurError.isEmpty)
   }
 
   test("Binary Tree Test"){
@@ -47,26 +38,16 @@ class TypeCheckingTests extends munit.FunSuite {
     val symbolTable = new symbolTable("goal")
     val symbolTableBuilder = new symbolTableBuilder
     symbolTableBuilder.visit(programAST.get, symbolTable)
-    var obtained = symbolTableBuilder.getError
-    var expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodParams(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkForCircularInheritance(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodReturnTypes(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     val statementTypeChecker = new typeCheckingVisitor
     statementTypeChecker.visit(programAST.get, symbolTable)
-    obtained = statementTypeChecker.getCurError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(statementTypeChecker.getCurError.isEmpty)
   }
 
   test("BubbleSort Test") {
@@ -78,26 +59,16 @@ class TypeCheckingTests extends munit.FunSuite {
     val symbolTable = new symbolTable("goal")
     val symbolTableBuilder = new symbolTableBuilder
     symbolTableBuilder.visit(programAST.get, symbolTable)
-    var obtained = symbolTableBuilder.getError
-    var expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodParams(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkForCircularInheritance(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodReturnTypes(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     val statementTypeChecker = new typeCheckingVisitor
     statementTypeChecker.visit(programAST.get, symbolTable)
-    obtained = statementTypeChecker.getCurError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(statementTypeChecker.getCurError.isEmpty)
   }
 
   test("Factorial Test") {
@@ -109,26 +80,16 @@ class TypeCheckingTests extends munit.FunSuite {
     val symbolTable = new symbolTable("goal")
     val symbolTableBuilder = new symbolTableBuilder
     symbolTableBuilder.visit(programAST.get, symbolTable)
-    var obtained = symbolTableBuilder.getError
-    var expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodParams(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkForCircularInheritance(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodReturnTypes(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     val statementTypeChecker = new typeCheckingVisitor
     statementTypeChecker.visit(programAST.get, symbolTable)
-    obtained = statementTypeChecker.getCurError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(statementTypeChecker.getCurError.isEmpty)
   }
 
   test("Linear Search Test") {
@@ -140,26 +101,16 @@ class TypeCheckingTests extends munit.FunSuite {
     val symbolTable = new symbolTable("goal")
     val symbolTableBuilder = new symbolTableBuilder
     symbolTableBuilder.visit(programAST.get, symbolTable)
-    var obtained = symbolTableBuilder.getError
-    var expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodParams(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkForCircularInheritance(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodReturnTypes(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     val statementTypeChecker = new typeCheckingVisitor
     statementTypeChecker.visit(programAST.get, symbolTable)
-    obtained = statementTypeChecker.getCurError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(statementTypeChecker.getCurError.isEmpty)
   }
 
   test("Linked List Test") {
@@ -171,26 +122,16 @@ class TypeCheckingTests extends munit.FunSuite {
     val symbolTable = new symbolTable("goal")
     val symbolTableBuilder = new symbolTableBuilder
     symbolTableBuilder.visit(programAST.get, symbolTable)
-    var obtained = symbolTableBuilder.getError
-    var expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodParams(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkForCircularInheritance(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodReturnTypes(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     val statementTypeChecker = new typeCheckingVisitor
     statementTypeChecker.visit(programAST.get, symbolTable)
-    obtained = statementTypeChecker.getCurError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(statementTypeChecker.getCurError.isEmpty)
   }
 
   test("QuickSort Test") {
@@ -202,26 +143,16 @@ class TypeCheckingTests extends munit.FunSuite {
     val symbolTable = new symbolTable("goal")
     val symbolTableBuilder = new symbolTableBuilder
     symbolTableBuilder.visit(programAST.get, symbolTable)
-    var obtained = symbolTableBuilder.getError
-    var expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodParams(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkForCircularInheritance(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodReturnTypes(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     val statementTypeChecker = new typeCheckingVisitor
     statementTypeChecker.visit(programAST.get, symbolTable)
-    obtained = statementTypeChecker.getCurError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(statementTypeChecker.getCurError.isEmpty)
   }
 
   test("Tree Visitor Test") {
@@ -233,25 +164,15 @@ class TypeCheckingTests extends munit.FunSuite {
     val symbolTable = new symbolTable("goal")
     val symbolTableBuilder = new symbolTableBuilder
     symbolTableBuilder.visit(programAST.get, symbolTable)
-    var obtained = symbolTableBuilder.getError
-    var expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodParams(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkForCircularInheritance(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodReturnTypes(symbolTable)
-    obtained = symbolTableBuilder.getError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(symbolTableBuilder.getError.isEmpty)
     val statementTypeChecker = new typeCheckingVisitor
     statementTypeChecker.visit(programAST.get, symbolTable)
-    obtained = statementTypeChecker.getCurError
-    expected = None
-    assertEquals(obtained, expected)
+    assert(statementTypeChecker.getCurError.isEmpty)
   }
 }

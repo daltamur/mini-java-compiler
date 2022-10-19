@@ -7,6 +7,7 @@ class Main{
 
 class testClass{
     char y;
+    Main test;
 
     public int testMethod(){
         int x;

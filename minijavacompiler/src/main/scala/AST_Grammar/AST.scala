@@ -104,11 +104,15 @@ case class commandLineArgs() extends varType
 case class booleanType() extends varType
 case class integerType() extends varType
 case class characterType() extends varType
-case class classType(clazz: String) extends varType 
+case class classType(clazz: String) extends varType {
+  var isMainClass:Boolean = false
+}
 case class voidType() extends varType
 case class methodVal(methodScope: symbolTable, paramTypes: List[varType], returnType: varType, line: Integer) extends symbolTableVal
 
-case class classVal(classScope: symbolTable, extendedClass: Option[String], line: Integer) extends symbolTableVal
+case class classVal(classScope: symbolTable, extendedClass: Option[String], line: Integer) extends symbolTableVal{
+  var isMainClass:Boolean = false
+}
 
 case class variableVal(varValue: varType, line: Integer) extends symbolTableVal
 

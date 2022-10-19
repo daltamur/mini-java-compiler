@@ -18,9 +18,13 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
 
   override def visitMainClass(ctx: miniJavaParser.MainClassContext): Option[ASTNode] = {
     val lineNum = ctx.getStart.getLine
+    if(ctx.IDENTIFIER(1).getSymbol.getText != "main"){
+      println("ERROR on line " + lineNum + ": Main method needs to be named 'main'.")
+      System.exit(0)
+    }
     val ctxClassName = Option(ctx.IDENTIFIER(0))
     val ASTClassName = ctxClassName.flatMap(x => Option(AST_Grammar.identifier(x.getSymbol.getText)))
-    val ctxArgName = Option(ctx.IDENTIFIER(1))
+    val ctxArgName = Option(ctx.IDENTIFIER(2))
     val ASTArgName = ctxArgName.flatMap(x => Option(AST_Grammar.identifier(x.getSymbol.getText)))
     val ctxStatement = Option(ctx.statement())
     val ASTStatement = ctxStatement.flatMap(x => x.accept(this))
