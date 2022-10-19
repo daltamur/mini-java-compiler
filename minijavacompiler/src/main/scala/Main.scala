@@ -18,6 +18,9 @@ object Main {
           val parser = parse(fileLocation)
           //make the ast
           val programAST = buildAST(parser)
+          if(programAST._2){
+            System.exit(1)
+          }
 
           //make the symbol table
           val symbolTable = new symbolTable("goal")
@@ -26,7 +29,7 @@ object Main {
 //          symbolTable.putClassVal("char", AST_Grammar.classVal(new symbolTable("char"), None, 0))
 //          symbolTable.putClassVal("int[]", AST_Grammar.classVal(new symbolTable("int[]"), None, 0))
           val symbolTableBuilder = new symbolTableBuilder
-          symbolTableBuilder.visit(programAST.get, symbolTable)
+          symbolTableBuilder.visit(programAST._1.get, symbolTable)
 
           //make sure there were no var dec or method errors
           if (symbolTableBuilder.getError.isDefined) {
@@ -56,7 +59,7 @@ object Main {
 
           //type check statements & method return values now, this ends symbol resolution & type checking
           val statementTypeChecker = new typeCheckingVisitor
-          statementTypeChecker.visit(programAST.get, symbolTable)
+          statementTypeChecker.visit(programAST._1.get, symbolTable)
           if(statementTypeChecker.getCurError.isDefined){
             println(statementTypeChecker.getCurError.get.errorVal)
             System.exit(1)
@@ -93,9 +96,9 @@ object Main {
     parser
   }
 
-  def buildAST(parser: miniJavaParser): Option[ASTNode] = {
+  def buildAST(parser: miniJavaParser): (Option[ASTNode], Boolean) = {
     val visitor = new MiniJavaVisitor()
     val program = visitor.visitGoal(parser.goal())
-    program
+    (program, visitor.mainMethodError)
   }
 }

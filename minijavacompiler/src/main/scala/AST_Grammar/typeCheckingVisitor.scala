@@ -33,7 +33,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
   //just make sure the statement has no type check errors
   override def visitMainClass(clazz: mainClass, a: symbolTable): typeCheckResult = {
     var hasError = hasErrorResult(false)
-    hasError = visit(clazz.body, a.getMethodVal(("main", List{commandLineArgs})).get.asInstanceOf[methodVal].methodScope).asInstanceOf[hasErrorResult]
+    hasError = visit(clazz.body, a.getMethodVal(("main", List{commandLineArgs()})).get.asInstanceOf[methodVal].methodScope).asInstanceOf[hasErrorResult]
     hasError
   }
 

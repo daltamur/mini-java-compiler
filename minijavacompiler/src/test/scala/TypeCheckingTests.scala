@@ -8,15 +8,15 @@ import AST_Grammar.symbolTableBuilder
 // https://scalameta.org/munit/docs/getting-started.html
 class TypeCheckingTests extends munit.FunSuite {
   test("Binary Search Test") {
-    println("Running ")
     val parser = parse("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/miniJavaSiteTests/BinarySearch.java")
     //make the ast
     val programAST = buildAST(parser)
+    assertEquals(programAST._2, false)
     //do the checks
     //make the symbol table
     val symbolTable = new symbolTable("goal")
     val symbolTableBuilder = new symbolTableBuilder
-    symbolTableBuilder.visit(programAST.get, symbolTable)
+    symbolTableBuilder.visit(programAST._1.get, symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodParams(symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
@@ -25,7 +25,7 @@ class TypeCheckingTests extends munit.FunSuite {
     symbolTableBuilder.checkMethodReturnTypes(symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
     val statementTypeChecker = new typeCheckingVisitor
-    statementTypeChecker.visit(programAST.get, symbolTable)
+    statementTypeChecker.visit(programAST._1.get, symbolTable)
     assert(statementTypeChecker.getCurError.isEmpty)
   }
 
@@ -37,7 +37,7 @@ class TypeCheckingTests extends munit.FunSuite {
     //make the symbol table
     val symbolTable = new symbolTable("goal")
     val symbolTableBuilder = new symbolTableBuilder
-    symbolTableBuilder.visit(programAST.get, symbolTable)
+    symbolTableBuilder.visit(programAST._1.get, symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodParams(symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
@@ -46,7 +46,7 @@ class TypeCheckingTests extends munit.FunSuite {
     symbolTableBuilder.checkMethodReturnTypes(symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
     val statementTypeChecker = new typeCheckingVisitor
-    statementTypeChecker.visit(programAST.get, symbolTable)
+    statementTypeChecker.visit(programAST._1.get, symbolTable)
     assert(statementTypeChecker.getCurError.isEmpty)
   }
 
@@ -58,7 +58,7 @@ class TypeCheckingTests extends munit.FunSuite {
     //make the symbol table
     val symbolTable = new symbolTable("goal")
     val symbolTableBuilder = new symbolTableBuilder
-    symbolTableBuilder.visit(programAST.get, symbolTable)
+    symbolTableBuilder.visit(programAST._1.get, symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodParams(symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
@@ -67,7 +67,7 @@ class TypeCheckingTests extends munit.FunSuite {
     symbolTableBuilder.checkMethodReturnTypes(symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
     val statementTypeChecker = new typeCheckingVisitor
-    statementTypeChecker.visit(programAST.get, symbolTable)
+    statementTypeChecker.visit(programAST._1.get, symbolTable)
     assert(statementTypeChecker.getCurError.isEmpty)
   }
 
@@ -79,7 +79,7 @@ class TypeCheckingTests extends munit.FunSuite {
     //make the symbol table
     val symbolTable = new symbolTable("goal")
     val symbolTableBuilder = new symbolTableBuilder
-    symbolTableBuilder.visit(programAST.get, symbolTable)
+    symbolTableBuilder.visit(programAST._1.get, symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodParams(symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
@@ -88,7 +88,7 @@ class TypeCheckingTests extends munit.FunSuite {
     symbolTableBuilder.checkMethodReturnTypes(symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
     val statementTypeChecker = new typeCheckingVisitor
-    statementTypeChecker.visit(programAST.get, symbolTable)
+    statementTypeChecker.visit(programAST._1.get, symbolTable)
     assert(statementTypeChecker.getCurError.isEmpty)
   }
 
@@ -100,7 +100,7 @@ class TypeCheckingTests extends munit.FunSuite {
     //make the symbol table
     val symbolTable = new symbolTable("goal")
     val symbolTableBuilder = new symbolTableBuilder
-    symbolTableBuilder.visit(programAST.get, symbolTable)
+    symbolTableBuilder.visit(programAST._1.get, symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodParams(symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
@@ -109,7 +109,7 @@ class TypeCheckingTests extends munit.FunSuite {
     symbolTableBuilder.checkMethodReturnTypes(symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
     val statementTypeChecker = new typeCheckingVisitor
-    statementTypeChecker.visit(programAST.get, symbolTable)
+    statementTypeChecker.visit(programAST._1.get, symbolTable)
     assert(statementTypeChecker.getCurError.isEmpty)
   }
 
@@ -121,7 +121,7 @@ class TypeCheckingTests extends munit.FunSuite {
     //make the symbol table
     val symbolTable = new symbolTable("goal")
     val symbolTableBuilder = new symbolTableBuilder
-    symbolTableBuilder.visit(programAST.get, symbolTable)
+    symbolTableBuilder.visit(programAST._1.get, symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodParams(symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
@@ -130,7 +130,7 @@ class TypeCheckingTests extends munit.FunSuite {
     symbolTableBuilder.checkMethodReturnTypes(symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
     val statementTypeChecker = new typeCheckingVisitor
-    statementTypeChecker.visit(programAST.get, symbolTable)
+    statementTypeChecker.visit(programAST._1.get, symbolTable)
     assert(statementTypeChecker.getCurError.isEmpty)
   }
 
@@ -142,7 +142,7 @@ class TypeCheckingTests extends munit.FunSuite {
     //make the symbol table
     val symbolTable = new symbolTable("goal")
     val symbolTableBuilder = new symbolTableBuilder
-    symbolTableBuilder.visit(programAST.get, symbolTable)
+    symbolTableBuilder.visit(programAST._1.get, symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodParams(symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
@@ -151,7 +151,7 @@ class TypeCheckingTests extends munit.FunSuite {
     symbolTableBuilder.checkMethodReturnTypes(symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
     val statementTypeChecker = new typeCheckingVisitor
-    statementTypeChecker.visit(programAST.get, symbolTable)
+    statementTypeChecker.visit(programAST._1.get, symbolTable)
     assert(statementTypeChecker.getCurError.isEmpty)
   }
 
@@ -163,7 +163,7 @@ class TypeCheckingTests extends munit.FunSuite {
     //make the symbol table
     val symbolTable = new symbolTable("goal")
     val symbolTableBuilder = new symbolTableBuilder
-    symbolTableBuilder.visit(programAST.get, symbolTable)
+    symbolTableBuilder.visit(programAST._1.get, symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
     symbolTableBuilder.checkMethodParams(symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
@@ -172,7 +172,7 @@ class TypeCheckingTests extends munit.FunSuite {
     symbolTableBuilder.checkMethodReturnTypes(symbolTable)
     assert(symbolTableBuilder.getError.isEmpty)
     val statementTypeChecker = new typeCheckingVisitor
-    statementTypeChecker.visit(programAST.get, symbolTable)
+    statementTypeChecker.visit(programAST._1.get, symbolTable)
     assert(statementTypeChecker.getCurError.isEmpty)
   }
 }

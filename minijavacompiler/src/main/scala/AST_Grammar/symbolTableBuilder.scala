@@ -37,7 +37,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
     val mainClassSymbolTable = new symbolTable("main")
     mainClassSymbolTable.setParentTable(a)
     mainClassSymbolTable.putVarVal(clazz.commandLineArgs.name, AST_Grammar.commandLineArgs())
-    a.putMethodVal(("main", List{commandLineArgs}), methodVal(mainClassSymbolTable, List[varType]{commandLineArgs()}, voidType(), clazz.line))
+    a.putMethodVal(("main", List{commandLineArgs()}), methodVal(mainClassSymbolTable, List[varType]{commandLineArgs()}, voidType(), clazz.line))
     val mainClass = classVal(a, None, clazz.line)
     mainClass.isMainClass = true
     mainClass

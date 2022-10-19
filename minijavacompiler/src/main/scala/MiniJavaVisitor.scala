@@ -6,6 +6,9 @@ import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
 import scala.collection.mutable.ListBuffer
 import scala.language.{existentials, postfixOps}
 class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
+  var mainMethodError = false
+  
+  def getMainMethodError: Boolean = mainMethodError
   override def visitGoal(ctx: miniJavaParser.GoalContext): Option[ASTNode] = {
     val ctxMainClass = Option(ctx.mainClass())
     val ASTMainClass = ctxMainClass.flatMap(x => x.accept(this))
@@ -20,7 +23,7 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     val lineNum = ctx.getStart.getLine
     if(ctx.IDENTIFIER(1).getSymbol.getText != "main"){
       println("ERROR on line " + lineNum + ": Main method needs to be named 'main'.")
-      System.exit(0)
+      mainMethodError = true
     }
     val ctxClassName = Option(ctx.IDENTIFIER(0))
     val ASTClassName = ctxClassName.flatMap(x => Option(AST_Grammar.identifier(x.getSymbol.getText)))

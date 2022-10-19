@@ -17,7 +17,7 @@ class testFile {
             char w;
             boolean y;
             test = new testFile();
-            System.out.println(this.main(w));
+            System.out.println(test.main(w));
             z = 1;
             w = '\"';
             x = ' ';
@@ -38,7 +38,6 @@ class testFile {
             x = ' ';
             i = aw.getHerDone();
             return true;
-
         }
     }
 
