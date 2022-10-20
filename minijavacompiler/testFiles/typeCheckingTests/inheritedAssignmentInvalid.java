@@ -6,7 +6,7 @@ class Main{
 
 class class1 extends class2{
     class4 x;
-    class1 y;
+    //class1 y;
     public int test(){
         x = y;
         return 0;

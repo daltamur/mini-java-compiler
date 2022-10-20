@@ -88,6 +88,9 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
                 if (hasError.errorVal) {
                   curError = Some(returnTypeError(AST_Grammar.getVarType(method.returnType), result.varVal, method.line))
                 }
+              }else{
+                hasError.errorVal = true
+                curError = Some(returnTypeError(AST_Grammar.getVarType(method.returnType), result.varVal, method.line))
               }
             }
           }
@@ -206,7 +209,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
       }
     } else {
       //check if the variable exists globally. If it does not, throw a variable never made error
-      val leftSideType = checkExtendedClassesForVar(leftVal.name, a)
+      val leftSideType = checkExtendedClassesForVar(leftVal.name, a.getParentTable.get)
       if (!leftSideType.isInstanceOf[hasErrorResult]) {
         //we found the reference in an inherited class, now see if it is equal to the right value
         val rightSideType = visit(statement.value, a)
@@ -243,12 +246,12 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
   def checkExtendedClassesForVar(variable: String, a: symbolTable): typeCheckResult = {
     var returnedVal:typeCheckResult = hasErrorResult(false)
     //remember that we are in a class, so get the classVal from the parent of the current symbol table
-    val extendedClass = a.getParentTable.get.getParentTable.get.getClassVal(a.getParentTable.get.getName).get.asInstanceOf[classVal].extendedClass
+    val extendedClass = a.getParentTable.get.getClassVal(a.getName).get.asInstanceOf[classVal].extendedClass
     extendedClass match
       case Some(clazz) =>
         //get that class's symbol table, if it has the variable letter, return its type, otherwise check for
         //that class's extended class
-        val extendedClassSymbolTable = a.getParentTable.get.getParentTable.get.getClassVal(clazz).get.asInstanceOf[classVal].classScope
+        val extendedClassSymbolTable = a.getParentTable.get.getClassVal(clazz).get.asInstanceOf[classVal].classScope
         if(extendedClassSymbolTable.checkIfVarIDExists(variable)){
           returnedVal = varValResult(extendedClassSymbolTable.getVariableVal(variable).get.asInstanceOf[variableVal].varValue)
         }else{
@@ -358,6 +361,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
           //no extended class, variable does not possibly exist
           curError = Some(noSuchVariableUnknownTypeDefinedError(variableID, expression.line))
           returnedVal.asInstanceOf[hasErrorResult].errorVal = true
+
     }
     returnedVal
   }

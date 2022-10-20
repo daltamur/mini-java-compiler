@@ -8,6 +8,6 @@ class class1{
     public boolean method1(){
         boolean x;
         boolean y;
-        return 7<5&&(7<(5))&&4<45&&true;
+        return x&&7;
     }
 }

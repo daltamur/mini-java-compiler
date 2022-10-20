@@ -41,7 +41,6 @@ abstract class ASTVisitor[A, B] {
     
     expressionVal.expressionOpt match
       case Some(value) =>
-        println(value)
         value match
           case x: andExpression => visitAndExpression(x, a, expressionTerminalVal)
           case x: addExpression => visitAddExpression(x, a, expressionTerminalVal)

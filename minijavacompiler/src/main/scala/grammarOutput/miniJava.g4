@@ -33,7 +33,7 @@ methodFuncCall: IDENTIFIER '(' (expression (',' expression )*)? ')';
 
 arrayLengthCall: 'length';
 
-expressionTailOps:ADD expression           #addExpression
+expressionTailOps:ADD expression              #addExpression
                   | SUBTRACT expression       #subtractExpression
                   | MULTIPLY expression       #multiplyExpression
                   ;

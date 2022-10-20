@@ -8,7 +8,8 @@ class class1{
     public int method1(){
         int[] x;
         int y;
-        y = x[true];
+        x = new int[true];
+        y = x[0];
         return 0;
     }
 }
