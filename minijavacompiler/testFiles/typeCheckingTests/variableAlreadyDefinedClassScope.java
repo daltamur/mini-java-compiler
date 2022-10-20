@@ -4,11 +4,7 @@ class Main{
     }
 }
 
-class testClass{
-    int[] x;
-
-    public int testMethod(){
-        return x;
-    }
-
+class class1{
+    int x;
+    int x;
 }

@@ -5,7 +5,11 @@ class Main{
 }
 
 class class1{
-    public int methodTest(int a, char b, int[] c, class1 d){
-        return new nonExistentClass();
+    public class3 methodTest(){
+        return new class1();
     }
 }
+
+class class2 extends class3{}
+
+class class3{}

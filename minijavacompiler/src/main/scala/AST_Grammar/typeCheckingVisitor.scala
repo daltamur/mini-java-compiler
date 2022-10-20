@@ -78,9 +78,17 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
       returnValue match
         case result:hasErrorResult => hasError = result
         case result:varValResult =>
-          if(!result.varVal.equals(AST_Grammar.getVarType(method.returnType))){
-            hasError.errorVal = true
-            curError = Some(returnTypeError(AST_Grammar.getVarType(method.returnType), result.varVal, method.line))
+          if(result.varVal.isInstanceOf[classType]) {
+            if (!result.varVal.equals(AST_Grammar.getVarType(method.returnType))) {
+              //if is possible that the return value is just a child of the expected return value, check for that.
+              val extendedClass = a.getParentTable.get.getParentTable.get.getClassVal(varTypeToString(result.varVal)).get.asInstanceOf[classVal].extendedClass
+              if (extendedClass.isDefined) {
+                hasError.errorVal = !matchParams(result.varVal, AST_Grammar.getVarType(method.returnType), a.getParentTable.get.getParentTable.get)
+                if (hasError.errorVal) {
+                  curError = Some(returnTypeError(AST_Grammar.getVarType(method.returnType), result.varVal, method.line))
+                }
+              }
+            }
           }
     }
     hasError
@@ -194,8 +202,19 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
                 rightSide match
                   case rightVal: hasErrorResult => hasError = rightVal
                   case rightVal: varValResult =>
-                    if(!result.varVal.equals(rightVal.varVal)){
-                      curError = Some(noSuchVariableDefinedError(leftVal.name, rightVal.varVal, statement.line))
+                    if(rightVal.varVal.isInstanceOf[classType] && result.varVal.isInstanceOf[classType]) {
+                      val extendedClass = a.getParentTable.get.getParentTable.get.getClassVal(varTypeToString(rightVal.varVal)).get.asInstanceOf[classVal].extendedClass
+                      if (extendedClass.isDefined) {
+                        hasError.errorVal = !matchParams(rightVal.varVal, result.varVal, a.getParentTable.get.getParentTable.get)
+                        if (hasError.errorVal) {
+                          curError = Some(returnTypeError(result.varVal, rightVal.varVal, statement.line))
+                        }
+                      } else {
+                        curError = Some(returnTypeError(result.varVal, rightVal.varVal, statement.line))
+                        hasError.errorVal = true
+                      }
+                    }else{
+                      curError = Some(returnTypeError(result.varVal, rightVal.varVal, statement.line))
                       hasError.errorVal = true
                     }
           }else{
@@ -206,9 +225,26 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
             rightSide match
               case rightVal: hasErrorResult => hasError = rightVal
               case rightVal: varValResult =>
-                if (!variableType.varValue.equals(rightVal.varVal)) {
-                  curError = Some(noSuchVariableDefinedError(leftVal.name, rightVal.varVal, statement.line))
-                  hasError.errorVal = true
+                  if (!variableType.varValue.equals(rightVal.varVal)) {
+                    if(rightVal.varVal.isInstanceOf[classType] && variableType.varValue.isInstanceOf[classType]) {
+                    val extendedClass = a.getParentTable.get.getParentTable.get.getClassVal(varTypeToString(rightVal.varVal)).get.asInstanceOf[classVal].extendedClass
+                    if (extendedClass.isDefined) {
+                      hasError.errorVal = !matchParams(rightVal.varVal, variableType.varValue, a.getParentTable.get.getParentTable.get)
+                      if (hasError.errorVal) {
+                        curError = Some(returnTypeError(variableType.varValue, rightVal.varVal, statement.line))
+                      }
+                    } else {
+                      curError = Some(returnTypeError(variableType.varValue, rightVal.varVal, statement.line))
+                      hasError.errorVal = true
+                    }
+                  }else{
+                        curError = Some(returnTypeError(variableType.varValue, rightVal.varVal, statement.line))
+                        hasError.errorVal = true
+
+                    }
+                }else{
+                    curError = Some(noSuchVariableDefinedError(leftVal.name, rightVal.varVal, statement.line))
+                    hasError.errorVal = true
                 }
           }
         case _ => hasError.errorVal = true
@@ -221,8 +257,26 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
         case rightVal: hasErrorResult => hasError = rightVal
         case rightVal: varValResult =>
           if (!variableType.varValue.equals(rightVal.varVal)) {
-            curError = Some(noSuchVariableDefinedError(leftVal.name, rightVal.varVal, statement.line))
-            hasError.errorVal = true
+            //right side could be a child of left side, check for that
+            //if is possible that the return value is just a child of the expected return value, check for that.
+            if(rightVal.varVal.isInstanceOf[classType] && variableType.varValue.isInstanceOf[classType]) {
+            val extendedClass = a.getParentTable.get.getParentTable.get.getClassVal(varTypeToString(rightVal.varVal)).get.asInstanceOf[classVal].extendedClass
+            if (extendedClass.isDefined) {
+              hasError.errorVal = !matchParams(rightVal.varVal, variableType.varValue, a.getParentTable.get.getParentTable.get)
+              if (hasError.errorVal) {
+                curError = Some(returnTypeError(variableType.varValue, rightVal.varVal, statement.line))
+              }
+            } else {
+              curError = Some(returnTypeError(variableType.varValue, rightVal.varVal, statement.line))
+              hasError.errorVal = true
+            }
+          }else{
+              curError = Some(returnTypeError(variableType.varValue, rightVal.varVal, statement.line))
+              hasError.errorVal = true
+            }
+          }else{
+              curError = Some(noSuchVariableDefinedError(leftVal.name, rightVal.varVal, statement.line))
+              hasError.errorVal = true
           }
     }
 
@@ -270,7 +324,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
             //need to check the extended classes for an int array
             val idType = checkExtendedClassesForVar(arrayID.name, a.getParentTable.get)
             idType match
-              case hasErrorResult =>
+              case result:hasErrorResult =>
                 hasError.errorVal = true
 
               case x:intArrayType => {
@@ -757,11 +811,13 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
           }
         }
       }
-    }else if(classVal.extendedClass.isDefined){
-      returnedVal = checkForMethod(key, classVal.extendedClass.get, programTable)
-    }else{
-      returnedVal = hasErrorResult(true)
     }
+
+    //if neither of those worked, check for more parents
+    if (returnedVal.isInstanceOf[hasErrorResult] && classVal.extendedClass.isDefined) {
+      returnedVal = checkForMethod(key, classVal.extendedClass.get, programTable)
+    }
+
     returnedVal
   }
 }

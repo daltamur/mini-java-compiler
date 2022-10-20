@@ -4,6 +4,6 @@ class Main{
     }
 }
 
-class class1 extends nonExistentClass{
+class class1 extends class1{
 
 }

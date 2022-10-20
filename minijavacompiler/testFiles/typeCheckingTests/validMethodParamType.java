@@ -5,9 +5,9 @@ class Main{
 }
 
 class class1{
-    public int GetAge(){
-        int x;
-        int x;
+    public int methodTest(int a, char b, int[] c, class1 d, class2 e){
         return 0;
     }
 }
+
+class class2{}

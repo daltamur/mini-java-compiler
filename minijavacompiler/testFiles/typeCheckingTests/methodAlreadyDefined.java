@@ -5,7 +5,12 @@ class Main{
 }
 
 class class1{
-    public int methodTest(int a, char b, int[] c, class1 d){
-        return new nonExistentClass();
+    public int methodTest(){
+        return 0;
     }
+
+    public int methodTest(){
+        return 0;
+    }
+
 }

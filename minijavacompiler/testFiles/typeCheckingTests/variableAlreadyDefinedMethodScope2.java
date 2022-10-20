@@ -4,15 +4,10 @@ class Main{
     }
 }
 
-
-class testClass{
-    char y;
-    Main test;
-
-    public int testMethod(){
+class class1{
+    public int methodTest(int x){
         int x;
-        x = y;
-        return x;
+        return 0;
     }
 
 }

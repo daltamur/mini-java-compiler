@@ -196,7 +196,7 @@ case class noSuchMethodError(methodName: String, types: List[varType], line: Int
 }
 
 case class noSuchClassError(className: String, line: Integer, index: Integer) extends  error {
-  val errorVal: String = "ERROR on line " + line + ":" + index + " :no such class named" + className
+  val errorVal: String = "ERROR on line " + line + ":" + index + " :no such class named " + className
 }
 
 case class callMethodOnPrimitve(primitive: varType, line: Integer) extends  error {

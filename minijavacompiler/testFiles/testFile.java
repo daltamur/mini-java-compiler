@@ -16,8 +16,9 @@ class testFile {
             char wyz;
             char w;
             boolean y;
+            int[] a;
             test = new testFile();
-            System.out.println(test.main(w));
+            //System.out.println(test.main(w));
             z = 1;
             w = '\"';
             x = ' ';
@@ -30,17 +31,18 @@ class testFile {
             return 1;
         }
 
-        public boolean testMethod2 (char b){
+        public testClass3 testMethod3 (char b){
             char wyz;
             char w;
-            testClass aw;
+            testClass3 aw;
+            aw = new testClass();
             w = '\"';
             x = ' ';
-            i = aw.getHerDone();
-            return true;
+            i = new sadf();
+            return aw;
         }
     }
-
+class some{}
 class testClass2{
     char wyz;
     char w;

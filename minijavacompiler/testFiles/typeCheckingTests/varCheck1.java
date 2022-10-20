@@ -4,10 +4,10 @@ class Main{
     }
 }
 
-class class1{
-
-    public int testMethod(invalidClass test){
-        //some stuff here
+class test{
+    public int methodTest(int a, char b, int[] c){
+        int r;
+        r = 1;
         return 0;
     }
 }

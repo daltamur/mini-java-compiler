@@ -4,14 +4,10 @@ class Main{
     }
 }
 
-class class2 extends class3{
+class class1{
 
 }
 
-class class2 extends class1{
-
-}
-
-class class3 extends class2{
+class class1{
 
 }

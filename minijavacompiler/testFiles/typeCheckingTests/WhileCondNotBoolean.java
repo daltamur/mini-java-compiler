@@ -5,7 +5,11 @@ class Main{
 }
 
 class class1{
+
     public int methodTest(int a, char b, int[] c, class1 d){
-        return new nonExistentClass();
+        while (d) {
+            a = 0;
+        }
+        return 0;
     }
 }
