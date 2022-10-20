@@ -80,6 +80,7 @@ object Main {
     }
 
   def parse(fileLocation: String): miniJavaParser = {
+    println("Current File: "+fileLocation)
     val charStream = CharStreams.fromFileName(fileLocation)
     val lexer = new miniJavaLexer(charStream)
     val tokenStream = new CommonTokenStream(lexer)

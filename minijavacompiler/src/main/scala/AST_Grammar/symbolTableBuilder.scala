@@ -23,7 +23,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
           curError = Some(classAlreadyDefinedError(currentClass.get.className.name, currentClass.get.line))
           loop.break
         } else {
-          println(currentClass.get.className.name)
+          //println(currentClass.get.className.name)
           val curClassSymbolTable = new symbolTable(currentClass.get.className.name)
           curClassSymbolTable.setParentTable(a)
           a.putClassVal(currentClass.get.className.name, visit(currentClass.get, curClassSymbolTable))

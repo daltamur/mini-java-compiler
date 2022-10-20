@@ -7,6 +7,7 @@ import scala.util.control.NonLocalReturns.*
 class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
 
   private var curError: Option[error] = None
+  private var atCompare = false
   def getCurError: Option[error] = curError
   override def visitGoal(goal: goal, a: symbolTable): typeCheckResult = {
     //assume we have no errors to begin with, only change is the main class or class throw an error
@@ -282,7 +283,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
         case _ =>
       }
     }
-    if(IDType != null || !IDType.equals(intArrayType())){
+    if(IDType != null && IDType.equals(intArrayType())){
       //check the index, make sure it is an int
       visit(statement.arrayIndex, a) match
         case result:varValResult =>
@@ -457,8 +458,19 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
               result
             }
           case _ => rightExpressionType
-      }else{
-        curError=Some(typeInconformitiyError(b.asInstanceOf[varValResult].varVal, booleanType(), expression.value.line, expression.value.index-1))
+      }else if(b.asInstanceOf[varValResult].varVal.equals(integerType()) && atCompare){
+        val rightExpressionType = visit(expression.value, a)
+        rightExpressionType match
+          case result: varValResult =>
+            if (!result.varVal.equals(booleanType())) {
+              curError = Some(typeInconformitiyError(result.asInstanceOf[varValResult].varVal, booleanType(), expression.value.line, expression.value.index))
+              hasErrorResult(true)
+            } else {
+              result
+            }
+          case _ => rightExpressionType
+      } else{
+        curError=Some(typeInconformitiyError(b.asInstanceOf[varValResult].varVal, booleanType(), expression.value.line, expression.value.index))
         hasErrorResult(true)
       }
     }
@@ -495,16 +507,32 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     } else {
       //now just make sure b is a boolean
       if (b.asInstanceOf[varValResult].varVal.equals(integerType())) {
-        val rightExpressionType = visit(expression.value, a)
+        val rightExpressionType = visit(AST_Grammar.expression(expressionTerm = expression.value.expressionTerm, expressionOpt = None, line = expression.value.line, index = expression.value.index), a)
         rightExpressionType match
           case result: varValResult =>
             if (!result.varVal.equals(integerType())) {
-              curError = Some(typeInconformitiyError(result.asInstanceOf[varValResult].varVal, integerType(), expression.value.line, expression.value.index))
+              curError = Some(typeInconformitiyError(result.varVal, integerType(), expression.value.line, expression.value.index))
               hasErrorResult(true)
             } else {
-              varValResult(booleanType())
+              if(expression.value.expressionOpt.isDefined){
+                atCompare = true
+                val restofExpressionType = visit(expression.value, a)
+                atCompare = false
+                restofExpressionType match
+                  case result: hasErrorResult => return result
+                  case result: varValResult =>
+                    if(result.varVal.equals(booleanType())){
+                      result
+                    }else{
+                      curError = Some(typeInconformitiyError(result.varVal, booleanType(), expression.value.line, expression.value.index))
+                      hasErrorResult(true)
+                    }
+              }else{
+                varValResult(booleanType())
+              }
             }
-          case _ => varValResult(booleanType())
+          case result: hasErrorResult => result
+
       } else {
         curError = Some(typeInconformitiyError(b.asInstanceOf[varValResult].varVal, integerType(), expression.value.line, expression.value.index - 1))
         hasErrorResult(true)
@@ -569,7 +597,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     }else if(b.asInstanceOf[varValResult].varVal.equals(intArrayType())){
       returnVal = varValResult(integerType())
     }else{
-      curError = Some(typeInconformitiyError(b.asInstanceOf[varValResult].varVal, integerType(), expression.line, expression.index))
+      curError = Some(typeInconformitiyError(b.asInstanceOf[varValResult].varVal, intArrayType(), expression.line, expression.index))
       returnVal = hasErrorResult(true)
     }
 

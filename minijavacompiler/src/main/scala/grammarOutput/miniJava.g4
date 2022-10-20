@@ -33,6 +33,8 @@ methodFuncCall: IDENTIFIER '(' (expression (',' expression )*)? ')';
 
 arrayLengthCall: 'length';
 
+expressionTailOps:
+
 expressionTail: AND expression              #andExpression
                 | COMPARE expression        #compareExpression
                 | ADD expression            #addExpression
