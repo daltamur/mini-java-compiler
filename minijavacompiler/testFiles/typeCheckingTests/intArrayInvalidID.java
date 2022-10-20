@@ -6,15 +6,18 @@ class Main{
 
 class class1 extends class2{
     public int method1(){
-        char y;
-        y = 'a';
+        class4 y;
+        int[] x;
+        x = x;
         return 0;
     }
 }
 
 class class2 extends class3{
-    int[] x;
 }
 
 class class3{
+    int[] x;
 }
+
+class class4{}

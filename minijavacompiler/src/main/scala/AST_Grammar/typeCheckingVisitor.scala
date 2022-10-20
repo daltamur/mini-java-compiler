@@ -183,101 +183,57 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     //if the variable is not defined in the method scope, check the current class scope. If that fails,
     //check the extended classes for the variable. If THAT fails, then the variable does not exist so change
     //hasError to true
-    if(!a.checkIfVarIDExists(leftVal.name)){
-      a.getParentTable match
-        case Some(parent) =>
-          //checking the class that the method is a child of
-          if(!parent.checkIfVarIDExists(leftVal.name)){
-            //now check any extend class to see if the variable might reside in the extended class
-            val variableType = checkExtendedClassesForVar(leftVal.name, parent)
-            variableType match
-              case result: hasErrorResult =>
-                curError = Some(noSuchVariableUnknownTypeDefinedError(leftVal.name, statement.line))
-                hasError = result
-              case result: varValResult =>
-                //we were able to find the variable type
-                //result now is of type varType
-                //check the right expression and make sure it is not an hasError node or an unequivalent type
-                val rightSide = visit(statement.value, a)
-                rightSide match
-                  case rightVal: hasErrorResult => hasError = rightVal
-                  case rightVal: varValResult =>
-                    if(rightVal.varVal.isInstanceOf[classType] && result.varVal.isInstanceOf[classType]) {
-                      val extendedClass = a.getParentTable.get.getParentTable.get.getClassVal(varTypeToString(rightVal.varVal)).get.asInstanceOf[classVal].extendedClass
-                      if (extendedClass.isDefined) {
-                        hasError.errorVal = !matchParams(rightVal.varVal, result.varVal, a.getParentTable.get.getParentTable.get)
-                        if (hasError.errorVal) {
-                          curError = Some(returnTypeError(result.varVal, rightVal.varVal, statement.line))
-                        }
-                      } else {
-                        curError = Some(returnTypeError(result.varVal, rightVal.varVal, statement.line))
-                        hasError.errorVal = true
-                      }
-                    }else{
-                      curError = Some(returnTypeError(result.varVal, rightVal.varVal, statement.line))
-                      hasError.errorVal = true
-                    }
-          }else{
-            //the variable is defined as a global value in the class, get it and perform the rest of the checks
-            val variableType = parent.getVariableVal(leftVal.name).get.asInstanceOf[variableVal]
-            //check right side
-            val rightSide = visit(statement.value, a)
-            rightSide match
-              case rightVal: hasErrorResult => hasError = rightVal
-              case rightVal: varValResult =>
-                  if (!variableType.varValue.equals(rightVal.varVal)) {
-                    if(rightVal.varVal.isInstanceOf[classType] && variableType.varValue.isInstanceOf[classType]) {
-                    val extendedClass = a.getParentTable.get.getParentTable.get.getClassVal(varTypeToString(rightVal.varVal)).get.asInstanceOf[classVal].extendedClass
-                    if (extendedClass.isDefined) {
-                      hasError.errorVal = !matchParams(rightVal.varVal, variableType.varValue, a.getParentTable.get.getParentTable.get)
-                      if (hasError.errorVal) {
-                        curError = Some(returnTypeError(variableType.varValue, rightVal.varVal, statement.line))
-                      }
-                    } else {
-                      curError = Some(returnTypeError(variableType.varValue, rightVal.varVal, statement.line))
-                      hasError.errorVal = true
-                    }
-                  }else{
-                        curError = Some(returnTypeError(variableType.varValue, rightVal.varVal, statement.line))
-                        hasError.errorVal = true
+    if(a.checkIfVarIDExists(leftVal.name)) {
+      //variable exists in current method
+      val leftSideType = a.getVariableVal(leftVal.name).get.asInstanceOf[variableVal].varValue
+      //now get the type of the right side
+      val rightSideType = visit(statement.value, a)
+      //if the two types are not equal, we'll attempt to check if the right type is a child of the left type
+      if (!rightSideType.isInstanceOf[hasErrorResult]) {
+        checkIfLeftTypeEqualsRightType(leftSideType, rightSideType.asInstanceOf[varValResult].varVal, a, statement)
+      }else{
+        hasError = rightSideType.asInstanceOf[hasErrorResult]
+      }
+    } else if (a.getParentTable.get.checkIfVarIDExists(leftVal.name)) {
+      //the variable exists as a global within the class
+      val leftSideType = a.getParentTable.get.getVariableVal(leftVal.name).get.asInstanceOf[variableVal].varValue
+      val rightSideType = visit(statement.value, a)
+      if (!rightSideType.isInstanceOf[hasErrorResult]) {
+        checkIfLeftTypeEqualsRightType(leftSideType, rightSideType.asInstanceOf[varValResult].varVal, a, statement)
+      } else {
+        hasError = rightSideType.asInstanceOf[hasErrorResult]
+      }
+    } else {
+      //check if the variable exists globally. If it does not, throw a variable never made error
+      val leftSideType = checkExtendedClassesForVar(leftVal.name, a)
+      if (!leftSideType.isInstanceOf[hasErrorResult]) {
+        //we found the reference in an inherited class, now see if it is equal to the right value
+        val rightSideType = visit(statement.value, a)
+        if (!rightSideType.isInstanceOf[hasErrorResult]) {
+          checkIfLeftTypeEqualsRightType(leftSideType.asInstanceOf[varValResult].varVal, rightSideType.asInstanceOf[varValResult].varVal, a, statement)
+        } else {
+          hasError = rightSideType.asInstanceOf[hasErrorResult]
+        }
+      }else{
+        hasError = leftSideType.asInstanceOf[hasErrorResult]
+      }
+    }
+    hasError
+  }
 
-                    }
-                }else{
-                    curError = Some(noSuchVariableDefinedError(leftVal.name, rightVal.varVal, statement.line))
-                    hasError.errorVal = true
-                }
-          }
-        case _ => hasError.errorVal = true
-          println("Something went wrong...Ill-defined statement")
-          System.exit(1)
-    }else{
-      val variableType = a.getVariableVal(leftVal.name).get.asInstanceOf[variableVal]
-      val rightSide = visit(statement.value, a)
-      rightSide match
-        case rightVal: hasErrorResult => hasError = rightVal
-        case rightVal: varValResult =>
-          if (!variableType.varValue.equals(rightVal.varVal)) {
-            //right side could be a child of left side, check for that
-            //if is possible that the return value is just a child of the expected return value, check for that.
-            if(rightVal.varVal.isInstanceOf[classType] && variableType.varValue.isInstanceOf[classType]) {
-            val extendedClass = a.getParentTable.get.getParentTable.get.getClassVal(varTypeToString(rightVal.varVal)).get.asInstanceOf[classVal].extendedClass
-            if (extendedClass.isDefined) {
-              hasError.errorVal = !matchParams(rightVal.varVal, variableType.varValue, a.getParentTable.get.getParentTable.get)
-              if (hasError.errorVal) {
-                curError = Some(returnTypeError(variableType.varValue, rightVal.varVal, statement.line))
-              }
-            } else {
-              curError = Some(returnTypeError(variableType.varValue, rightVal.varVal, statement.line))
-              hasError.errorVal = true
-            }
-          }else{
-              curError = Some(returnTypeError(variableType.varValue, rightVal.varVal, statement.line))
-              hasError.errorVal = true
-            }
-          }else{
-              curError = Some(noSuchVariableDefinedError(leftVal.name, rightVal.varVal, statement.line))
-              hasError.errorVal = true
-          }
+  def checkIfLeftTypeEqualsRightType(leftSideType: varType, rightSideType: varType, a: symbolTable, statement: assignStatement): typeCheckResult = {
+    val hasError = hasErrorResult(false)
+    if(!leftSideType.equals(rightSideType)) {
+      if (leftSideType.isInstanceOf[classType] && rightSideType.isInstanceOf[classType]) {
+        //match params returns true if the classes are related, so just negate it
+        hasError.errorVal = !matchParams(rightSideType, leftSideType, a.getParentTable.get.getParentTable.get)
+        if (hasError.errorVal) {
+          curError = Some(typeInconformitiyError(rightSideType, leftSideType, statement.line, statement.value.index))
+        }
+      } else {
+        hasError.errorVal = true
+        curError = Some(typeInconformitiyError(rightSideType, leftSideType, statement.line, statement.value.index))
+      }
     }
 
     hasError
@@ -286,12 +242,12 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
   def checkExtendedClassesForVar(variable: String, a: symbolTable): typeCheckResult = {
     var returnedVal:typeCheckResult = hasErrorResult(false)
     //remember that we are in a class, so get the classVal from the parent of the current symbol table
-    val extendedClass = a.getParentTable.get.getClassVal(a.getName).get.asInstanceOf[classVal].extendedClass
+    val extendedClass = a.getParentTable.get.getParentTable.get.getClassVal(a.getParentTable.get.getName).get.asInstanceOf[classVal].extendedClass
     extendedClass match
       case Some(clazz) =>
         //get that class's symbol table, if it has the variable letter, return its type, otherwise check for
         //that class's extended class
-        val extendedClassSymbolTable = a.getParentTable.get.getClassVal(clazz).get.asInstanceOf[classVal].classScope
+        val extendedClassSymbolTable = a.getParentTable.get.getParentTable.get.getClassVal(clazz).get.asInstanceOf[classVal].classScope
         if(extendedClassSymbolTable.checkIfVarIDExists(variable)){
           returnedVal = varValResult(extendedClassSymbolTable.getVariableVal(variable).get.asInstanceOf[variableVal].varValue)
         }else{
@@ -305,90 +261,47 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
 
   //make sure the array identifier is actually of type array
   //make sure the expression in the brackets is an int, make sure the assigned value is an int
-  //NOT FINISHED
   override def visitArrayAssignStatement(statement: arrayAssignStatement, a: symbolTable): typeCheckResult = {
     var hasError = hasErrorResult(false)
     //first get the array identifier
     val arrayID = statement.idVal
-
-    //just like the assignment statement, we have to check and make sure the identifier is defined in either the current
-    //class or an extended class. If it is not, we have an error on our hands
-    //if it is found, make sure it is of type int array
-    if(!a.checkIfVarIDExists(arrayID.name)){
-      //if we're here, then the array identifier does not exist in the current scope, check the current class &
-      //its parent classes
-      a.getParentTable match
-        case Some(parent) =>
-          //checking the class that the method is a child of
-          if (!parent.checkIfVarIDExists(arrayID.name)) {
-            //need to check the extended classes for an int array
-            val idType = checkExtendedClassesForVar(arrayID.name, a.getParentTable.get)
-            idType match
-              case result:hasErrorResult =>
-                hasError.errorVal = true
-
-              case x:intArrayType => {
-                // we found the identifier and it was an array
-                //check and make sure the array index is of type int
-                val arrIndex = visit(statement.arrayIndex, a)
-                arrIndex match
-                  case result: hasErrorResult =>
-                    hasError = result
-                  case result: varValResult =>
-                    if (!result.varVal.equals(integerType)) {
-                      curError = Some(typeInconformitiyError(result.varVal, integerType(), statement.arrayIndex.line, statement.arrayIndex.index))
-                      hasError.errorVal = true
-                    }
-                //so long as the previous check passed, we'll type check the assigned expression now to make sure it is an integer
-                if (!hasError.errorVal) {
-                  val assignedExpression = visit(statement.value, a)
-                  assignedExpression match
-                    case result: hasErrorResult =>
-                      hasError = result
-                    case result: varValResult =>
-                      if (!result.varVal.equals(integerType)) {
-                        curError = Some(typeInconformitiyError(result.varVal, integerType(), statement.arrayIndex.line, statement.arrayIndex.index))
-                        hasError.errorVal = true
-                      }
-                }
-              }
-
-              case _ =>
-                //we found the identifier and it was not an array
-                curError = Some(typeInconformitiyError(idType.asInstanceOf[varValResult].varVal, intArrayType(), statement.value.line, statement.value.index))
-                hasError.errorVal = true
-
-          }else{//DO NOT FORGET THE ELSE HERE
-            //the array exists as a global within the class
-          }
-        case _ => hasError.errorVal = true
-          println("Something went wrong...Ill-defined statement")
-          System.exit(1)
-
+    //first we're going to make sure the arrayID is indeed an array
+    //local context
+    var IDType:varType = null
+    if (a.checkIfVarIDExists(arrayID.name)) {
+      IDType = a.getVariableVal(arrayID.name).get.asInstanceOf[variableVal].varValue
+      //now the class context
+    }else if(a.getParentTable.get.checkIfVarIDExists(arrayID.name)){
+      IDType = a.getParentTable.get.getVariableVal(arrayID.name).get.asInstanceOf[variableVal].varValue
     }else{
-      //the array exists in the current method if we get here
-      //check and make sure the array index is of type int
-      val arrIndex = visit(statement.arrayIndex, a)
-      arrIndex match
-        case result:hasErrorResult =>
-          hasError = result
+      //try and get it in the global context
+      val globalCheck = checkExtendedClassesForVar(arrayID.name, a)
+      globalCheck match {
         case result: varValResult =>
-          if(!result.varVal.equals(integerType)){
-            curError = Some(typeInconformitiyError(result.varVal, integerType(), statement.arrayIndex.line, statement.arrayIndex.index))
-            hasError.errorVal = true
-          }
-      //so long as the previous check passed, we'll type check the assigned expression now to make sure it is an integer
-      if(!hasError.errorVal){
-        val assignedExpression = visit(statement.value, a)
-        assignedExpression match
-          case result: hasErrorResult =>
-            hasError = result
-          case result: varValResult =>
-            if (!result.varVal.equals(integerType)) {
-              curError = Some(typeInconformitiyError(result.varVal, integerType(), statement.arrayIndex.line, statement.arrayIndex.index))
-              hasError.errorVal = true
-            }
+          IDType = result.varVal
+        case _ =>
       }
+    }
+    if(IDType != null || !IDType.equals(intArrayType())){
+      //check the index, make sure it is an int
+      visit(statement.arrayIndex, a) match
+        case result:varValResult =>
+          if(result.varVal.equals(integerType())) {
+            visit(statement.value, a) match
+              case expressionResult: varValResult =>
+                if(!expressionResult.varVal.equals(integerType())){
+                  hasError.errorVal = true
+                  curError = Some(typeInconformitiyError(expressionResult.varVal, intArrayType(), statement.value.line, statement.value.index))
+                }
+              case expressionResult:hasErrorResult => hasError = expressionResult
+          }else{
+            hasError.errorVal = true
+            curError = Some(typeInconformitiyError(result.varVal, intArrayType(), statement.arrayIndex.line, statement.arrayIndex.index))
+          }
+        case result:hasErrorResult => hasError = result
+    }else{
+      hasError.errorVal = true
+      curError = Some(noSuchVariableDefinedError(arrayID.name, intArrayType(), statement.value.line))
     }
 
     hasError
