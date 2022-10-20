@@ -33,17 +33,18 @@ methodFuncCall: IDENTIFIER '(' (expression (',' expression )*)? ')';
 
 arrayLengthCall: 'length';
 
-expressionTailOps:
+expressionTailOps:ADD expression           #addExpression
+                  | SUBTRACT expression       #subtractExpression
+                  | MULTIPLY expression       #multiplyExpression
+                  ;
 
-expressionTail: AND expression              #andExpression
-                | COMPARE expression        #compareExpression
-                | ADD expression            #addExpression
-                | SUBTRACT expression       #subtractExpression
-                | MULTIPLY expression       #multiplyExpression
-                | arrayIndex                #arrayIndexCall
-                | '.' arrayLengthCall       #getArrayLength
-                | '.' methodFuncCall        #functionVallExpression
-                |                           #noExpressionTail
+expressionTail: expressionTailOps                               #operatorExpression
+                | arrayIndex (expressionTailOps)?               #arrayIndexCall
+                | '.' arrayLengthCall (expressionTailOps)?      #getArrayLength
+                | '.' methodFuncCall (expressionTailOps)?       #functionVallExpression
+                | AND expression                                #andExpression
+                | COMPARE expression                            #compareExpression
+                |                                               #noExpressionTail
                 ;
 
 expressionTerminal: 'this'                                              #thisKeyword

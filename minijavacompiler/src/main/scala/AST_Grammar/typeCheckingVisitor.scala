@@ -507,7 +507,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     } else {
       //now just make sure b is a boolean
       if (b.asInstanceOf[varValResult].varVal.equals(integerType())) {
-        val rightExpressionType = visit(AST_Grammar.expression(expressionTerm = expression.value.expressionTerm, expressionOpt = None, line = expression.value.line, index = expression.value.index), a)
+        val rightExpressionType = visit(expression.value, a)//visit(AST_Grammar.expression(expressionTerm = expression.value.expressionTerm, expressionOpt = None, line = expression.value.line, index = expression.value.index), a)
         rightExpressionType match
           case result: varValResult =>
             if (!result.varVal.equals(integerType())) {
@@ -596,6 +596,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
       returnVal = b
     }else if(b.asInstanceOf[varValResult].varVal.equals(intArrayType())){
       returnVal = varValResult(integerType())
+      returnVal = visitExpressionOpt(expression.operation, a, returnVal)
     }else{
       curError = Some(typeInconformitiyError(b.asInstanceOf[varValResult].varVal, intArrayType(), expression.line, expression.index))
       returnVal = hasErrorResult(true)
@@ -607,19 +608,26 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
   //make sure b is an int array type. If it is, make sure the index is an integer. If these checks pass, return an integer type
   override def visitArrayIndexExpression(expression: arrayIndexExpression, a: symbolTable, b: typeCheckResult): typeCheckResult = {
     var returnVal: typeCheckResult = hasErrorResult(false)
-    if(b.isInstanceOf[hasErrorResult]){
-      returnVal = b
-    }else{
-      val indexVal = visit(expression.value, a)
-      indexVal match
-        case result: hasErrorResult => returnVal = result
-        case result: varValResult =>
-          if(!result.varVal.equals(integerType())){
-            curError = Some(typeInconformitiyError(result.varVal, integerType(), expression.value.line, expression.value.index))
+    b match {
+      case _: hasErrorResult =>
+        returnVal = b
+      case identifierType:varValResult =>
+        identifierType.varVal match
+          case _:intArrayType =>
+            val indexVal = visit(expression.value, a)
+            indexVal match
+              case result: hasErrorResult => returnVal = result
+              case result: varValResult =>
+                if (!result.varVal.equals(integerType())) {
+                  curError = Some(typeInconformitiyError(result.varVal, integerType(), expression.value.line, expression.value.index))
+                  returnVal = hasErrorResult(true)
+                } else {
+                  returnVal = result
+                  returnVal = visitExpressionOpt(expression.operation, a, returnVal)
+                }
+          case _ =>
+            curError = Some(typeInconformitiyError(b.asInstanceOf[AST_Grammar.varValResult].varVal, intArrayType(), expression.value.line, expression.value.index))
             returnVal = hasErrorResult(true)
-          }else{
-            returnVal = result
-          }
     }
     returnVal
   }
@@ -664,6 +672,8 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
       //get method keys for current class
       if (a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].classScope.checkIfMethodIDExists(methodKey)) {
         returnedVal = varValResult(a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].classScope.getMethodVal(methodKey).get.asInstanceOf[methodVal].returnType)
+        //do a check for any possible operation arg
+        returnedVal = visitExpressionOpt(expression.operation, a, returnedVal)
         returnedVal
       } else {
         //possible that the method requires parent types, making the method signature valid. check this and  return as
@@ -674,6 +684,8 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
             val varsMatch = checkForParentTypes(methodKey._2, possibleKey.asInstanceOf[(String, List[varType])]._2, a.getParentTable.get.getParentTable.get)
             if (varsMatch) {
               returnedVal = varValResult(a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].classScope.getMethodVal(possibleKey).get.asInstanceOf[methodVal].returnType)
+              //do a check for any possible operation arg
+              returnedVal = visitExpressionOpt(expression.operation, a, returnedVal)
             }
           }
         }
@@ -693,6 +705,8 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
                 curError = Some(noSuchMethodError(expression.funcName.name, paramVarTypes.toList, expression.line))
                 result.errorVal = true
           case _ =>
+            //do a check for any possible operation arg
+            returnedVal = visitExpressionOpt(expression.operation, a, returnedVal)
         }
         returnedVal
       }

@@ -58,15 +58,16 @@ case class parenthesizedExpression(value: expression, line: Integer, index: Inte
 
 sealed trait expressionTail() extends ASTNode
 
-case class andExpression(value: expression) extends expressionTail
-case class addExpression(value: expression) extends expressionTail
-case class compareExpression(value: expression) extends expressionTail
-case class subtractExpression(value: expression) extends expressionTail
-case class multiplyExpression(value: expression) extends expressionTail
-case class arrayLengthExpression(line: Integer, index: Integer) extends expressionTail
+sealed trait operation() extends expressionTail
+case class andExpression(value: expression) extends operation
+case class addExpression(value: expression) extends operation
+case class compareExpression(value: expression) extends operation
+case class subtractExpression(value: expression) extends operation
+case class multiplyExpression(value: expression) extends operation
+case class arrayLengthExpression(line: Integer, index: Integer,var operation: Option[operation]) extends expressionTail
 
-case class arrayIndexExpression(value: expression) extends expressionTail
-case class methodFunctionCallExpression(funcName: identifier, params: List[expression], line: Integer) extends expressionTail
+case class arrayIndexExpression(value: expression, var operation: Option[operation]) extends expressionTail
+case class methodFunctionCallExpression(funcName: identifier, params: List[expression], line: Integer, var operation: Option[operation]) extends expressionTail
 case class expression(expressionTerm: expressionTerminal, expressionOpt: Option[expressionTail], line: Integer, index: Integer) extends ASTNode
 
 

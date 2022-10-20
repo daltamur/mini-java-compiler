@@ -142,39 +142,46 @@ public interface miniJavaVisitor<T> extends ParseTreeVisitor<T> {
 	T visitArrayLengthCall(miniJavaParser.ArrayLengthCallContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code andExpression}
-	 * labeled alternative in {@link miniJavaParser#expressionTail}.
+	 * labeled alternative in {@link miniJavaParser#expressionTailOps}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitAndExpression(miniJavaParser.AndExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code compareExpression}
-	 * labeled alternative in {@link miniJavaParser#expressionTail}.
+	 * labeled alternative in {@link miniJavaParser#expressionTailOps}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitCompareExpression(miniJavaParser.CompareExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code addExpression}
-	 * labeled alternative in {@link miniJavaParser#expressionTail}.
+	 * labeled alternative in {@link miniJavaParser#expressionTailOps}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitAddExpression(miniJavaParser.AddExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code subtractExpression}
-	 * labeled alternative in {@link miniJavaParser#expressionTail}.
+	 * labeled alternative in {@link miniJavaParser#expressionTailOps}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitSubtractExpression(miniJavaParser.SubtractExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code multiplyExpression}
-	 * labeled alternative in {@link miniJavaParser#expressionTail}.
+	 * labeled alternative in {@link miniJavaParser#expressionTailOps}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitMultiplyExpression(miniJavaParser.MultiplyExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code operatorExpression}
+	 * labeled alternative in {@link miniJavaParser#expressionTail}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOperatorExpression(miniJavaParser.OperatorExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code arrayIndexCall}
 	 * labeled alternative in {@link miniJavaParser#expressionTail}.

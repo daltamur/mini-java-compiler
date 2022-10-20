@@ -41,6 +41,7 @@ abstract class ASTVisitor[A, B] {
     
     expressionVal.expressionOpt match
       case Some(value) =>
+        println(value)
         value match
           case x: andExpression => visitAndExpression(x, a, expressionTerminalVal)
           case x: addExpression => visitAddExpression(x, a, expressionTerminalVal)
@@ -50,6 +51,18 @@ abstract class ASTVisitor[A, B] {
           case x: arrayLengthExpression => visitArrayLengthExpression(x, a, expressionTerminalVal)
           case x: arrayIndexExpression => visitArrayIndexExpression(x, a, expressionTerminalVal)
           case x: methodFunctionCallExpression => visitMethodFunctionCallExpression(x, a, expressionTerminalVal)
+      case _ => visitNoTail(expressionTerminalVal)
+  }
+
+  def visitExpressionOpt(expressionVal: Option[operation], a:A, expressionTerminalVal:B): B ={
+    expressionVal match
+      case Some(value) =>
+        value match
+          case x: andExpression => visitAndExpression(x, a, expressionTerminalVal)
+          case x: addExpression => visitAddExpression(x, a, expressionTerminalVal)
+          case x: compareExpression => visitCompareExpression(x, a, expressionTerminalVal)
+          case x: subtractExpression => visitSubtractExpression(x, a, expressionTerminalVal)
+          case x: multiplyExpression => visitMultiplyExpression(x, a, expressionTerminalVal)
       case _ => visitNoTail(expressionTerminalVal)
   }
 

@@ -8,11 +8,8 @@ class class1{
     public int method1(){
         int[] x;
         int y;
-        char yz;
-        boolean b;
-        b = x.length-5-7-x[5]-7*8+(4) < x.length-5-7-x[5]-7*8+(4);
-        y = x.length-5-7-x[5]-7*8+(yz);
-        return (x[4]-7);
+        y = x.length-5-7-x.length-7*8+(9-8*x.length);
+        return (x[4]-7<x.length-5-7-x.length-7*8+(9-8*x.length));
     }
 
     public int method2(){
