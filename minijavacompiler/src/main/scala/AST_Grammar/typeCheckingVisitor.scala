@@ -77,7 +77,8 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     if(!hasError.errorVal){
       val returnValue = visit(method.returnVal, a)
       returnValue match
-        case result:hasErrorResult => hasError = result
+        case result:hasErrorResult =>
+          hasError = result
         case result:varValResult =>
           if(result.varVal.isInstanceOf[classType]) {
             if (!result.varVal.equals(AST_Grammar.getVarType(method.returnType))) {
@@ -87,11 +88,19 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
                 hasError.errorVal = !matchParams(result.varVal, AST_Grammar.getVarType(method.returnType), a.getParentTable.get.getParentTable.get)
                 if (hasError.errorVal) {
                   curError = Some(returnTypeError(AST_Grammar.getVarType(method.returnType), result.varVal, method.line))
+                  hasError = hasErrorResult(true)
+                  return  hasError
                 }
               }else{
-                hasError.errorVal = true
                 curError = Some(returnTypeError(AST_Grammar.getVarType(method.returnType), result.varVal, method.line))
+                hasError = hasErrorResult(true)
+                return  hasError
               }
+            }
+          }else{
+            if(!result.varVal.equals(AST_Grammar.getVarType(method.returnType))){
+              curError = Some(returnTypeError(AST_Grammar.getVarType(method.returnType), result.varVal, method.line))
+              hasError = hasErrorResult(true)
             }
           }
     }
