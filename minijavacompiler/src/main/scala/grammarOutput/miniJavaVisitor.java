@@ -123,11 +123,19 @@ public interface miniJavaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitArrayAssignStatement(miniJavaParser.ArrayAssignStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link miniJavaParser#expression}.
+	 * Visit a parse tree produced by the {@code expressionValue}
+	 * labeled alternative in {@link miniJavaParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExpression(miniJavaParser.ExpressionContext ctx);
+	T visitExpressionValue(miniJavaParser.ExpressionValueContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code andexpression}
+	 * labeled alternative in {@link miniJavaParser#expressionAnd}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAndexpression(miniJavaParser.AndexpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link miniJavaParser#methodFuncCall}.
 	 * @param ctx the parse tree
@@ -141,15 +149,8 @@ public interface miniJavaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitArrayLengthCall(miniJavaParser.ArrayLengthCallContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code andExpression}
-	 * labeled alternative in {@link miniJavaParser#expressionTailOps}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAndExpression(miniJavaParser.AndExpressionContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code compareExpression}
-	 * labeled alternative in {@link miniJavaParser#expressionTailOps}.
+	 * labeled alternative in {@link miniJavaParser#expressionComp}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */

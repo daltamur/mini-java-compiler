@@ -1,5 +1,7 @@
 package AST_Grammar
 
+import antlr.ASTNULLType
+
 import scala.collection.mutable.ListBuffer
 
 
@@ -45,6 +47,11 @@ case class assignStatement(idVal: identifier, value: expression, line: Integer) 
 case class arrayAssignStatement(idVal: identifier, arrayIndex: expression, value: expression) extends statement
 
 //expression cases
+
+case class expressionValue(leftVal: expressionTerminal, rightVal: Option[expressionTail], line: Integer, index: Integer)
+case class expression(leftVal: compExpression, rightVal: Option[andExpression]) extends ASTNode
+case class compExpression(value: expressionValue, optVal: Option[compExpression], line:Integer, index:Integer) extends ASTNode
+case class andExpression(leftVal:Option[expression]) extends ASTNode
 sealed trait expressionTerminal() extends ASTNode
 case class thisExpression(line: Integer, index: Integer) extends expressionTerminal
 case class booleanExpression(value: Boolean, line: Integer, index: Integer) extends expressionTerminal
@@ -53,22 +60,18 @@ case class characterExpression(value: String, line: Integer, index: Integer) ext
 case class identifierExpression(value: identifier, line: Integer, index: Integer) extends expressionTerminal
 case class newArrayExpression(size: expression, line: Integer, index: Integer) extends expressionTerminal
 case class newClassInstanceExpression(classType: identifier, line: Integer, index: Integer) extends expressionTerminal
-case class negatedExpression(value: expression, line: Integer, index: Integer) extends expressionTerminal
+case class negatedExpression(value: expressionValue, line: Integer, index: Integer) extends expressionTerminal
 case class parenthesizedExpression(value: expression, line: Integer, index: Integer) extends expressionTerminal
 
 sealed trait expressionTail() extends ASTNode
 
 sealed trait operation() extends expressionTail
-case class andExpression(value: expression) extends operation
-case class addExpression(value: expression) extends operation
-case class compareExpression(value: expression) extends operation
-case class subtractExpression(value: expression) extends operation
-case class multiplyExpression(value: expression) extends operation
+case class addExpression(value: expressionValue) extends operation
+case class subtractExpression(value: expressionValue) extends operation
+case class multiplyExpression(value: expressionValue) extends operation
 case class arrayLengthExpression(line: Integer, index: Integer,var operation: Option[operation]) extends expressionTail
-
 case class arrayIndexExpression(value: expression, var operation: Option[operation]) extends expressionTail
 case class methodFunctionCallExpression(funcName: identifier, params: List[expression], line: Integer, var operation: Option[operation]) extends expressionTail
-case class expression(expressionTerm: expressionTerminal, expressionOpt: Option[expressionTail], line: Integer, index: Integer) extends ASTNode
 
 
 

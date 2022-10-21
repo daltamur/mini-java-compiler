@@ -54,11 +54,12 @@ class testClass2{
         char w;
         char aw;
         bool value;
+        int[] a;
         w = '\"';
         x = ' ';
         //x & b;
-        //x = aw.getHerDone();
-        return true;
+        x = aw.getHerDone();
+        return !(12-14-45+a[0]<a.length<1-12<1-13-2&&12-!14-45+a[0]<a.length<1-12<1-13-2&&5);
 
     }
 }

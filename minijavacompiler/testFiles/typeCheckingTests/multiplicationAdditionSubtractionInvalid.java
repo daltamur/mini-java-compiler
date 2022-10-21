@@ -8,7 +8,7 @@ class class1{
     public int method1(){
         int[] x;
         int y;
-        y = x.length-5-7-x.length-'a'*8+(9-8*x.length);
+        y = x.length-5-7-x[7]+x.length-'a'*8+(9-8*x.length);
         return 0;
     }
 
