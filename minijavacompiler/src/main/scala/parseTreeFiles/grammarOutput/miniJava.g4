@@ -48,7 +48,7 @@ expressionTailOps:ADD (expressionTerminal expressionTail)                       
 expressionTail: expressionTailOps                               #operatorExpression
                 | arrayIndex (expressionTailOps)?               #arrayIndexCall
                 | '.' arrayLengthCall (expressionTailOps)?      #getArrayLength
-                | '.' methodFuncCall (expressionTail)       #functionVallExpression
+                | '.' methodFuncCall (expressionTail)           #functionVallExpression
                 |                                               #noExpressionTail
                 ;
 

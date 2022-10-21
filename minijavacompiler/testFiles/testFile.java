@@ -25,7 +25,7 @@ class testClass2 extends testClass3{
         w = '\"';
         x = ' ';
         //x & b;
-        value = this.testFile().testMethod('a', 1,2);
+        value = this.testFile().testMethod();
         //x = aw.getHerDone();
         return a;
 
@@ -49,7 +49,10 @@ class testClass3{
         //value = x && b;
         //x = aw.getHerDone();
         return true;
+    }
 
+    public boolean testMethod(){
+        return true;
     }
 
     public boolean getHerDone(){
