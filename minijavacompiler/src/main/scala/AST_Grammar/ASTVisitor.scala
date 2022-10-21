@@ -36,7 +36,6 @@ abstract class ASTVisitor[A, B] {
   }
 
   def visitBaseExpression(currentNode: expressionValue, a:A): B = {
-    println(currentNode)
     val expressionTerminalVal = {
       currentNode.leftVal match
         case x: thisExpression => visitThisExpression(x, a)
@@ -49,7 +48,7 @@ abstract class ASTVisitor[A, B] {
         case x: negatedExpression => visitNegatedExpression(x, a)
         case x: parenthesizedExpression => visitParenthesizedExpression(x, a)
     }
-    println(currentNode)
+
     currentNode.rightVal match
       case Some(value) =>
         value match
