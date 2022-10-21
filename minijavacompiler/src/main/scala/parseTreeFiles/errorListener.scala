@@ -1,5 +1,7 @@
+package parseTreeFiles
+
 import org.antlr.v4.runtime.misc.ParseCancellationException
-import org.antlr.v4.runtime.{BaseErrorListener, FailedPredicateException, InputMismatchException, NoViableAltException, Parser, RecognitionException, Recognizer, Token, TokenStream}
+import org.antlr.v4.runtime.*
 
 import scala.collection.mutable
 class errorListener extends BaseErrorListener{

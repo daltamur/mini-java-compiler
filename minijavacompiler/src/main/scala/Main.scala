@@ -1,6 +1,8 @@
 import AST_Grammar.{ASTNode, symbolTable, symbolTableBuilder, typeCheckingVisitor}
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream, ParserRuleContext}
 import org.antlr.v4.runtime.tree.{ErrorNode, ParseTree, ParseTreeListener, ParseTreeWalker, TerminalNode}
+import parseTreeFiles.grammarOutput.{miniJavaLexer, miniJavaParser}
+import parseTreeFiles.{MiniJavaVisitor, errorListener}
 
 import java.io.File
 import java.nio.file.{Files, Paths}
@@ -24,10 +26,6 @@ object Main {
 
           //make the symbol table
           val symbolTable = new symbolTable("goal")
-//          symbolTable.putClassVal("int", AST_Grammar.classVal(new symbolTable("int"), None, 0))
-//          symbolTable.putClassVal("boolean", AST_Grammar.classVal(new symbolTable("boolean"), None, 0))
-//          symbolTable.putClassVal("char", AST_Grammar.classVal(new symbolTable("char"), None, 0))
-//          symbolTable.putClassVal("int[]", AST_Grammar.classVal(new symbolTable("int[]"), None, 0))
           val symbolTableBuilder = new symbolTableBuilder
           symbolTableBuilder.visit(programAST._1.get, symbolTable)
 
