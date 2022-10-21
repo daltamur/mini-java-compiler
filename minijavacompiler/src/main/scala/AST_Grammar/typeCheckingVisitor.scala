@@ -238,6 +238,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
           hasError = rightSideType.asInstanceOf[hasErrorResult]
         }
       }else{
+        curError = Some(noSuchVariableUnknownTypeDefinedError(leftVal.name, statement.line))
         hasError = leftSideType.asInstanceOf[hasErrorResult]
       }
     }
@@ -618,6 +619,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
                 } else {
                   returnVal = result
                   returnVal = visitExpressionOpt(expression.operation, a, returnVal)
+                  returnVal
                 }
           case _ =>
             curError = Some(typeInconformitiyError(b.asInstanceOf[AST_Grammar.varValResult].varVal, intArrayType(), expression.value.leftVal.line, expression.value.leftVal.index))
@@ -636,12 +638,12 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     val methodParams = expression.params
     val paramVarTypes = new ListBuffer[varType]
     var className: String = null
-    if(b.isInstanceOf[hasErrorResult]){
+    if (b.isInstanceOf[hasErrorResult]) {
       return b
-    }else{
+    } else {
       b.asInstanceOf[varValResult].varVal match
         //we're ok so long as the var type is a class
-        case result:classType => className = result.clazz
+        case result: classType => className = result.clazz
         case _ =>
           curError = Some(callMethodOnPrimitve(b.asInstanceOf[varValResult].varVal, expression.line))
           returnedVal = hasErrorResult(true)
@@ -660,14 +662,15 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
       }
     }
     //if there was some error going through the expressions, we're not going to bother looking for the method
-    if(!returnedVal.asInstanceOf[hasErrorResult].errorVal) {
+    if (!returnedVal.asInstanceOf[hasErrorResult].errorVal) {
       val methodKey = (methodName, paramVarTypes.toList)
       //method exists in th current scope
       //get method keys for current class
       if (a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].classScope.checkIfMethodIDExists(methodKey)) {
         returnedVal = varValResult(a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].classScope.getMethodVal(methodKey).get.asInstanceOf[methodVal].returnType)
         //do a check for any possible operation arg
-        returnedVal = visitExpressionOpt(expression.operation, a, returnedVal)
+
+        returnedVal = visitTerminalTail(expression.operation, a, returnedVal)
         returnedVal
       } else {
         //possible that the method requires parent types, making the method signature valid. check this and  return as
@@ -679,7 +682,8 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
             if (varsMatch) {
               returnedVal = varValResult(a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].classScope.getMethodVal(possibleKey).get.asInstanceOf[methodVal].returnType)
               //do a check for any possible operation arg
-              returnedVal = visitExpressionOpt(expression.operation, a, returnedVal)
+              returnedVal = visitTerminalTail(expression.operation, a, returnedVal)
+              returnedVal
             }
           }
         }
@@ -694,17 +698,19 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
                 returnedVal = checkForMethod(methodKey, extended, a.getParentTable.get.getParentTable.get)
                 if (returnedVal.isInstanceOf[hasErrorResult]) {
                   curError = Some(noSuchMethodError(expression.funcName.name, paramVarTypes.toList, expression.line))
+                }else{
+                  returnedVal = visitTerminalTail(expression.operation, a, returnedVal)
                 }
               case None =>
                 curError = Some(noSuchMethodError(expression.funcName.name, paramVarTypes.toList, expression.line))
                 result.errorVal = true
           case _ =>
             //do a check for any possible operation arg
-            returnedVal = visitExpressionOpt(expression.operation, a, returnedVal)
+            returnedVal = visitTerminalTail(expression.operation, a, returnedVal)
         }
         returnedVal
       }
-    }else{
+    } else {
       returnedVal
     }
   }

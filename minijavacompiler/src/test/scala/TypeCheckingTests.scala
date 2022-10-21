@@ -3,8 +3,6 @@ import AST_Grammar.*
 import AST_Grammar.symbolTable
 import AST_Grammar.symbolTableBuilder
 
-// For more information on writing tests, see
-// https://scalameta.org/munit/docs/getting-started.html
 class TypeCheckingTests extends munit.FunSuite {
   test("Binary Search Test") {
     val parser = parse("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/miniJavaSiteTests/BinarySearch.java")
@@ -429,6 +427,52 @@ class TypeCheckingTests extends munit.FunSuite {
     val statementTypeChecker = new typeCheckingVisitor
     statementTypeChecker.visit(programAST._1.get, symbolTable)
     assert(statementTypeChecker.getCurError.isEmpty)
+  }
+
+  test("Inherited Return 1") {
+    val parser = parse("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/typeCheckingTests/invalidReturn1.java")
+    //make the ast
+    val programAST = buildAST(parser)
+    assertEquals(programAST._2, false)
+    //do the checks
+    //make the symbol table
+    val symbolTable = new symbolTable("goal")
+    val symbolTableBuilder = new symbolTableBuilder
+    symbolTableBuilder.visit(programAST._1.get, symbolTable)
+    assert(symbolTableBuilder.getError.isEmpty)
+    symbolTableBuilder.checkMethodParams(symbolTable)
+    assert(symbolTableBuilder.getError.isEmpty)
+    symbolTableBuilder.checkForCircularInheritance(symbolTable)
+    assert(symbolTableBuilder.getError.isEmpty)
+    symbolTableBuilder.checkMethodReturnTypes(symbolTable)
+    assert(symbolTableBuilder.getError.isEmpty)
+    val statementTypeChecker = new typeCheckingVisitor
+    statementTypeChecker.visit(programAST._1.get, symbolTable)
+    assert(statementTypeChecker.getCurError.isDefined)
+    println(statementTypeChecker.getCurError.get.errorVal)
+  }
+
+  test("Inherited Return 2") {
+    val parser = parse("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/typeCheckingTests/invalidReturn2.java")
+    //make the ast
+    val programAST = buildAST(parser)
+    assertEquals(programAST._2, false)
+    //do the checks
+    //make the symbol table
+    val symbolTable = new symbolTable("goal")
+    val symbolTableBuilder = new symbolTableBuilder
+    symbolTableBuilder.visit(programAST._1.get, symbolTable)
+    assert(symbolTableBuilder.getError.isEmpty)
+    symbolTableBuilder.checkMethodParams(symbolTable)
+    assert(symbolTableBuilder.getError.isEmpty)
+    symbolTableBuilder.checkForCircularInheritance(symbolTable)
+    assert(symbolTableBuilder.getError.isEmpty)
+    symbolTableBuilder.checkMethodReturnTypes(symbolTable)
+    assert(symbolTableBuilder.getError.isEmpty)
+    val statementTypeChecker = new typeCheckingVisitor
+    statementTypeChecker.visit(programAST._1.get, symbolTable)
+    assert(statementTypeChecker.getCurError.isDefined)
+    println(statementTypeChecker.getCurError.get.errorVal)
   }
 
   test("Inherited Method 2") {
@@ -1123,6 +1167,29 @@ class TypeCheckingTests extends munit.FunSuite {
   }
   test("While Condition Not Boolean") {
     val parser = parse("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/typeCheckingTests/WhileCondNotBoolean.java")
+    //make the ast
+    val programAST = buildAST(parser)
+    assertEquals(programAST._2, false)
+    //do the checks
+    //make the symbol table
+    val symbolTable = new symbolTable("goal")
+    val symbolTableBuilder = new symbolTableBuilder
+    symbolTableBuilder.visit(programAST._1.get, symbolTable)
+    assert(symbolTableBuilder.getError.isEmpty)
+    symbolTableBuilder.checkMethodParams(symbolTable)
+    assert(symbolTableBuilder.getError.isEmpty)
+    symbolTableBuilder.checkForCircularInheritance(symbolTable)
+    assert(symbolTableBuilder.getError.isEmpty)
+    symbolTableBuilder.checkMethodReturnTypes(symbolTable)
+    assert(symbolTableBuilder.getError.isEmpty)
+    val statementTypeChecker = new typeCheckingVisitor
+    statementTypeChecker.visit(programAST._1.get, symbolTable)
+    assert(statementTypeChecker.getCurError.isDefined)
+    println(statementTypeChecker.getCurError.get.errorVal)
+  }
+
+  test("Chained Methods") {
+    val parser = parse("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/testFile.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
