@@ -38,7 +38,7 @@ class testFile {
             aw = new testClass();
             w = '\"';
             x = ' ';
-            i = new sadf();
+            //i = new sadf();
             return aw;
         }
     }
@@ -49,17 +49,18 @@ class testClass2{
     char aw;
     char x;
     int z;
-    public boolean testFile (char b, int y, int q){
+    public int[] testFile (char b, int y, int q){
         char wyz;
         char w;
         char aw;
-        bool value;
+        boolean value;
         int[] a;
         w = '\"';
         x = ' ';
         //x & b;
-        x = aw.getHerDone();
-        return !(12-14-45+a[0]<a.length<1-12<1-13-2&&12-!14-45+a[0]<a.length<1-12<1-13-2&&5);
+        a = new testClass().testFile(b,y,q)[5];
+        //x = aw.getHerDone();
+        return new int[];
 
     }
 }
