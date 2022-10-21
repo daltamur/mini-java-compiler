@@ -6,66 +6,35 @@ class testFile {
 
 
     class testClass extends testClass3{
-        char wyz;
-        char w;
-        int aw;
-        char x;
-        boolean i;
-        testFile test;
-        public boolean testMethod (char b){
-            char wyz;
-            char w;
-            boolean y;
-            int[] a;
-            test = new testFile();
-            //System.out.println(test.main(w));
-            z = 1;
-            w = '\"';
-            x = ' ';
-            //i = aw;
-            return y;
 
-        }
-
-        public int main (char x){
-            return 1;
-        }
-
-        public testClass3 testMethod3 (char b){
-            char wyz;
-            char w;
-            testClass3 aw;
-            aw = new testClass();
-            w = '\"';
-            x = ' ';
-            //i = new sadf();
-            return aw;
-        }
+        public int[] getArr(){return new int[5];}
     }
 class some{}
-class testClass2{
+class testClass2 extends testClass3{
     char wyz;
     char w;
     char aw;
     char x;
     int z;
-    public int[] testFile (char b, int y, int q){
+    public testClass testFile (){
         char wyz;
         char w;
         char aw;
-        boolean value;
-        int[] a;
+        testClass value;
+        testClass a;
         w = '\"';
         x = ' ';
         //x & b;
-        a = new testClass().testFile(b,y,q)[5];
+        value = this.testFile().testMethod('a', 1,2);
         //x = aw.getHerDone();
-        return new int[];
+        return a;
 
     }
+
+    public int[] getArr(){return new int[5];}
 }
 
-class testClass3 extends testClass2{
+class testClass3{
     char wyz;
     char w;
     char aw;

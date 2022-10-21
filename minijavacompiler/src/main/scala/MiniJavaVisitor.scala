@@ -280,11 +280,11 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
   override def visitFunctionVallExpression(ctx: miniJavaParser.FunctionVallExpressionContext): Option[ASTNode] = {
     val ctxMethodCall = Option(ctx.methodFuncCall())
     val ASTMethodCall = ctxMethodCall.flatMap(x => x.accept(this))
-    val ctxOps = Option(ctx.expressionTailOps())
+    val ctxOps = Option(ctx.expressionTail())
     val ASTctxOps = ctxOps.flatMap(x => x.accept(this))
     //println(ASTctxOps)
     if (ASTctxOps.isDefined){
-      ASTMethodCall.get.asInstanceOf[AST_Grammar.methodFunctionCallExpression].operation = ASTctxOps.asInstanceOf[Option[AST_Grammar.operation]]
+      ASTMethodCall.get.asInstanceOf[AST_Grammar.methodFunctionCallExpression].operation = ASTctxOps.asInstanceOf[Option[AST_Grammar.expressionTail]]
     }
 
     ASTMethodCall

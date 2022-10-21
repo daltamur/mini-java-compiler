@@ -31,8 +31,6 @@ abstract class ASTVisitor[A, B] {
         curType = visitAndExpression(curType, value, a)
         curType
       case _ => curType
-
-
   }
 
   def visitBaseExpression(currentNode: expressionValue, a:A): B = {
@@ -61,6 +59,18 @@ abstract class ASTVisitor[A, B] {
       case _ => visitNoTail(expressionTerminalVal)
   }
 
+  def visitTerminalTail(expressionVal: Option[AST_Grammar.expressionTail], a:A, expressionTerminalVal:B): B = {
+    expressionVal match
+      case Some(value) =>
+        value match
+          case x: addExpression => visitAddExpression(x, a, expressionTerminalVal)
+          case x: subtractExpression => visitSubtractExpression(x, a, expressionTerminalVal)
+          case x: multiplyExpression => visitMultiplyExpression(x, a, expressionTerminalVal)
+          case x: arrayLengthExpression => visitArrayLengthExpression(x, a, expressionTerminalVal)
+          case x: arrayIndexExpression => visitArrayIndexExpression(x, a, expressionTerminalVal)
+          case x: methodFunctionCallExpression => visitMethodFunctionCallExpression(x, a, expressionTerminalVal)
+      case _ => visitNoTail(expressionTerminalVal)
+  }
   def visitExpressionOpt(expressionVal: Option[operation], a:A, expressionTerminalVal:B): B ={
     expressionVal match
       case Some(value) =>

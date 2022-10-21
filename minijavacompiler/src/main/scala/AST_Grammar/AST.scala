@@ -71,7 +71,7 @@ case class subtractExpression(value: expressionValue) extends operation
 case class multiplyExpression(value: expressionValue) extends operation
 case class arrayLengthExpression(line: Integer, index: Integer,var operation: Option[operation]) extends expressionTail
 case class arrayIndexExpression(value: expression, var operation: Option[operation]) extends expressionTail
-case class methodFunctionCallExpression(funcName: identifier, params: List[expression], line: Integer, var operation: Option[operation]) extends expressionTail
+case class methodFunctionCallExpression(funcName: identifier, params: List[expression], line: Integer, var operation: Option[expressionTail]) extends expressionTail
 
 
 
