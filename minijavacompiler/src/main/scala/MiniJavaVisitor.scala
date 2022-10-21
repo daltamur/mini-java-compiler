@@ -173,23 +173,6 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     arrayAssignment
   }
 
-  override def visitExpression(ctx: miniJavaParser.ExpressionContext): Option[ASTNode] = {
-    val expressionLine = ctx.getStart.getLine
-    val expressionIndex = ctx.getStart.getCharPositionInLine
-    val ctxExpressionTerminal = Option(ctx.expressionTerminal())
-    var ASTExpressionTerminal = ctxExpressionTerminal.flatMap(x => x.accept(this))
-    if (ASTExpressionTerminal == null){
-      ASTExpressionTerminal = None
-    }
-    val ctxExpressionTail = Option(ctx.expressionTail())
-    var ASTExpressionTail = ctxExpressionTail.flatMap(x => x.accept(this))
-    if (ASTExpressionTail == null){
-      ASTExpressionTail = None
-    }
-    val expression = Some(AST_Grammar.expression(ASTExpressionTerminal.orNull.asInstanceOf[AST_Grammar.expressionTerminal], ASTExpressionTail.asInstanceOf[Option[AST_Grammar.expressionTail]], expressionLine, expressionIndex))
-    expression
-  }
-
   override def visitMethodFuncCall(ctx: miniJavaParser.MethodFuncCallContext): Option[ASTNode] = {
     val lineNum = ctx.getStart.getLine
     val ctxMethodName = Option(ctx.IDENTIFIER())
@@ -207,38 +190,48 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     Some(AST_Grammar.arrayLengthExpression(lineNum, expressionIndex, None))
   }
 
-  override def visitAndExpression(ctx: miniJavaParser.AndExpressionContext): Option[ASTNode] = {
-    val ctxExpr = Option(ctx.expression())
-    val ASTExpr = ctxExpr.flatMap(x => x.accept(this))
-    val andExpr = Some(AST_Grammar.andExpression(ASTExpr.orNull.asInstanceOf[AST_Grammar.expression]))
-    andExpr
-  }
-
   override def visitCompareExpression(ctx: miniJavaParser.CompareExpressionContext): Option[ASTNode] = {
-    val ctxExpr = Option(ctx.expression())
-    val ASTExpr = ctxExpr.flatMap(x => x.accept(this))
-    val compExpr = Some(AST_Grammar.compareExpression(ASTExpr.orNull.asInstanceOf[AST_Grammar.expression]))
+    val ctxLeft = Option(ctx.expressionTerminal())
+    val ASTLeft = ctxLeft.flatMap(x => x.accept(this))
+    val ctxRight = Option(ctx.expressionTail())
+    val ASTRight = ctxRight.flatMap(x => x.accept(this))
+    val expVal = AST_Grammar.expressionValue(ASTLeft.orNull.asInstanceOf[AST_Grammar.expressionTerminal], ASTRight.asInstanceOf[Option[AST_Grammar.expressionTail]], ctx.getStart.getLine, ctx.getStart.getLine)
+    val CtxOtionalComp = Option(ctx.expressionComp())
+    var optionalComp = CtxOtionalComp.flatMap(x => x.accept(this))
+    if(optionalComp==null){
+      optionalComp = None
+    }
+    val compExpr = Some(AST_Grammar.compExpression(expVal, optionalComp.asInstanceOf[Option[AST_Grammar.compExpression]], ctx.getStart.getLine, ctx.getStart.getCharPositionInLine))
     compExpr
   }
 
   override def visitAddExpression(ctx: miniJavaParser.AddExpressionContext): Option[ASTNode] = {
-    val ctxExpr = Option(ctx.expression())
-    val ASTExpr = ctxExpr.flatMap(x => x.accept(this))
-    val addExpr = Some(AST_Grammar.addExpression(ASTExpr.orNull.asInstanceOf[AST_Grammar.expression]))
+    val ctxLeftExpression = Option(ctx.expressionTerminal())
+    val ASTLeft = ctxLeftExpression.flatMap(x => x.accept(this))
+    val ctxRightExpression = Option(ctx.expressionTail())
+    val ASTRight = ctxRightExpression.flatMap(x => x.accept(this))
+    val exprVal = AST_Grammar.expressionValue(ASTLeft.orNull.asInstanceOf[AST_Grammar.expressionTerminal], ASTRight.asInstanceOf[Option[AST_Grammar.expressionTail]], ctx.getStart.getLine, ctx.getStart.getLine)
+    val addExpr = Some(AST_Grammar.addExpression(exprVal))
     addExpr
   }
 
   override def visitSubtractExpression(ctx: miniJavaParser.SubtractExpressionContext): Option[ASTNode] = {
-    val ctxExpr = Option(ctx.expression())
-    val ASTExpr = ctxExpr.flatMap(x => x.accept(this))
-    val subExpr = Some(AST_Grammar.subtractExpression(ASTExpr.orNull.asInstanceOf[AST_Grammar.expression]))
+    val ctxLeftExpression = Option(ctx.expressionTerminal())
+    val ASTLeft = ctxLeftExpression.flatMap(x => x.accept(this))
+    val ctxRightExpression = Option(ctx.expressionTail())
+    val ASTRight = ctxRightExpression.flatMap(x => x.accept(this))
+    val exprVal = AST_Grammar.expressionValue(ASTLeft.orNull.asInstanceOf[AST_Grammar.expressionTerminal], ASTRight.asInstanceOf[Option[AST_Grammar.expressionTail]], ctx.getStart.getLine, ctx.getStart.getLine)
+    val subExpr = Some(AST_Grammar.subtractExpression(exprVal))
     subExpr
   }
 
   override def visitMultiplyExpression(ctx: miniJavaParser.MultiplyExpressionContext): Option[ASTNode] = {
-    val ctxExpr = Option(ctx.expression())
-    val ASTExpr = ctxExpr.flatMap(x => x.accept(this))
-    val multExpr = Some(AST_Grammar.multiplyExpression(ASTExpr.orNull.asInstanceOf[AST_Grammar.expression]))
+    val ctxLeftExpression = Option(ctx.expressionTerminal())
+    val ASTLeft = ctxLeftExpression.flatMap(x => x.accept(this))
+    val ctxRightExpression = Option(ctx.expressionTail())
+    val ASTRight = ctxRightExpression.flatMap(x => x.accept(this))
+    val exprVal = AST_Grammar.expressionValue(ASTLeft.orNull.asInstanceOf[AST_Grammar.expressionTerminal], ASTRight.asInstanceOf[Option[AST_Grammar.expressionTail]], ctx.getStart.getLine, ctx.getStart.getLine)
+    val multExpr = Some(AST_Grammar.multiplyExpression(exprVal))
     multExpr
   }
 
@@ -260,6 +253,29 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     }
     ASTArrLengthCall
   }
+
+  override def visitExpressionValue(ctx: miniJavaParser.ExpressionValueContext): Option[ASTNode] = {
+    val ctxLeftVal = Option(ctx.expressionComp());
+    var ASTLeftVal = ctxLeftVal.flatMap(x => x.accept(this))
+    val ctxRightVal = Option(ctx.expressionAnd());
+    var ASTRightVal = ctxRightVal.flatMap(x => x.accept(this))
+    if (ASTRightVal == null) {
+      ASTRightVal = None
+    }
+    val expression = AST_Grammar.expression(ASTLeftVal.orNull.asInstanceOf[AST_Grammar.compExpression], ASTRightVal.asInstanceOf[Option[AST_Grammar.andExpression]])
+    Some(expression)
+  }
+
+  override def visitAndexpression(ctx: miniJavaParser.AndexpressionContext): Option[ASTNode] = {
+    val ctxRightVal = Option(ctx.expression())
+    var ASTRightVal = ctxRightVal.flatMap(x => x.accept(this))
+    if (ASTRightVal == null) {
+      ASTRightVal = None
+    }
+    Some(AST_Grammar.andExpression(ASTRightVal.asInstanceOf[Option[AST_Grammar.expression]]))
+  }
+
+  override def visitOperatorExpression(ctx: miniJavaParser.OperatorExpressionContext): Option[ASTNode] = super.visitOperatorExpression(ctx)
 
   override def visitFunctionVallExpression(ctx: miniJavaParser.FunctionVallExpressionContext): Option[ASTNode] = {
     val ctxMethodCall = Option(ctx.methodFuncCall())
@@ -334,9 +350,12 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
   override def visitNegatedExpression(ctx: miniJavaParser.NegatedExpressionContext): Option[ASTNode] = {
     val lineNum = ctx.getStart.getLine
     val expressionIndex = ctx.getStart.getCharPositionInLine
-    val ctxExpression = Option(ctx.expression())
-    val ASTExpression = ctxExpression.flatMap(x => x.accept(this))
-    val negatedExpression = Some(AST_Grammar.negatedExpression(ASTExpression.orNull.asInstanceOf[AST_Grammar.expression], lineNum, expressionIndex))
+    val ctxExpressionLeft = Option(ctx.expressionTerminal())
+    val ASTExpressionLeft = ctxExpressionLeft.flatMap(x => x.accept(this))
+    val ctxExpressionRight = Option(ctx.expressionTail())
+    val ASTExpressionRight = ctxExpressionRight.flatMap(x => x.accept(this))
+    val expVal = AST_Grammar.expressionValue(ASTExpressionLeft.orNull.asInstanceOf[AST_Grammar.expressionTerminal], ASTExpressionRight.asInstanceOf[Option[AST_Grammar.expressionTail]], ctx.getStart.getLine, ctx.getStart.getLine)
+    val negatedExpression = Some(AST_Grammar.negatedExpression(expVal,lineNum, expressionIndex))
     negatedExpression
   }
 

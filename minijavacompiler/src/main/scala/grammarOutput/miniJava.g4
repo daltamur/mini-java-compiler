@@ -27,23 +27,28 @@ statement:  '{' statement* '}'                                      #blockStatem
             | IDENTIFIER arrayIndex EQUALS expression ';'           #arrayAssignStatement
             ;
 
-expression: expressionTerminal expressionTail; //expression node rewritten to get rid of left recursion
+expression: expressionComp (expressionAnd)? #expressionValue
+            ;
+expressionAnd: AND expression             #andexpression
+               ;
 
 methodFuncCall: IDENTIFIER '(' (expression (',' expression )*)? ')';
 
 arrayLengthCall: 'length';
 
-expressionTailOps:ADD expression              #addExpression
-                  | SUBTRACT expression       #subtractExpression
-                  | MULTIPLY expression       #multiplyExpression
+expressionComp:  (expressionTerminal expressionTail) (COMPARE expressionComp)?                         #compareExpression
+                ;
+
+
+expressionTailOps:ADD (expressionTerminal expressionTail)                       #addExpression
+                  | SUBTRACT (expressionTerminal expressionTail)                #subtractExpression
+                  | MULTIPLY (expressionTerminal expressionTail)                #multiplyExpression
                   ;
 
 expressionTail: expressionTailOps                               #operatorExpression
                 | arrayIndex (expressionTailOps)?               #arrayIndexCall
                 | '.' arrayLengthCall (expressionTailOps)?      #getArrayLength
                 | '.' methodFuncCall (expressionTailOps)?       #functionVallExpression
-                | AND expression                                #andExpression
-                | COMPARE expression                            #compareExpression
                 |                                               #noExpressionTail
                 ;
 
@@ -54,7 +59,7 @@ expressionTerminal: 'this'                                              #thisKey
                 | IDENTIFIER                                            #identifierExpression
                 | 'new' 'int' '[' expression ']'                        #newArrayExpression
                 | 'new' IDENTIFIER '(' ')'                              #newClassExpression
-                | NOT expression                                        #negatedExpression
+                | NOT (expressionTerminal expressionTail)               #negatedExpression
                 | '(' expression ')'                                    #parenthesizedExpression
                 ;
 
