@@ -132,7 +132,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
 
   def checkForCircularInheritance(programSymbolTable: symbolTable): Unit = {
     val classIDs = programSymbolTable.getClassKeys
-    val loop = new Breaks;
+    val loop = new Breaks
     loop.breakable {
       for (classID <- classIDs) {
         if (curError.isDefined) {
@@ -171,8 +171,8 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
   }
 
   def checkMethodParams(programSymbolTable: symbolTable): Unit = {
-    val outloop = new Breaks;
-    val inloop = new Breaks;
+    val outloop = new Breaks
+    val inloop = new Breaks
     val classIDs = programSymbolTable.getClassKeys
     outloop.breakable{
       for(classID <- classIDs){
@@ -204,8 +204,8 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
   }
 
   def checkMethodReturnTypes(programSymbolTable: symbolTable): Unit = {
-    val outloop = new Breaks;
-    val inloop = new Breaks;
+    val outloop = new Breaks
+    val inloop = new Breaks
     val classIDs = programSymbolTable.getClassKeys
     outloop.breakable{
     for (classID <- classIDs) {

@@ -5,9 +5,9 @@ import scala.collection.mutable.HashMap
 
 class symbolTable(tableName: String):
   private val name = tableName
-  private var variableTable = new mutable.HashMap[Any, symbolTableVal]()
-  private var classTable = new mutable.HashMap[Any, symbolTableVal]()
-  private var methodTable = new mutable.HashMap[Any, symbolTableVal]()
+  private val variableTable = new mutable.HashMap[Any, symbolTableVal]()
+  private val classTable = new mutable.HashMap[Any, symbolTableVal]()
+  private val methodTable = new mutable.HashMap[Any, symbolTableVal]()
   private var parentTable = None:Option[symbolTable]
   def getClassKeys: List[Any] = classTable.keys.toList
   def getMethodKeys: List[Any] = methodTable.keys.toList
