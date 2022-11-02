@@ -199,8 +199,8 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     val ctxRight = Option(ctx.expressionTail())
     val ASTRight = ctxRight.flatMap(x => x.accept(this))
     val expVal = AST_Grammar.expressionValue(ASTLeft.orNull.asInstanceOf[AST_Grammar.expressionTerminal], ASTRight.asInstanceOf[Option[AST_Grammar.expressionTail]], ctx.getStart.getLine, ctx.getStart.getLine)
-    val CtxOtionalComp = Option(ctx.expressionComp())
-    var optionalComp = CtxOtionalComp.flatMap(x => x.accept(this))
+    val CtxOptionalComp = Option(ctx.expressionComp())
+    var optionalComp = CtxOptionalComp.flatMap(x => x.accept(this))
     if(optionalComp==null){
       optionalComp = None
     }
@@ -258,9 +258,9 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
   }
 
   override def visitExpressionValue(ctx: miniJavaParser.ExpressionValueContext): Option[ASTNode] = {
-    val ctxLeftVal = Option(ctx.expressionComp());
-    var ASTLeftVal = ctxLeftVal.flatMap(x => x.accept(this))
-    val ctxRightVal = Option(ctx.expressionAnd());
+    val ctxLeftVal = Option(ctx.expressionComp())
+    val ASTLeftVal = ctxLeftVal.flatMap(x => x.accept(this))
+    val ctxRightVal = Option(ctx.expressionAnd())
     var ASTRightVal = ctxRightVal.flatMap(x => x.accept(this))
     if (ASTRightVal == null) {
       ASTRightVal = None
@@ -293,7 +293,7 @@ class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
     ASTMethodCall
   }
 
-  override def visitNoExpressionTail(ctx: miniJavaParser.NoExpressionTailContext): Option[ASTNode] = {None}
+  override def visitNoExpressionTail(ctx: miniJavaParser.NoExpressionTailContext): Option[ASTNode] = None
 
   override def visitThisKeyword(ctx: miniJavaParser.ThisKeywordContext): Option[ASTNode] = {
     val lineNum = ctx.getStart.getLine

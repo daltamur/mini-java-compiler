@@ -203,6 +203,10 @@ case class noSuchClassError(className: String, line: Integer, index: Integer) ex
   val errorVal: String = "ERROR on line " + line + ":" + index + " :no such class named " + className
 }
 
+case class notInitializedError(varName: String, line: Integer, index: Integer) extends error {
+  val errorVal: String = "ERROT on line " + line + ":" + index + " " + varName + " referenced but never initialized"
+}
+
 case class callMethodOnPrimitve(primitive: varType, line: Integer) extends  error {
   val errorVal: String = "ERROR on line " + line + ": cannot call functions on primitives"
 }

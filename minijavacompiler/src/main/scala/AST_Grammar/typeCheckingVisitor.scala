@@ -6,8 +6,6 @@ import scala.util.control.NonLocalReturns.*
 
 class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
   private var curError: Option[error] = None
-  private var atCompare = false
-  private var atAnd = false
   def getCurError: Option[error] = curError
   override def visitGoal(goal: goal, a: symbolTable): typeCheckResult = {
     //assume we have no errors to begin with, only change is the main class or class throw an error
@@ -26,10 +24,6 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     }
     hasError
   }
-
-  //return what type the identifier is
-  //I don't think I need this in hindsight, but we'll keep it here for now
-  override def visitIdentifier(identifier: identifier, a: symbolTable): typeCheckResult = super.visitIdentifier(identifier, a)
 
   //just make sure the statement has no type check errors
   override def visitMainClass(clazz: mainClass, a: symbolTable): typeCheckResult = {
@@ -128,7 +122,6 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
 
   override def visitExpression(expressionVal: expression, a: symbolTable): typeCheckResult =
     var curType = visitCompExpression(expressionVal.leftVal, a)
-    atCompare = false
     expressionVal.rightVal match
       case Some(value) =>
         curType = visitAndExpression(curType, value, a)
@@ -181,7 +174,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     hasError
   }
 
-  //make sure expresison in print statement is an integer
+  //make sure expression in print statement is an integer
   override def visitPrintStatement(statement: printStatement, a: symbolTable): typeCheckResult = {
     var hasError = hasErrorResult(false)
     val printedVal = visit(statement.value, a)
@@ -393,7 +386,6 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
       //variable exists at this point, so set returnedVal to the return type
       returnedVal = varValResult(a.getClassVal(extendedClassID).get.asInstanceOf[classVal].classScope.getVariableVal(varID).get.asInstanceOf[variableVal].varValue)
     }else{
-      val curClassname = a.getClassVal(extendedClassID).get.asInstanceOf[classVal].classScope.getName
       val curClassExtension = a.getClassVal(extendedClassID).get.asInstanceOf[classVal].extendedClass
       curClassExtension match
         case Some(value) =>
@@ -552,13 +544,13 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
       b match
         case leftType: varValResult =>
           leftType.varVal match
-            case prevType: integerType =>
+            case _: integerType =>
               //now make sure the right side returns an int
               val RightType = visitBaseExpression(expression, a)
               RightType match
                 case rightSideType:varValResult =>
                   rightSideType.varVal match
-                    case integerType => varValResult(integerType)
+                    case _:integerType => varValResult(integerType())
                     case _  =>
                       curError = Some(typeInconformitiyError(rightSideType.varVal, integerType(), line, index))
                       hasErrorResult(true)
