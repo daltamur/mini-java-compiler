@@ -10,6 +10,8 @@ lazy val root = project
     assemblyJarName in assembly := "miniJavaCompiler.jar",
     libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test
   )
+  .enablePlugins(MiniDependencyTreePlugin)
+
 libraryDependencies ++= Seq(
   "org.antlr" % "antlr4-runtime" % "4.10.1",
   "org.antlr" % "stringtemplate" % "3.2",
