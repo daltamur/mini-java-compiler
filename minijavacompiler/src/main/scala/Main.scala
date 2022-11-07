@@ -64,6 +64,8 @@ object Main {
           }
 
           //Code Generation
+          generateCode(programAST)
+
 
           //Code Optimization
 
@@ -94,10 +96,18 @@ object Main {
     parser.reset()
     parser
   }
-
+ 
   def buildAST(parser: miniJavaParser): (Option[ASTNode], Boolean) = {
     val visitor = new MiniJavaVisitor()
     val program = visitor.visitGoal(parser.goal())
     (program, visitor.mainMethodError)
+  }
+
+  def generateCode(GoalNode: (Option[ASTNode], Boolean)): Unit ={
+    //if we get here, we can assume that there does indeed exist a goal
+    //AST node, no need to do pattern matching
+    val goal = GoalNode._1.get.asInstanceOf[AST_Grammar.goal]
+
+
   }
 }
