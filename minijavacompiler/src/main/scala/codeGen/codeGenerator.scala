@@ -1,5 +1,4 @@
 package codeGen
-<<<<<<< HEAD
 import org.objectweb.asm
 import org.objectweb.asm.{ClassWriter, Label, MethodVisitor, Opcodes}
 
