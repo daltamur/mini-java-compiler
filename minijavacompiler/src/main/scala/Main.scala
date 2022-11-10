@@ -1,4 +1,5 @@
 import AST_Grammar.{ASTNode, symbolTable, symbolTableBuilder, typeCheckingVisitor}
+import codeGen.codeGenerator
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream, ParserRuleContext}
 import org.antlr.v4.runtime.tree.{ErrorNode, ParseTree, ParseTreeListener, ParseTreeWalker, TerminalNode}
 import parseTreeFiles.grammarOutput.{miniJavaLexer, miniJavaParser}
@@ -64,7 +65,7 @@ object Main {
           }
 
           //Code Generation
-          generateCode(programAST)
+          generateCode(programAST,fileLocation)
 
 
           //Code Optimization
@@ -103,11 +104,10 @@ object Main {
     (program, visitor.mainMethodError)
   }
 
-  def generateCode(GoalNode: (Option[ASTNode], Boolean)): Unit ={
+  def generateCode(GoalNode: (Option[ASTNode], Boolean), sourcePath: String): Unit ={
     //if we get here, we can assume that there does indeed exist a goal
     //AST node, no need to do pattern matching
-    val goal = GoalNode._1.get.asInstanceOf[AST_Grammar.goal]
-
-
+    val codeGenerator = new codeGenerator
+    codeGenerator.visitGoal(GoalNode._1.get.asInstanceOf[AST_Grammar.goal], sourcePath)
   }
 }
