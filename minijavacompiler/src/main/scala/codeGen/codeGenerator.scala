@@ -71,29 +71,43 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
       }
       cw.visitSource(sourceName, null)
 
-      //let's make all our class variables now!
+      for(variable <- curClass.get.variables){
+        cw.visitField(Opcodes.ACC_PUBLIC, variable.get.name.name, convertToASMType(AST_Grammar.getVarType(variable.get.typeval)), null, null)
+      }
 
-      for(curMethod <- curClass.get.methods)
+      for(curMethod <- curClass.get.methods) {
         //make the signature
         var methodSignature: String = "("
-        for(param<-curMethod.get.params){
+        for (param <- curMethod.get.params)
           methodSignature = methodSignature.concat(convertToASMType(AST_Grammar.getVarType(param._1)))
-        }
 
         methodSignature = methodSignature.concat(")")
 
 
         methodSignature = methodSignature.concat(convertToASMType(AST_Grammar.getVarType(curMethod.get.returnType)))
 
-        if(methodSignature.equals("()")){
+        if (methodSignature.equals("()")) {
           methodSignature = null
         }
 
         println(methodSignature)
-        val mmw = cw.visitMethod(Opcodes.ACC_PUBLIC, curMethod.get.methodName.name,  methodSignature, null, null)
-        //INSERT VISITING THE METHOD STATEMENTS HERE
-        mmw.visitEnd()
+        val mmw = cw.visitMethod(Opcodes.ACC_PUBLIC, curMethod.get.methodName.name, methodSignature, null, null)
+        val methodStartLabel = new Label()
+        val methodEndLabel = new Label()
+
+
+        for ((variable, index) <- curMethod.get.variables.zipWithIndex) {
+          mmw.visitLocalVariable(variable.get.name.name, convertToASMType(AST_Grammar.getVarType(variable.get.typeval)), null, methodStartLabel, methodEndLabel, index+curMethod.get.params.length+1)
+        }
+        //^declared, but won't show up until we implement EVERYTHING
+
+        mmw.visitLabel(methodStartLabel)
+        //visit statements goes here
+        //return statement goes here
+        mmw.visitLabel(methodEndLabel)
         mmw.visitMaxs(-1, -1)
+        mmw.visitEnd()
+      }
       cw.visitEnd()
       val fos = new FileOutputStream(f"${goal.main.className.name}/$className.class")
       fos.write(cw.toByteArray)
