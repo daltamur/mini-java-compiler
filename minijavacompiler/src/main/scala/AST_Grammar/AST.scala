@@ -12,6 +12,7 @@ case class goal (main: mainClass, classes: List[Option[klass]]) extends ASTNode
 
 //identifier case
 case class identifier(name: String) extends ASTNode{
+  var parentName: String = ""
   var isLocal: Boolean = false
   var isParameter: Boolean = false
   var paramIndex: Option[Integer] = None

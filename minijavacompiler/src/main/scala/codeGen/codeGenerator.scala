@@ -13,10 +13,11 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
   private var curClassName: String = ""
 
   override def visitCompExpression(expression: compExpression, a: MethodVisitor): Unit = {
-    val compareFail = new Label()
     visitBaseExpression(expression.value, a)
     var curCompTail = expression.optVal
     if(curCompTail.isDefined) {
+      val compareFail = new Label()
+      val compareEnd = new Label()
       while (curCompTail.isDefined) {
         visitBaseExpression(curCompTail.get.value, a)
         //comparison goes here I think?
@@ -24,8 +25,10 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
         curCompTail = curCompTail.get.optVal
       }
       a.visitInsn(Opcodes.ICONST_1)
+      a.visitJumpInsn(Opcodes.GOTO, compareEnd)
       a.visitLabel(compareFail)
       a.visitInsn(Opcodes.ICONST_0)
+      a.visitLabel(compareEnd)
     }
   }
 
@@ -160,7 +163,7 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
         visit(curMethod.get.returnVal, mmw)
         mmw.visitInsn(getReturnInsn(AST_Grammar.getVarType(curMethod.get.returnType)))
         mmw.visitLabel(methodEndLabel)
-        mmw.visitMaxs(ClassWriter.COMPUTE_MAXS, ClassWriter.COMPUTE_MAXS)
+        mmw.visitMaxs(-1, -1)
         mmw.visitEnd()
       }
       cw.visitEnd()
@@ -232,19 +235,45 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
     //push the value that is getting assigned to the variable
     //store the value at whatever index the identifier is at
     //this is nearly identical to the visitIdentifierExpression method except we are using the store opcode now
-    visit(statement.value, a)
     if(statement.idVal.isLocal && statement.idVal.isParameter){
+      visit(statement.value, a)
+      println(statement.idVal.name)
+      println(statement.idVal.variableType)
       a.visitIntInsn(getStoreInsn(statement.idVal.variableType), statement.idVal.paramIndex.get)
     }else if (statement.idVal.isLocal){
+      visit(statement.value, a)
+      println(statement.idVal.name)
+      println(statement.idVal.variableType)
       a.visitIntInsn(getStoreInsn(statement.idVal.variableType),statement.idVal.paramIndex.get+curMethodParamAmount)
     }else{
       a.visitIntInsn(Opcodes.ALOAD, 0)
-      a.visitFieldInsn(Opcodes.PUTFIELD, AST_Grammar.varTypeToString(statement.idVal.variableType), statement.idVal.name, convertToASMType(statement.idVal.variableType))
+      visit(statement.value, a)
+      println(statement.idVal.name)
+      println(statement.idVal.variableType)
+      a.visitFieldInsn(Opcodes.PUTFIELD, statement.idVal.parentName, statement.idVal.name, convertToASMType(statement.idVal.variableType))
     }
 
   }
 
-  override def visitArrayAssignStatement(statement: arrayAssignStatement, a: MethodVisitor): Unit = super.visitArrayAssignStatement(statement, a)
+  override def visitArrayAssignStatement(statement: arrayAssignStatement, a: MethodVisitor): Unit = {
+    if (statement.idVal.isLocal && statement.idVal.isParameter) {
+      a.visitIntInsn(getLoadInsn(statement.idVal.variableType), statement.idVal.paramIndex.get)
+      visit(statement.arrayIndex, a)
+      visit(statement.value, a)
+      a.visitInsn(Opcodes.IASTORE)
+    } else if (statement.idVal.isLocal) {
+      a.visitIntInsn(getLoadInsn(statement.idVal.variableType), statement.idVal.paramIndex.get + curMethodParamAmount)
+      visit(statement.arrayIndex, a)
+      visit(statement.value, a)
+      a.visitInsn(Opcodes.IASTORE)
+    } else {
+      a.visitIntInsn(Opcodes.ALOAD, 0)
+      a.visitFieldInsn(Opcodes.GETFIELD, statement.idVal.parentName, statement.idVal.name, convertToASMType(AST_Grammar.intArrayType()))
+      visit(statement.arrayIndex, a)
+      visit(statement.value, a)
+      a.visitInsn(Opcodes.IASTORE)
+    }
+  }
 
   override def visitThisExpression(expression: thisExpression, a: MethodVisitor): Unit = {
     //load this
@@ -298,7 +327,17 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
     a.visitMethodInsn(Opcodes.INVOKESPECIAL, expression.classType.name, "<init>", "()V", false)
   }
 
-  override def visitNegatedExpression(expression: negatedExpression, a: MethodVisitor): Unit = super.visitNegatedExpression(expression, a)
+  override def visitNegatedExpression(expression: negatedExpression, a: MethodVisitor): Unit = {
+    val isNotZero = new Label()
+    val negationEnd = new Label()
+    visitBaseExpression(expression.value, a)
+    a.visitJumpInsn(Opcodes.IFNE, isNotZero)
+    a.visitInsn(Opcodes.ICONST_1)
+    a.visitJumpInsn(Opcodes.GOTO, negationEnd)
+    a.visitLabel(isNotZero)
+    a.visitInsn(Opcodes.ICONST_0)
+    a.visitLabel(negationEnd)
+  }
 
   override def visitParenthesizedExpression(expression: parenthesizedExpression, a: MethodVisitor): Unit = {
     visit(expression.value, a)
@@ -327,7 +366,10 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
     a.visitInsn(Opcodes.ARRAYLENGTH)
   }
 
-  override def visitArrayIndexExpression(expression: arrayIndexExpression, a: MethodVisitor, b: Unit): Unit = super.visitArrayIndexExpression(expression, a, b)
+  override def visitArrayIndexExpression(expression: arrayIndexExpression, a: MethodVisitor, b: Unit): Unit = {
+    visit(expression.value, a)
+    a.visitInsn(Opcodes.IALOAD)
+  }
 
   override def visitMethodFunctionCallExpression(expression: methodFunctionCallExpression, a: MethodVisitor, b: Unit): Unit = {
     //put all the parameters of the method call on the stack

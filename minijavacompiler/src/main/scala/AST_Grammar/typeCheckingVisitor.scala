@@ -218,6 +218,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
       }
     } else if (a.getParentTable.get.checkIfVarIDExists(leftVal.name)) {
       //the variable exists as a global within the class
+      statement.idVal.parentName = a.getParentTable.get.getName
       val leftSideType = a.getParentTable.get.getVariableVal(leftVal.name).get.asInstanceOf[variableVal].varValue
       statement.idVal.variableType = leftSideType
       val rightSideType = visit(statement.value, a)
@@ -232,6 +233,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
       if (!leftSideType.isInstanceOf[hasErrorResult]) {
         //we found the reference in an inherited class, now see if it is equal to the right value
         statement.idVal.variableType = leftSideType.asInstanceOf[varValResult].varVal
+        statement.idVal.parentName = a.getParentTable.get.getName
         val rightSideType = visit(statement.value, a)
         if (!rightSideType.isInstanceOf[hasErrorResult]) {
           checkIfLeftTypeEqualsRightType(leftSideType.asInstanceOf[varValResult].varVal, rightSideType.asInstanceOf[varValResult].varVal, a, statement)
@@ -297,12 +299,14 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
       IDType = a.getVariableVal(arrayID.name).get.asInstanceOf[variableVal].varValue
       //now the class context
     }else if(a.getParentTable.get.checkIfVarIDExists(arrayID.name)){
+      statement.idVal.parentName = a.getParentTable.get.getName
       IDType = a.getParentTable.get.getVariableVal(arrayID.name).get.asInstanceOf[variableVal].varValue
     }else{
       //try and get it in the global context
       val globalCheck = checkExtendedClassesForVar(arrayID.name, a)
       globalCheck match {
         case result: varValResult =>
+          statement.idVal.parentName = a.getParentTable.get.getName
           IDType = result.varVal
         case _ =>
       }
