@@ -323,6 +323,7 @@ object codeGenerator{
     mmw.visitEnd()
     mmw.visitMaxs(-1, -1)
     cw.visitEnd()
+    //
 
     val fos = new FileOutputStream(f"$className.class")
     fos.write(cw.toByteArray)
