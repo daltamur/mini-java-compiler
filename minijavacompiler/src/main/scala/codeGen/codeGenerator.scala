@@ -6,6 +6,8 @@ import org.objectweb.asm.{ClassWriter, Label, MethodVisitor, Opcodes}
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 import scala.collection.mutable.ListBuffer
+
+//12 more things to implement, let's pray to god it works
 class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
   private var curMethodParamAmount: Integer = -1
   private var curClassName: String = ""
@@ -54,7 +56,7 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
     val mmw = cw.visitMethod(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null)
     mmw.visitCode()
 
-    //visit(goal.main.body, mmw)
+    visit(goal.main.body, mmw)
 
     mmw.visitInsn(Opcodes.RETURN)
     mmw.visitEnd()
@@ -103,7 +105,7 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
 
         println(methodSignature)
         val mmw = cw.visitMethod(Opcodes.ACC_PUBLIC, curMethod.get.methodName.name, methodSignature, null, null)
-        //mmw.visitCode()
+        mmw.visitCode()
         val methodStartLabel = new Label()
         val methodEndLabel = new Label()
         curMethodParamAmount = curMethod.get.params.length
@@ -166,7 +168,12 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
   override def visitPrintStatement(statement: printStatement, a: MethodVisitor): Unit = {
     a.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;")
     visit(statement.value, a)
-    a.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(C)V", false)
+    //we need to type check the expression, it could be multiple things
+    if(statement.value.typeValue.get == AST_Grammar.characterType()){
+      a.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(C)V", false)
+    }else{
+      a.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(I)V", false)
+    }
   }
 
   override def visitAssignStatement(statement: assignStatement, a: MethodVisitor): Unit = {
@@ -193,11 +200,21 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
     a.visitIntInsn(Opcodes.ALOAD, 0)
   }
 
-  override def visitBooleanExpression(expression: booleanExpression, a: MethodVisitor): Unit = super.visitBooleanExpression(expression, a)
+  override def visitBooleanExpression(expression: booleanExpression, a: MethodVisitor): Unit = {
+    if(expression.value){
+      a.visitLdcInsn(Opcodes.ICONST_1)
+    }else{
+      a.visitLdcInsn(Opcodes.ICONST_0)
+    }
+  }
 
-  override def visitIntegerExpression(expression: integerExpression, a: MethodVisitor): Unit = super.visitIntegerExpression(expression, a)
+  override def visitIntegerExpression(expression: integerExpression, a: MethodVisitor): Unit = {
+    a.visitLdcInsn(expression.value)
+  }
 
-  override def visitCharacterExpression(expression: characterExpression, a: MethodVisitor): Unit = super.visitCharacterExpression(expression, a)
+  override def visitCharacterExpression(expression: characterExpression, a: MethodVisitor): Unit = {
+    a.visitLdcInsn(expression.value.charAt(1))
+  }
 
   override def visitIdentiferExpression(expression: identifierExpression, a: MethodVisitor): Unit = {
     if(expression.isLocal && expression.isParameter){
@@ -323,7 +340,6 @@ object codeGenerator{
     mmw.visitEnd()
     mmw.visitMaxs(-1, -1)
     cw.visitEnd()
-    //
 
     val fos = new FileOutputStream(f"$className.class")
     fos.write(cw.toByteArray)

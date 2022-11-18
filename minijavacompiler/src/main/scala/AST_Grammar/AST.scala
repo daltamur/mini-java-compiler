@@ -54,7 +54,9 @@ case class arrayAssignStatement(idVal: identifier, arrayIndex: expression, value
 //expression cases
 
 case class expressionValue(leftVal: expressionTerminal, rightVal: Option[expressionTail], line: Integer, index: Integer)
-case class expression(leftVal: compExpression, rightVal: Option[andExpression]) extends ASTNode
+case class expression(leftVal: compExpression, rightVal: Option[andExpression]) extends ASTNode{
+  var typeValue: Option[varType] = None
+}
 case class compExpression(value: expressionValue, optVal: Option[compExpression], line:Integer, index:Integer) extends ASTNode
 case class andExpression(leftVal:Option[expression]) extends ASTNode
 sealed trait expressionTerminal() extends ASTNode

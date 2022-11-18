@@ -180,6 +180,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     val printedVal = visit(statement.value, a)
     printedVal match
       case result: varValResult =>
+        statement.value.typeValue = Some(result.varVal)
         if(result.varVal != integerType() && (result.varVal != characterType() && result.varVal != integerType())) {
           curError = Some(printError(statement.value.leftVal.line, statement.value.leftVal.index, result.varVal))
           hasError.errorVal = true

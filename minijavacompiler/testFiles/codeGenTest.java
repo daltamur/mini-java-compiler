@@ -1,6 +1,6 @@
 class codeGenTest {
     public static void main(String[] a) {
-        System.out.println(15);
+        System.out.println('?');
     }
 }
 
@@ -8,8 +8,12 @@ class codeGenTestOtherClass{
     char x;
     public char testMethod(char w){
         char y;
+        char z;
         y = x;
-        return x;
+        z = 'a';
+        y = z;
+        z = y;
+        return z;
     }
 
 }
