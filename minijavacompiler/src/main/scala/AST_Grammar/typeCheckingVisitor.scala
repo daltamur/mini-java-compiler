@@ -699,6 +699,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
               returnedVal = varValResult(a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].classScope.getMethodVal(possibleKey).get.asInstanceOf[methodVal].returnType)
               expression.returnType = returnedVal.asInstanceOf[varValResult].varVal
               //do a check for any possible operation arg
+              expression.paramTypes = possibleKey.asInstanceOf[(String, List[varType])]._2
               returnedVal = visitTerminalTail(expression.operation, a, returnedVal)
               returnedVal
             }
@@ -712,7 +713,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
             extendedClass match
               //there is an extended class, so try and find the method in the scope of the extended class
               case Some(extended) =>
-                returnedVal = checkForMethod(methodKey, extended, a.getParentTable.get.getParentTable.get)
+                returnedVal = checkForMethod(methodKey, extended, a.getParentTable.get.getParentTable.get, expression)
                 if (returnedVal.isInstanceOf[hasErrorResult]) {
                   curError = Some(noSuchMethodError(expression.funcName.name, paramVarTypes.toList, expression.line))
                 }else{
@@ -768,7 +769,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
   
   
 
-  def checkForMethod(key: (String, List[varType]), curClassName: String, programTable: symbolTable): typeCheckResult ={
+  def checkForMethod(key: (String, List[varType]), curClassName: String, programTable: symbolTable, expression: methodFunctionCallExpression): typeCheckResult ={
     var returnedVal: typeCheckResult = hasErrorResult(false)
     val classVal = programTable.getClassVal(curClassName).get.asInstanceOf[AST_Grammar.classVal]
     if(classVal.classScope.checkIfMethodIDExists(key)){
@@ -781,6 +782,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
         if (possibleKey.asInstanceOf[(String, List[varType])]._1.equals(key._1)) {
           val varsMatch = checkForParentTypes(key._2, possibleKey.asInstanceOf[(String, List[varType])]._2, programTable)
           if (varsMatch) {
+            expression.paramTypes = possibleKey.asInstanceOf[(String, List[varType])]._2
             returnedVal = varValResult(classVal.classScope.getMethodVal(possibleKey).get.asInstanceOf[methodVal].returnType)
           }
         }
@@ -789,7 +791,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
 
     //if neither of those worked, check for more parents
     if (returnedVal.isInstanceOf[hasErrorResult] && classVal.extendedClass.isDefined) {
-      returnedVal = checkForMethod(key, classVal.extendedClass.get, programTable)
+      returnedVal = checkForMethod(key, classVal.extendedClass.get, programTable, expression)
     }
 
     returnedVal
