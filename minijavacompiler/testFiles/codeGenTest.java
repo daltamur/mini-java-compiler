@@ -11,12 +11,15 @@ class codeGenTestOtherClass{
         char y;
         char z;
         boolean t;
+        int[] testArray;
         boolean testVal;
         boolean testVal2;
         testVal = true;
         testVal2 = false;
+        testArray = new int[new int[4].length];
         t = testVal && testVal2 && true && false && true;
         r = 1 + 2 * 3 - 1000 - 67;
+        //z = this.testMethod('a');
         while(testVal){
             r = 1 + 2 * 3 - 1000 - 67;
             testVal = false;

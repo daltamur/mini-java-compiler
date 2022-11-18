@@ -13,12 +13,19 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
   private var curClassName: String = ""
 
   override def visitCompExpression(expression: compExpression, a: MethodVisitor): Unit = {
+    val compareFail = new Label()
     visitBaseExpression(expression.value, a)
     var curCompTail = expression.optVal
-    while(curCompTail.isDefined){
-      visitBaseExpression(curCompTail.get.value, a)
-      //comparison goes here I think?
-      curCompTail = curCompTail.get.optVal
+    if(curCompTail.isDefined) {
+      while (curCompTail.isDefined) {
+        visitBaseExpression(curCompTail.get.value, a)
+        //comparison goes here I think?
+        a.visitJumpInsn(Opcodes.IF_ICMPGE, compareFail)
+        curCompTail = curCompTail.get.optVal
+      }
+      a.visitInsn(Opcodes.ICONST_1)
+      a.visitLabel(compareFail)
+      a.visitInsn(Opcodes.ICONST_0)
     }
   }
 
@@ -139,9 +146,8 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
           println(convertToASMType(AST_Grammar.getVarType(variable.get.typeval)))
           //println("Var Index: " + index)
           val valIndex= index+curMethodParamAmount+1
-          mmw.visitLocalVariable("var"+valIndex, convertToASMType(AST_Grammar.getVarType(variable.get.typeval)), null, methodStartLabel, methodEndLabel, index+curMethodParamAmount+1)
+          mmw.visitLocalVariable(variable.get.name.name, convertToASMType(AST_Grammar.getVarType(variable.get.typeval)), null, methodStartLabel, methodEndLabel, index+curMethodParamAmount+1)
         }
-        //^declared, but won't show up in the bytecode until we implement EVERYTHING
 
         mmw.visitLabel(methodStartLabel)
         //visit statements goes here
@@ -278,9 +284,19 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
     }
   }
 
-  override def visitNewArrayExpression(expression: newArrayExpression, a: MethodVisitor): Unit = super.visitNewArrayExpression(expression, a)
+  override def visitNewArrayExpression(expression: newArrayExpression, a: MethodVisitor): Unit = {
+    //first visit the given size
+    visit(expression.size, a)
 
-  override def visitNewClassInstanceExpression(expression: newClassInstanceExpression, a: MethodVisitor): Unit = super.visitNewClassInstanceExpression(expression, a)
+    //now throw a new int array on the stack
+    a.visitIntInsn(Opcodes.NEWARRAY, 10)
+  }
+
+  override def visitNewClassInstanceExpression(expression: newClassInstanceExpression, a: MethodVisitor): Unit = {
+    a.visitTypeInsn(Opcodes.NEW, expression.classType.name)
+    a.visitInsn(Opcodes.DUP)
+    a.visitMethodInsn(Opcodes.INVOKESPECIAL, expression.classType.name, "<init>", "()V", false)
+  }
 
   override def visitNegatedExpression(expression: negatedExpression, a: MethodVisitor): Unit = super.visitNegatedExpression(expression, a)
 
@@ -313,7 +329,31 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
 
   override def visitArrayIndexExpression(expression: arrayIndexExpression, a: MethodVisitor, b: Unit): Unit = super.visitArrayIndexExpression(expression, a, b)
 
-  override def visitMethodFunctionCallExpression(expression: methodFunctionCallExpression, a: MethodVisitor, b: Unit): Unit = super.visitMethodFunctionCallExpression(expression, a, b)
+  override def visitMethodFunctionCallExpression(expression: methodFunctionCallExpression, a: MethodVisitor, b: Unit): Unit = {
+    //put all the parameters of the method call on the stack
+    for(param <- expression.params){
+      visit(param, a)
+    }
+    //make the signature
+    var methodSignature: String = "("
+    for (param <- expression.paramTypes)
+      methodSignature = methodSignature.concat(convertToASMType(param))
+
+    methodSignature = methodSignature.concat(")")
+
+
+    methodSignature = methodSignature.concat(convertToASMType(expression.returnType))
+
+    if (methodSignature.equals("()")) {
+      methodSignature = null
+    }
+
+    a.visitMethodInsn(Opcodes.INVOKEVIRTUAL, AST_Grammar.varTypeToString(expression.classType), expression.funcName.name, methodSignature, false)
+
+    visitExpressionTail(expression.operation, a , b)
+
+
+  }
 
   override def visitNoTail(previousExpressionVal: Unit): Unit = {
     /*

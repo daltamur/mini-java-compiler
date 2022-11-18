@@ -672,6 +672,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
         }
       }
     }
+    expression.paramTypes = paramVarTypes.toList
     //if there was some error going through the expressions, we're not going to bother looking for the method
     if (!returnedVal.asInstanceOf[hasErrorResult].errorVal) {
       val methodKey = (methodName, paramVarTypes.toList)
@@ -680,7 +681,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
       if (a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].classScope.checkIfMethodIDExists(methodKey)) {
         returnedVal = varValResult(a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].classScope.getMethodVal(methodKey).get.asInstanceOf[methodVal].returnType)
         //do a check for any possible operation arg
-
+        expression.returnType = returnedVal.asInstanceOf[varValResult].varVal
         returnedVal = visitTerminalTail(expression.operation, a, returnedVal)
         returnedVal
       } else {
@@ -692,6 +693,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
             val varsMatch = checkForParentTypes(methodKey._2, possibleKey.asInstanceOf[(String, List[varType])]._2, a.getParentTable.get.getParentTable.get)
             if (varsMatch) {
               returnedVal = varValResult(a.getParentTable.get.getParentTable.get.getClassVal(className).get.asInstanceOf[classVal].classScope.getMethodVal(possibleKey).get.asInstanceOf[methodVal].returnType)
+              expression.returnType = returnedVal.asInstanceOf[varValResult].varVal
               //do a check for any possible operation arg
               returnedVal = visitTerminalTail(expression.operation, a, returnedVal)
               returnedVal
@@ -710,12 +712,14 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
                 if (returnedVal.isInstanceOf[hasErrorResult]) {
                   curError = Some(noSuchMethodError(expression.funcName.name, paramVarTypes.toList, expression.line))
                 }else{
+                  expression.returnType = returnedVal.asInstanceOf[varValResult].varVal
                   returnedVal = visitTerminalTail(expression.operation, a, returnedVal)
                 }
               case None =>
                 curError = Some(noSuchMethodError(expression.funcName.name, paramVarTypes.toList, expression.line))
                 result.errorVal = true
           case _ =>
+            expression.returnType = returnedVal.asInstanceOf[varValResult].varVal
             //do a check for any possible operation arg
             returnedVal = visitTerminalTail(expression.operation, a, returnedVal)
         }

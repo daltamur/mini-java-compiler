@@ -85,6 +85,8 @@ case class arrayLengthExpression(line: Integer, index: Integer,var operation: Op
 case class arrayIndexExpression(value: expression, var operation: Option[operation]) extends expressionTail
 case class methodFunctionCallExpression(funcName: identifier, params: List[expression], line: Integer, var operation: Option[expressionTail]) extends expressionTail{
   var classType: varType = null
+  var returnType: varType = null
+  var paramTypes: List[varType] =null
 }
 
 
@@ -214,7 +216,7 @@ case class noSuchMethodError(methodName: String, types: List[varType], line: Int
 }
 
 case class printError(line: Integer, index: Integer, givenType: varType) extends error{
-  val errorVal: String = "ERROR on line " + line + ":" + index + " Print Statements require a Character or Integer, " + varTypeToString(givenType) + " are currently not supported"
+  val errorVal: String = "ERROR on line " + line + ":" + index + " Print Statements require a Character or Integer, " + varTypeToString(givenType) + " types are currently not supported"
 }
 
 case class noSuchClassError(className: String, line: Integer, index: Integer) extends  error {
