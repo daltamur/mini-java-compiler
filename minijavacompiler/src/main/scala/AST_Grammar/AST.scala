@@ -211,6 +211,10 @@ case class noSuchMethodError(methodName: String, types: List[varType], line: Int
   }
 }
 
+case class printError(line: Integer, index: Integer, givenType: varType) extends error{
+  val errorVal: String = "ERROR on line " + line + ":" + index + " Print Statements require a Character or Integer, " + varTypeToString(givenType) + " are currently not supported"
+}
+
 case class noSuchClassError(className: String, line: Integer, index: Integer) extends  error {
   val errorVal: String = "ERROR on line " + line + ":" + index + " :no such class named " + className
 }
