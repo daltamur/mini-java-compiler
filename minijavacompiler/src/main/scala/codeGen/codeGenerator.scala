@@ -252,41 +252,57 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
   def convertToASMType(typeVal: AST_Grammar.varType): String ={
       typeVal match {
         case x: AST_Grammar.classType => f"L${x.clazz};"
-        case x: AST_Grammar.intArrayType => "[I"
-        case x: AST_Grammar.booleanType => "Z"
-        case x: AST_Grammar.integerType => "I"
-        case x: AST_Grammar.characterType => "C"
+        case _: AST_Grammar.intArrayType => "[I"
+        case _: AST_Grammar.booleanType => "Z"
+        case _: AST_Grammar.integerType => "I"
+        case _: AST_Grammar.characterType => "C"
+        case _ =>
+          println("Okay something wild went wrong if none of these are working")
+          System.exit(-1)
+          ""
       }
   }
 
   def getLoadInsn(varType: AST_Grammar.varType): Int = {
     varType match
-      case x: AST_Grammar.classType => Opcodes.ALOAD
-      case x: AST_Grammar.intArrayType => Opcodes.ALOAD
-      case x: AST_Grammar.booleanType => Opcodes.ILOAD
-      case x: AST_Grammar.integerType => Opcodes.ILOAD
+      case _: AST_Grammar.classType => Opcodes.ALOAD
+      case _: AST_Grammar.intArrayType => Opcodes.ALOAD
+      case _: AST_Grammar.booleanType => Opcodes.ILOAD
+      case _: AST_Grammar.integerType => Opcodes.ILOAD
       //do ILOAD for chars, you just have to specify the type as 'C' when printing
-      case x: AST_Grammar.characterType => Opcodes.ILOAD
+      case _: AST_Grammar.characterType => Opcodes.ILOAD
+      case _ =>
+        println("Okay something wild went wrong if none of these are working")
+        System.exit(-1)
+        0
   }
 
   def getStoreInsn(varType: AST_Grammar.varType): Int = {
     varType match
-      case x: AST_Grammar.classType => Opcodes.ASTORE
-      case x: AST_Grammar.intArrayType => Opcodes.ASTORE
-      case x: AST_Grammar.booleanType => Opcodes.ISTORE
-      case x: AST_Grammar.integerType => Opcodes.ISTORE
+      case _: AST_Grammar.classType => Opcodes.ASTORE
+      case _: AST_Grammar.intArrayType => Opcodes.ASTORE
+      case _: AST_Grammar.booleanType => Opcodes.ISTORE
+      case _: AST_Grammar.integerType => Opcodes.ISTORE
       //do ISTORE for chars, you just have to specify the type as 'C' when printing
-      case x: AST_Grammar.characterType => Opcodes.ISTORE
+      case _: AST_Grammar.characterType => Opcodes.ISTORE
+      case _ =>
+        println("Okay something wild went wrong if none of these are working")
+        System.exit(-1)
+        0
   }
 
   def getReturnInsn(varType: AST_Grammar.varType): Int = {
     varType match
-      case x: AST_Grammar.classType => Opcodes.ARETURN
-      case x: AST_Grammar.intArrayType => Opcodes.ARETURN
-      case x: AST_Grammar.booleanType => Opcodes.IRETURN
-      case x: AST_Grammar.integerType => Opcodes.IRETURN
+      case _: AST_Grammar.classType => Opcodes.ARETURN
+      case _: AST_Grammar.intArrayType => Opcodes.ARETURN
+      case _: AST_Grammar.booleanType => Opcodes.IRETURN
+      case _: AST_Grammar.integerType => Opcodes.IRETURN
       //do ISTORE for chars, you just have to specify the type as 'C' when printing
-      case x: AST_Grammar.characterType => Opcodes.IRETURN
+      case _: AST_Grammar.characterType => Opcodes.IRETURN
+      case _ =>
+        println("Okay something wild went wrong if none of these are working")
+        System.exit(-1)
+        0
   }
 
 }
