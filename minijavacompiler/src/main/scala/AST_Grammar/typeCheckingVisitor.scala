@@ -202,6 +202,11 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     if(a.checkIfVarIDExists(leftVal.name)) {
       //variable exists in current method
       val leftSideType = a.getVariableVal(leftVal.name).get.asInstanceOf[variableVal].varValue
+      statement.idVal.isParameter = a.getVariableVal(leftVal.name).get.asInstanceOf[variableVal].isMethodParam
+      statement.idVal.isLocal = true
+      statement.idVal.paramIndex = Some(a.getVariableVal(leftVal.name).get.asInstanceOf[variableVal].variableIndex)
+      statement.idVal.variableType = leftSideType
+
       //now get the type of the right side
       val rightSideType = visit(statement.value, a)
       //if the two types are not equal, we'll attempt to check if the right type is a child of the left type
@@ -213,6 +218,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     } else if (a.getParentTable.get.checkIfVarIDExists(leftVal.name)) {
       //the variable exists as a global within the class
       val leftSideType = a.getParentTable.get.getVariableVal(leftVal.name).get.asInstanceOf[variableVal].varValue
+      statement.idVal.variableType = leftSideType
       val rightSideType = visit(statement.value, a)
       if (!rightSideType.isInstanceOf[hasErrorResult]) {
         checkIfLeftTypeEqualsRightType(leftSideType, rightSideType.asInstanceOf[varValResult].varVal, a, statement)
@@ -224,6 +230,7 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
       val leftSideType = checkExtendedClassesForVar(leftVal.name, a.getParentTable.get)
       if (!leftSideType.isInstanceOf[hasErrorResult]) {
         //we found the reference in an inherited class, now see if it is equal to the right value
+        statement.idVal.variableType = leftSideType.asInstanceOf[varValResult].varVal
         val rightSideType = visit(statement.value, a)
         if (!rightSideType.isInstanceOf[hasErrorResult]) {
           checkIfLeftTypeEqualsRightType(leftSideType.asInstanceOf[varValResult].varVal, rightSideType.asInstanceOf[varValResult].varVal, a, statement)
@@ -357,6 +364,11 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     //first checking the current method
     if(a.checkIfVarIDExists(variableID)){
       returnedVal = varValResult(a.getVariableVal(variableID).get.asInstanceOf[variableVal].varValue)
+      expression.isLocal = true
+      if(a.getVariableVal(variableID).get.asInstanceOf[variableVal].isMethodParam){
+        expression.isParameter = true
+      }
+      expression.paramIndex = Some(a.getVariableVal(variableID).get.asInstanceOf[variableVal].variableIndex)
     }else if(a.getParentTable.get.checkIfVarIDExists(variableID)){
       returnedVal =  varValResult(a.getParentTable.get.getVariableVal(variableID).get.asInstanceOf[variableVal].varValue)
     }else{
@@ -375,6 +387,9 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
           curError = Some(noSuchVariableUnknownTypeDefinedError(variableID, expression.line))
           returnedVal.asInstanceOf[hasErrorResult].errorVal = true
 
+    }
+    if(returnedVal.isInstanceOf[varValResult]) {
+      expression.variableType = returnedVal.asInstanceOf[varValResult].varVal
     }
     returnedVal
   }
@@ -635,7 +650,10 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     } else {
       b.asInstanceOf[varValResult].varVal match
         //we're ok so long as the var type is a class
-        case result: classType => className = result.clazz
+        case result: classType =>
+          className = result.clazz
+          //keep a reference of the class type that the method belongs to
+          expression.classType = result
         case _ =>
           curError = Some(callMethodOnPrimitve(b.asInstanceOf[varValResult].varVal, expression.line))
           returnedVal = hasErrorResult(true)

@@ -11,7 +11,12 @@ sealed trait ASTNode
 case class goal (main: mainClass, classes: List[Option[klass]]) extends ASTNode
 
 //identifier case
-case class identifier(name: String) extends ASTNode
+case class identifier(name: String) extends ASTNode{
+  var isLocal: Boolean = false
+  var isParameter: Boolean = false
+  var paramIndex: Option[Integer] = None
+  var variableType: varType = null
+}
 
 //variable declaration case
 case class variableDecs(typeval: dataType, name: identifier, line: Integer) extends ASTNode
@@ -57,7 +62,12 @@ case class thisExpression(line: Integer, index: Integer) extends expressionTermi
 case class booleanExpression(value: Boolean, line: Integer, index: Integer) extends expressionTerminal
 case class integerExpression(value: Integer, line: Integer, index: Integer) extends expressionTerminal
 case class characterExpression(value: String, line: Integer, index: Integer) extends expressionTerminal
-case class identifierExpression(value: identifier, line: Integer, index: Integer) extends expressionTerminal
+case class identifierExpression(value: identifier, line: Integer, index: Integer) extends expressionTerminal{
+  var isLocal: Boolean = false
+  var isParameter: Boolean = false
+  var paramIndex: Option[Integer] = None
+  var variableType: varType = null
+}
 case class newArrayExpression(size: expression, line: Integer, index: Integer) extends expressionTerminal
 case class newClassInstanceExpression(classType: identifier, line: Integer, index: Integer) extends expressionTerminal
 case class negatedExpression(value: expressionValue, line: Integer, index: Integer) extends expressionTerminal
@@ -71,7 +81,9 @@ case class subtractExpression(value: expressionValue) extends operation
 case class multiplyExpression(value: expressionValue) extends operation
 case class arrayLengthExpression(line: Integer, index: Integer,var operation: Option[operation]) extends expressionTail
 case class arrayIndexExpression(value: expression, var operation: Option[operation]) extends expressionTail
-case class methodFunctionCallExpression(funcName: identifier, params: List[expression], line: Integer, var operation: Option[expressionTail]) extends expressionTail
+case class methodFunctionCallExpression(funcName: identifier, params: List[expression], line: Integer, var operation: Option[expressionTail]) extends expressionTail{
+  var classType: varType = null
+}
 
 
 
@@ -118,7 +130,7 @@ case class classVal(classScope: symbolTable, extendedClass: Option[String], line
   var isMainClass:Boolean = false
 }
 
-case class variableVal(varValue: varType, line: Integer) extends symbolTableVal
+case class variableVal(varValue: varType, line: Integer, isMethodParam: Boolean, variableIndex: Integer) extends symbolTableVal
 
 case class programVal(program: symbolTable) extends symbolTableVal
 

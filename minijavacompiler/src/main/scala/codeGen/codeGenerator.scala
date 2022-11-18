@@ -7,19 +7,30 @@ import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 import scala.collection.mutable.ListBuffer
 class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
-  private val classWriters: ListBuffer[ClassWriter] = ListBuffer()
+  private var curMethodParamAmount: Integer = -1
+  private var curClassName: String = ""
 
-  override def visitExpression(expressionVal: expression, a: MethodVisitor): Unit = super.visitExpression(expressionVal, a)
+  override def visitCompExpression(expression: compExpression, a: MethodVisitor): Unit = {
+    visitBaseExpression(expression.value, a)
+    var curCompTail = expression.optVal
+    while(curCompTail.isDefined){
+      visitBaseExpression(curCompTail.get.value, a)
+      //comparison goes here I think?
+      curCompTail = curCompTail.get.optVal
+    }
+  }
 
-  override def visitBaseExpression(currentNode: expressionValue, a: MethodVisitor): Unit = super.visitBaseExpression(currentNode, a)
-
-  override def visitTerminalTail(expressionVal: Option[expressionTail], a: MethodVisitor, expressionTerminalVal: Unit): Unit = super.visitTerminalTail(expressionVal, a, expressionTerminalVal)
-
-  override def visitExpressionOpt(expressionVal: Option[operation], a: MethodVisitor, expressionTerminalVal: Unit): Unit = super.visitExpressionOpt(expressionVal, a, expressionTerminalVal)
-
-  override def visitCompExpression(expression: compExpression, a: MethodVisitor): Unit = super.visitCompExpression(expression, a)
-
-  override def visitAndExpression(curType: Unit, curExpression: andExpression, a: MethodVisitor): Unit = super.visitAndExpression(curType, curExpression, a)
+  override def visitAndExpression(curType: Unit, curExpression: andExpression, a: MethodVisitor): Unit = {
+    var curNextAnd: Option[andExpression] = None
+    visit(curExpression.leftVal.get, a)
+    //and operation goes here???
+    curNextAnd = curExpression.leftVal.get.rightVal
+    while(curNextAnd.isDefined){
+      visit(curNextAnd.get.leftVal.get, a)
+      //and operation goes here???
+      curNextAnd = curNextAnd.get.leftVal.get.rightVal
+    }
+  }
 
   def generateConstructor(cw: ClassWriter, parent: String): Unit = {
     val constructorMethodVisitor = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null)
@@ -43,8 +54,7 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
     val mmw = cw.visitMethod(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null)
     mmw.visitCode()
 
-    //for now we're just having it do hello world, this will instead be replaced with whatever comes from visiting the statement
-    visit(goal.main.body, mmw)
+    //visit(goal.main.body, mmw)
 
     mmw.visitInsn(Opcodes.RETURN)
     mmw.visitEnd()
@@ -52,13 +62,14 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
     //clos the class writer
     cw.visitEnd()
     //write class to file
-    Files.createDirectories(Paths.get(className))
-    val fos = new FileOutputStream(f"$className/$className.class")
+    Files.createDirectories(Paths.get("compiledPrograms/" + className))
+    val fos = new FileOutputStream(f"compiledPrograms/$className/$className.class")
     fos.write(cw.toByteArray)
     fos.close()
 
     //then make all the other classes
     for (curClass <- goal.classes){
+      curClassName = curClass.get.className.name
       val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES)
       val className = curClass.get.className.name
       val parentClass = curClass.get.extendedClassName.orNull
@@ -92,48 +103,61 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
 
         println(methodSignature)
         val mmw = cw.visitMethod(Opcodes.ACC_PUBLIC, curMethod.get.methodName.name, methodSignature, null, null)
+        //mmw.visitCode()
         val methodStartLabel = new Label()
         val methodEndLabel = new Label()
-
-
+        curMethodParamAmount = curMethod.get.params.length
         for ((variable, index) <- curMethod.get.variables.zipWithIndex) {
-          mmw.visitLocalVariable(variable.get.name.name, convertToASMType(AST_Grammar.getVarType(variable.get.typeval)), null, methodStartLabel, methodEndLabel, index+curMethod.get.params.length+1)
+          println(convertToASMType(AST_Grammar.getVarType(variable.get.typeval)))
+          //println("Var Index: " + index)
+          val valIndex= index+curMethodParamAmount+1
+          mmw.visitLocalVariable("var"+valIndex, convertToASMType(AST_Grammar.getVarType(variable.get.typeval)), null, methodStartLabel, methodEndLabel, index+curMethodParamAmount+1)
         }
-        //^declared, but won't show up until we implement EVERYTHING
+        //^declared, but won't show up in the bytecode until we implement EVERYTHING
 
         mmw.visitLabel(methodStartLabel)
         //visit statements goes here
+        for(statement<-curMethod.get.statements){
+          visit(statement.get, mmw)
+        }
+
+
         //return statement goes here
+        visit(curMethod.get.returnVal, mmw)
+        mmw.visitInsn(getReturnInsn(AST_Grammar.getVarType(curMethod.get.returnType)))
         mmw.visitLabel(methodEndLabel)
-        mmw.visitMaxs(-1, -1)
+        mmw.visitMaxs(ClassWriter.COMPUTE_MAXS, ClassWriter.COMPUTE_MAXS)
         mmw.visitEnd()
       }
       cw.visitEnd()
-      val fos = new FileOutputStream(f"${goal.main.className.name}/$className.class")
+      val fos = new FileOutputStream(f"compiledPrograms/${goal.main.className.name}/$className.class")
       fos.write(cw.toByteArray)
       fos.close()
     }
   }
 
-  def writeClasses(folderName: String): Unit ={
+  override def visitIdentifier(identifier: identifier, a: MethodVisitor): Unit = {
+    if (identifier.isLocal && identifier.isParameter) {
+      //we load the identifier as a method parameter
+      a.visitVarInsn(getLoadInsn(identifier.variableType), identifier.paramIndex.get)
+    } else if (identifier.isLocal) {
+      //we load the identifier as a value declared within the method
+      //nearly the same as the previous case, we just need to add the offset of how many params there are in the current method
+      a.visitVarInsn(getLoadInsn(identifier.variableType), identifier.paramIndex.get + curMethodParamAmount)
+    } else {
+      //we load the identifier as a class instance variable
 
+      //first load in the current class variable
+      a.visitIntInsn(Opcodes.ALOAD, 0)
+      a.visitFieldInsn(Opcodes.GETFIELD, curClassName, identifier.name, convertToASMType(identifier.variableType))
+    }
   }
 
-  override def visitIdentifier(identifier: identifier, a: MethodVisitor): Unit = super.visitIdentifier(identifier, a)
-
-  override def visitVarDec(decs: variableDecs, a: MethodVisitor): Unit = super.visitVarDec(decs, a)
-
-  override def visitMainClass(clazz: mainClass, a: MethodVisitor): Unit = super.visitMainClass(clazz, a)
-
-  override def visitClass(klass: klass, a: MethodVisitor): Unit = super.visitClass(klass, a)
-
-  override def visitMethod(method: method, a: MethodVisitor): Unit = {
-
+  override def visitBlockStatement(statement: blockStatement, a: MethodVisitor): Unit = {
+    for(curStatement <- statement.statements){
+      visit(curStatement, a)
+    }
   }
-
-  override def visitDataType(dataType: dataType, a: MethodVisitor): Unit = super.visitDataType(dataType, a)
-
-  override def visitBlockStatement(statement: blockStatement, a: MethodVisitor): Unit = super.visitBlockStatement(statement, a)
 
   override def visitIfStatement(statement: ifStatement, a: MethodVisitor): Unit = super.visitIfStatement(statement, a)
 
@@ -141,15 +165,33 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
 
   override def visitPrintStatement(statement: printStatement, a: MethodVisitor): Unit = {
     a.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;")
-    a.visitLdcInsn('b')
+    visit(statement.value, a)
     a.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(C)V", false)
   }
 
-  override def visitAssignStatement(statement: assignStatement, a: MethodVisitor): Unit = super.visitAssignStatement(statement, a)
+  override def visitAssignStatement(statement: assignStatement, a: MethodVisitor): Unit = {
+    //the order for the assign statement is as such:
+    //push the value that is getting assigned to the variable
+    //store the value at whatever index the identifier is at
+    //this is nearly identical to the visitIdentifierExpression method except we are using the store opcode now
+    visit(statement.value, a)
+    if(statement.idVal.isLocal && statement.idVal.isParameter){
+      a.visitIntInsn(getStoreInsn(statement.idVal.variableType), statement.idVal.paramIndex.get)
+    }else if (statement.idVal.isLocal){
+      a.visitIntInsn(getStoreInsn(statement.idVal.variableType),statement.idVal.paramIndex.get+curMethodParamAmount)
+    }else{
+      a.visitIntInsn(Opcodes.ALOAD, 0)
+      a.visitFieldInsn(Opcodes.PUTFIELD, AST_Grammar.varTypeToString(statement.idVal.variableType), statement.idVal.name, convertToASMType(statement.idVal.variableType))
+    }
+
+  }
 
   override def visitArrayAssignStatement(statement: arrayAssignStatement, a: MethodVisitor): Unit = super.visitArrayAssignStatement(statement, a)
 
-  override def visitThisExpression(expression: thisExpression, a: MethodVisitor): Unit = super.visitThisExpression(expression, a)
+  override def visitThisExpression(expression: thisExpression, a: MethodVisitor): Unit = {
+    //load this
+    a.visitIntInsn(Opcodes.ALOAD, 0)
+  }
 
   override def visitBooleanExpression(expression: booleanExpression, a: MethodVisitor): Unit = super.visitBooleanExpression(expression, a)
 
@@ -157,7 +199,22 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
 
   override def visitCharacterExpression(expression: characterExpression, a: MethodVisitor): Unit = super.visitCharacterExpression(expression, a)
 
-  override def visitIdentiferExpression(expression: identifierExpression, a: MethodVisitor): Unit = super.visitIdentiferExpression(expression, a)
+  override def visitIdentiferExpression(expression: identifierExpression, a: MethodVisitor): Unit = {
+    if(expression.isLocal && expression.isParameter){
+      //we load the identifier as a method parameter
+      a.visitIntInsn(getLoadInsn(expression.variableType),expression.paramIndex.get)
+    }else if(expression.isLocal){
+      //we load the identifier as a value declared within the method
+      //nearly the same as the previous case, we just need to add the offset of how many params there are in the current method
+      a.visitIntInsn(getLoadInsn(expression.variableType),expression.paramIndex.get+curMethodParamAmount)
+    }else{
+      //we load the identifier as a class instance variable
+
+      //first load in the current class variable
+      a.visitIntInsn(Opcodes.ALOAD, 0)
+      a.visitFieldInsn(Opcodes.GETFIELD, curClassName, expression.value.name, convertToASMType(expression.variableType))
+    }
+  }
 
   override def visitNewArrayExpression(expression: newArrayExpression, a: MethodVisitor): Unit = super.visitNewArrayExpression(expression, a)
 
@@ -165,7 +222,9 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
 
   override def visitNegatedExpression(expression: negatedExpression, a: MethodVisitor): Unit = super.visitNegatedExpression(expression, a)
 
-  override def visitParenthesizedExpression(expression: parenthesizedExpression, a: MethodVisitor): Unit = super.visitParenthesizedExpression(expression, a)
+  override def visitParenthesizedExpression(expression: parenthesizedExpression, a: MethodVisitor): Unit = {
+    visit(expression.value, a)
+  }
 
   override def visitAndExpression(expression: andExpression, a: MethodVisitor, b: Unit): Unit = super.visitAndExpression(expression, a, b)
 
@@ -175,13 +234,20 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
 
   override def visitMultiplyExpression(expression: multiplyExpression, a: MethodVisitor, b: Unit): Unit = super.visitMultiplyExpression(expression, a, b)
 
-  override def visitArrayLengthExpression(expression: arrayLengthExpression, a: MethodVisitor, b: Unit): Unit = super.visitArrayLengthExpression(expression, a, b)
+  override def visitArrayLengthExpression(expression: arrayLengthExpression, a: MethodVisitor, b: Unit): Unit = {
+    // Push the array length
+    a.visitInsn(Opcodes.ARRAYLENGTH)
+  }
 
   override def visitArrayIndexExpression(expression: arrayIndexExpression, a: MethodVisitor, b: Unit): Unit = super.visitArrayIndexExpression(expression, a, b)
 
   override def visitMethodFunctionCallExpression(expression: methodFunctionCallExpression, a: MethodVisitor, b: Unit): Unit = super.visitMethodFunctionCallExpression(expression, a, b)
 
-  override def visitNoTail(previousExpressionVal: Unit): Unit = super.visitNoTail(previousExpressionVal)
+  override def visitNoTail(previousExpressionVal: Unit): Unit = {
+    /*
+    do nothing
+  */
+  }
 
   def convertToASMType(typeVal: AST_Grammar.varType): String ={
       typeVal match {
@@ -191,6 +257,36 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
         case x: AST_Grammar.integerType => "I"
         case x: AST_Grammar.characterType => "C"
       }
+  }
+
+  def getLoadInsn(varType: AST_Grammar.varType): Int = {
+    varType match
+      case x: AST_Grammar.classType => Opcodes.ALOAD
+      case x: AST_Grammar.intArrayType => Opcodes.ALOAD
+      case x: AST_Grammar.booleanType => Opcodes.ILOAD
+      case x: AST_Grammar.integerType => Opcodes.ILOAD
+      //do ILOAD for chars, you just have to specify the type as 'C' when printing
+      case x: AST_Grammar.characterType => Opcodes.ILOAD
+  }
+
+  def getStoreInsn(varType: AST_Grammar.varType): Int = {
+    varType match
+      case x: AST_Grammar.classType => Opcodes.ASTORE
+      case x: AST_Grammar.intArrayType => Opcodes.ASTORE
+      case x: AST_Grammar.booleanType => Opcodes.ISTORE
+      case x: AST_Grammar.integerType => Opcodes.ISTORE
+      //do ISTORE for chars, you just have to specify the type as 'C' when printing
+      case x: AST_Grammar.characterType => Opcodes.ISTORE
+  }
+
+  def getReturnInsn(varType: AST_Grammar.varType): Int = {
+    varType match
+      case x: AST_Grammar.classType => Opcodes.ARETURN
+      case x: AST_Grammar.intArrayType => Opcodes.ARETURN
+      case x: AST_Grammar.booleanType => Opcodes.IRETURN
+      case x: AST_Grammar.integerType => Opcodes.IRETURN
+      //do ISTORE for chars, you just have to specify the type as 'C' when printing
+      case x: AST_Grammar.characterType => Opcodes.IRETURN
   }
 
 }

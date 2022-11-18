@@ -57,11 +57,11 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
           curError = Some(variableAlreadyDefinedError(varName, varDecLine))
         }
         varType match
-          case integer() => a.putVarVal(varName, AST_Grammar.variableVal(integerType(), varDecLine))
-          case character() => a.putVarVal(varName, AST_Grammar.variableVal(characterType(), varDecLine))
-          case identifierType(_) => a.putVarVal(varName, AST_Grammar.variableVal(classType(varType.asInstanceOf[AST_Grammar.identifierType].name.name), varDecLine))
-          case intArray() => a.putVarVal(varName, AST_Grammar.variableVal(AST_Grammar.intArrayType(), varDecLine))
-          case boolean() => a.putVarVal(varName, AST_Grammar.variableVal(booleanType(), varDecLine))
+          case integer() => a.putVarVal(varName, AST_Grammar.variableVal(integerType(), varDecLine, false, null))
+          case character() => a.putVarVal(varName, AST_Grammar.variableVal(characterType(), varDecLine, false, null))
+          case identifierType(_) => a.putVarVal(varName, AST_Grammar.variableVal(classType(varType.asInstanceOf[AST_Grammar.identifierType].name.name), varDecLine, false, null))
+          case intArray() => a.putVarVal(varName, AST_Grammar.variableVal(AST_Grammar.intArrayType(), varDecLine, false, null))
+          case boolean() => a.putVarVal(varName, AST_Grammar.variableVal(booleanType(), varDecLine, false, null))
       }
     }
 
@@ -104,7 +104,7 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
       val paramID = param._2.name
       val symbolTableParam = AST_Grammar.getVarType(paramType)
       paramTypes += symbolTableParam
-      a.putVarVal(paramID, variableVal(symbolTableParam, methodLine))
+      a.putVarVal(paramID, variableVal(symbolTableParam, methodLine, true, params.indexOf(param)+1))
     }
 
     //check variables
@@ -119,11 +119,11 @@ class symbolTableBuilder extends ASTVisitor[symbolTable, AST_Grammar.symbolTable
           loop.break()
         }
         varType match
-          case integer() => a.putVarVal(varName, AST_Grammar.variableVal(integerType(), varLine))
-          case character() => a.putVarVal(varName, AST_Grammar.variableVal(characterType(), varLine))
-          case x: identifierType => a.putVarVal(varName, AST_Grammar.variableVal(classType(x.name.name), varLine))
-          case intArray() => a.putVarVal(varName, AST_Grammar.variableVal(AST_Grammar.intArrayType(), varLine))
-          case boolean() => a.putVarVal(varName, AST_Grammar.variableVal(booleanType(), varLine))
+          case integer() => a.putVarVal(varName, AST_Grammar.variableVal(integerType(), varLine, false, method.variables.indexOf(currentVarDec)+1))
+          case character() => a.putVarVal(varName, AST_Grammar.variableVal(characterType(), varLine, false, method.variables.indexOf(currentVarDec)+1))
+          case x: identifierType => a.putVarVal(varName, AST_Grammar.variableVal(classType(x.name.name), varLine, false, method.variables.indexOf(currentVarDec)+1))
+          case intArray() => a.putVarVal(varName, AST_Grammar.variableVal(AST_Grammar.intArrayType(), varLine, false, method.variables.indexOf(currentVarDec)+1))
+          case boolean() => a.putVarVal(varName, AST_Grammar.variableVal(booleanType(), varLine, false, method.variables.indexOf(currentVarDec)+1))
       }
     }
 
