@@ -7,7 +7,7 @@ import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 import scala.collection.mutable.ListBuffer
 
-//9 more things to implement, let's pray to god it works
+//6 more things to implement, let's pray to god it works
 class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
   private var curMethodParamAmount: Integer = -1
   private var curClassName: String = ""
@@ -187,9 +187,28 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
     }
   }
 
-  override def visitIfStatement(statement: ifStatement, a: MethodVisitor): Unit = super.visitIfStatement(statement, a)
+  override def visitIfStatement(statement: ifStatement, a: MethodVisitor): Unit = {
+    val ifFail = new Label()
+    val ifEnd = new Label()
+    visit(statement.condition, a)
+    a.visitJumpInsn(Opcodes.IFEQ, ifFail)
+    visit(statement.thenStatement, a)
+    a.visitJumpInsn(Opcodes.GOTO, ifEnd)
+    a.visitLabel(ifFail)
+    visit(statement.elseStatement, a)
+    a.visitLabel(ifEnd)
+  }
 
-  override def visitWhileStatement(statement: whileStatement, a: MethodVisitor): Unit = super.visitWhileStatement(statement, a)
+  override def visitWhileStatement(statement: whileStatement, a: MethodVisitor): Unit = {
+    val whileStart = new Label()
+    val whileLeave = new Label()
+    a.visitLabel(whileStart)
+    visit(statement.condition, a)
+    a.visitJumpInsn(Opcodes.IFEQ, whileLeave)
+    visit(statement.thenStatement, a)
+    a.visitJumpInsn(Opcodes.GOTO, whileStart)
+    a.visitLabel(whileLeave)
+  }
 
   override def visitPrintStatement(statement: printStatement, a: MethodVisitor): Unit = {
     a.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;")
@@ -268,8 +287,6 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
   override def visitParenthesizedExpression(expression: parenthesizedExpression, a: MethodVisitor): Unit = {
     visit(expression.value, a)
   }
-
-  override def visitAndExpression(expression: andExpression, a: MethodVisitor, b: Unit): Unit = super.visitAndExpression(expression, a, b)
 
   override def visitAddExpression(expression: addExpression, a: MethodVisitor, b: Unit): Unit = {
     visitTerminalExpression(expression.value.leftVal, a)

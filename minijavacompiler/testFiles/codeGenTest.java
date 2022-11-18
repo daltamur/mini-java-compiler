@@ -16,7 +16,11 @@ class codeGenTestOtherClass{
         testVal = true;
         testVal2 = false;
         t = testVal && testVal2 && true && false && true;
-        r = (1 + 2) * 3 - (1000 - 67);
+        r = 1 + 2 * 3 - 1000 - 67;
+        while(testVal){
+            r = 1 + 2 * 3 - 1000 - 67;
+            testVal = false;
+        }
         y = x;
         z = 'a';
         y = z;
