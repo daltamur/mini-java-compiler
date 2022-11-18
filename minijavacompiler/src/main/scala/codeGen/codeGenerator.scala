@@ -7,7 +7,7 @@ import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 import scala.collection.mutable.ListBuffer
 
-//12 more things to implement, let's pray to god it works
+//9 more things to implement, let's pray to god it works
 class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
   private var curMethodParamAmount: Integer = -1
   private var curClassName: String = ""
@@ -23,15 +23,41 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
   }
 
   override def visitAndExpression(curType: Unit, curExpression: andExpression, a: MethodVisitor): Unit = {
+    //this methodology is pulled almost directly from an observed set of instructions from when I compiled the expression (a&&b&&true):
+    //    L5
+    //    LINENUMBER 16 L5
+    //    GETSTATIC java/lang/System.out : Ljava/io/PrintStream;
+    //    ILOAD 3
+    //    IFEQ L6
+    //    ILOAD 4
+    //    IFEQ L6
+    //    ILOAD 5
+    //    IFEQ L6
+    //    ICONST_1
+    //    GOTO L7
+    //   L6
+    //   FRAME FULL [codeGenTestOtherClass I I I I I] [java/io/PrintStream]
+    //    ICONST_0
+    //   L7
+    //   FRAME FULL [codeGenTestOtherClass I I I I I] [java/io/PrintStream I]
+    //    INVOKEVIRTUAL java/io/PrintStream.println (Z)V
+    //everytime we visit a new value in the AND instruction, we have to do the IFEQ opcode and jump to a failed state
+    val andPass = new Label()
+    val andFail = new Label()
     var curNextAnd: Option[andExpression] = None
-    visit(curExpression.leftVal.get, a)
+    a.visitJumpInsn(Opcodes.IFEQ, andFail)
     //and operation goes here???
-    curNextAnd = curExpression.leftVal.get.rightVal
+    curNextAnd = Some(curExpression)
     while(curNextAnd.isDefined){
-      visit(curNextAnd.get.leftVal.get, a)
-      //and operation goes here???
+      visitCompExpression(curNextAnd.get.leftVal.get.leftVal, a)
+      a.visitJumpInsn(Opcodes.IFEQ, andFail)
       curNextAnd = curNextAnd.get.leftVal.get.rightVal
     }
+    a.visitInsn(Opcodes.ICONST_1)
+    a.visitJumpInsn(Opcodes.GOTO, andPass)
+    a.visitLabel(andFail)
+    a.visitInsn(Opcodes.ICONST_0)
+    a.visitLabel(andPass)
   }
 
   def generateConstructor(cw: ClassWriter, parent: String): Unit = {
@@ -202,9 +228,9 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
 
   override def visitBooleanExpression(expression: booleanExpression, a: MethodVisitor): Unit = {
     if(expression.value){
-      a.visitLdcInsn(Opcodes.ICONST_1)
+      a.visitInsn(Opcodes.ICONST_1)
     }else{
-      a.visitLdcInsn(Opcodes.ICONST_0)
+      a.visitInsn(Opcodes.ICONST_0)
     }
   }
 
@@ -245,11 +271,23 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
 
   override def visitAndExpression(expression: andExpression, a: MethodVisitor, b: Unit): Unit = super.visitAndExpression(expression, a, b)
 
-  override def visitAddExpression(expression: addExpression, a: MethodVisitor, b: Unit): Unit = super.visitAddExpression(expression, a, b)
+  override def visitAddExpression(expression: addExpression, a: MethodVisitor, b: Unit): Unit = {
+    visitTerminalExpression(expression.value.leftVal, a)
+    a.visitInsn(Opcodes.IADD)
+    visitExpressionTail(expression.value.rightVal, a, b)
+  }
 
-  override def visitSubtractExpression(expression: subtractExpression, a: MethodVisitor, b: Unit): Unit = super.visitSubtractExpression(expression, a, b)
+  override def visitSubtractExpression(expression: subtractExpression, a: MethodVisitor, b: Unit): Unit = {
+    visitTerminalExpression(expression.value.leftVal, a)
+    a.visitInsn(Opcodes.ISUB)
+    visitExpressionTail(expression.value.rightVal, a, b)
+  }
 
-  override def visitMultiplyExpression(expression: multiplyExpression, a: MethodVisitor, b: Unit): Unit = super.visitMultiplyExpression(expression, a, b)
+  override def visitMultiplyExpression(expression: multiplyExpression, a: MethodVisitor, b: Unit): Unit = {
+    visitTerminalExpression(expression.value.leftVal, a)
+    a.visitInsn(Opcodes.IMUL)
+    visitExpressionTail(expression.value.rightVal, a, b)
+  }
 
   override def visitArrayLengthExpression(expression: arrayLengthExpression, a: MethodVisitor, b: Unit): Unit = {
     // Push the array length

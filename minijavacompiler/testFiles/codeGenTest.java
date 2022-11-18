@@ -7,8 +7,16 @@ class codeGenTest {
 class codeGenTestOtherClass{
     char x;
     public char testMethod(char w){
+        int r;
         char y;
         char z;
+        boolean t;
+        boolean testVal;
+        boolean testVal2;
+        testVal = true;
+        testVal2 = false;
+        t = testVal && testVal2 && true && false && true;
+        r = (1 + 2) * 3 - (1000 - 67);
         y = x;
         z = 'a';
         y = z;

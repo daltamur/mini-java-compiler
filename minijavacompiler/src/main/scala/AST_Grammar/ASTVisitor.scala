@@ -32,6 +32,32 @@ abstract class ASTVisitor[A, B] {
         curType
       case _ => curType
   }
+  
+  def visitTerminalExpression(currentNode: expressionTerminal, a:A): B ={
+      currentNode match
+        case x: thisExpression => visitThisExpression(x, a)
+        case x: booleanExpression => visitBooleanExpression(x, a)
+        case x: integerExpression => visitIntegerExpression(x, a)
+        case x: characterExpression => visitCharacterExpression(x, a)
+        case x: identifierExpression => visitIdentiferExpression(x, a)
+        case x: newArrayExpression => visitNewArrayExpression(x, a)
+        case x: newClassInstanceExpression => visitNewClassInstanceExpression(x, a)
+        case x: negatedExpression => visitNegatedExpression(x, a)
+        case x: parenthesizedExpression => visitParenthesizedExpression(x, a)
+  }
+
+  def visitExpressionTail(currentNode: Option[expressionTail], a: A, expressionTerminalVal: B): B = {
+    currentNode match
+      case Some(value) =>
+        value match
+          case x: addExpression => visitAddExpression(x, a, expressionTerminalVal)
+          case x: subtractExpression => visitSubtractExpression(x, a, expressionTerminalVal)
+          case x: multiplyExpression => visitMultiplyExpression(x, a, expressionTerminalVal)
+          case x: arrayLengthExpression => visitArrayLengthExpression(x, a, expressionTerminalVal)
+          case x: arrayIndexExpression => visitArrayIndexExpression(x, a, expressionTerminalVal)
+          case x: methodFunctionCallExpression => visitMethodFunctionCallExpression(x, a, expressionTerminalVal)
+      case _ => visitNoTail(expressionTerminalVal)
+  }
 
   def visitBaseExpression(currentNode: expressionValue, a:A): B = {
     val expressionTerminalVal = {
