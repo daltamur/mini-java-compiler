@@ -34,7 +34,7 @@ expressionAnd: AND expression             #andexpression
 
 methodFuncCall: IDENTIFIER '(' (expression (',' expression )*)? ')';
 
-arrayLengthCall: 'length';
+arrayLengthCall: '.length';
 
 expressionComp:  (expressionTerminal expressionTail) (COMPARE expressionComp)?                         #compareExpression
                 ;
@@ -48,7 +48,7 @@ expressionTailOps:  MULTIPLY (expressionTerminal expressionTail)                
 
 expressionTail: expressionTailOps                               #operatorExpression
                 | arrayIndex (expressionTailOps)?               #arrayIndexCall
-                | '.' arrayLengthCall (expressionTailOps)?      #getArrayLength
+                | arrayLengthCall (expressionTailOps)?      #getArrayLength
                 | '.' methodFuncCall (expressionTail)           #functionVallExpression
                 |                                               #noExpressionTail
                 ;
