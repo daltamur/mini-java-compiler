@@ -3,11 +3,11 @@ package parseTreeFiles
 import AST_Grammar.ASTNode
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.{ErrorNode, TerminalNode}
+import parseTreeFiles.grammarOutput.{miniJavaBaseVisitor, miniJavaParser}
 
 import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
 import scala.collection.mutable.ListBuffer
 import scala.language.{existentials, postfixOps}
-import grammarOutput._
 class MiniJavaVisitor extends miniJavaBaseVisitor[Option[ASTNode]] {
 
   var mainMethodError = false
