@@ -305,11 +305,15 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
       a.visitIntInsn(getLoadInsn(expression.variableType),expression.paramIndex.get+curMethodParamAmount)
     }else{
       //we load the identifier as a class instance variable
-
       //first load in the current class variable
       a.visitIntInsn(Opcodes.ALOAD, 0)
+      //now get the instance variable
       a.visitFieldInsn(Opcodes.GETFIELD, curClassName, expression.value.name, convertToASMType(expression.variableType))
     }
+    //do a null check here
+
+
+
   }
 
   override def visitNewArrayExpression(expression: newArrayExpression, a: MethodVisitor): Unit = {

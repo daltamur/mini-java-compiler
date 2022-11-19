@@ -41,9 +41,9 @@ expressionComp:  (expressionTerminal expressionTail) (COMPARE expressionComp)?  
 
 //this will likely need to be refined when generating code...for now keep it like this & see
 //what happens when we use ASM
-expressionTailOps:  MULTIPLY (expressionTerminal expressionTail)                #addExpression
-                  | ADD (expressionTerminal expressionTail)                     #subtractExpression
-                  | SUBTRACT (expressionTerminal expressionTail)                #multiplyExpression
+expressionTailOps:  MULTIPLY (expressionTerminal expressionTail)                #multiplyExpression
+                  | ADD (expressionTerminal expressionTail)                     #addExpression
+                  | SUBTRACT (expressionTerminal expressionTail)                #subtractExpression
                   ;
 
 expressionTail: expressionTailOps                               #operatorExpression
