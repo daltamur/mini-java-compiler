@@ -346,32 +346,204 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
     visit(expression.value, a)
   }
 
+  //the following three functions are for arithmetic operations. It is important to consider any multiplication operations as a single value
+  //to preseve order of operations. For instance, 5-8+5*5*6-7 needs to be considered 5-8+(5*5*6)-7,
+  //so when we run visitAdd and visitSubtract, before we go on to just linearly keep performing arithmetic operations,
+  //we need to look at the next value's operation and if it is a multiplication operation, we need to perform all of those operations
+  //first and then either subtract or add
+
   override def visitAddExpression(expression: addExpression, a: MethodVisitor, b: Unit): Unit = {
     visitTerminalExpression(expression.value.leftVal, a)
-    a.visitInsn(Opcodes.IADD)
-    visitExpressionTail(expression.value.rightVal, a, b)
+    //immediately visit the expression tail if it is any of the following expressions, it means the value currently on the stack is not the one getting the operation
+    //done on it
+    if (expression.value.rightVal.isDefined && (expression.value.rightVal.get.isInstanceOf[arrayLengthExpression] || expression.value.rightVal.get.isInstanceOf[arrayIndexExpression] || expression.value.rightVal.get.isInstanceOf[methodFunctionCallExpression])) {
+      expression.value.rightVal.get match
+        case x: arrayLengthExpression =>
+          visitArrayLengthExpressionNoVisitTail(x, a, b)
+          a.visitInsn(Opcodes.IADD)
+          //now visit the operation that MAY be done on the tail after this
+          visitExpressionOpt(x.operation, a, b)
+        case x: arrayIndexExpression =>
+          visitArrayIndexExpressionNoTail(x, a, b)
+          a.visitInsn(Opcodes.IADD)
+          //now visit the operation that MAY be done on the tail after this
+          visitExpressionOpt(x.operation, a, b)
+        case x: methodFunctionCallExpression =>
+          //method
+          visitMethodFunctionCallExpressionNoTailVisit(x, a, b)
+          var curMethodTail = x.operation
+          while (curMethodTail.isDefined && curMethodTail.get.isInstanceOf[methodFunctionCallExpression]) {
+            visitMethodFunctionCallExpressionNoTailVisit(curMethodTail.get.asInstanceOf[methodFunctionCallExpression], a, b)
+            curMethodTail = curMethodTail.get.asInstanceOf[methodFunctionCallExpression].operation
+          }
+          //all method calls have now been chained together, now just make sure it is not followed by an array index or length call
+          curMethodTail match
+            case Some(value) =>
+              value match
+                case x: arrayLengthExpression =>
+                  visitArrayLengthExpressionNoVisitTail(x, a, b)
+                  a.visitInsn(Opcodes.IADD)
+                  //now visit the operation that MAY be done on the tail after this
+                  visitExpressionOpt(x.operation, a, b)
+                case x: arrayIndexExpression =>
+                  visitArrayIndexExpressionNoTail(x, a, b)
+                  a.visitInsn(Opcodes.IADD)
+                  //now visit the operation that MAY be done on the tail after this
+                  visitExpressionOpt(x.operation, a, b)
+                case _ => //for all other cases, just call the visitExpressionTailFunction
+                  a.visitInsn(Opcodes.IADD)
+                  visitExpressionTail(curMethodTail, a, b)
+
+
+            case None => //do nothing if there is no other tails
+    } else {
+      a.visitInsn(Opcodes.IADD)
+      visitExpressionTail(expression.value.rightVal, a, b)
+    }
   }
 
   override def visitSubtractExpression(expression: subtractExpression, a: MethodVisitor, b: Unit): Unit = {
     visitTerminalExpression(expression.value.leftVal, a)
-    a.visitInsn(Opcodes.ISUB)
-    visitExpressionTail(expression.value.rightVal, a, b)
+    //immediately visit the expression tail if it is any of the following expressions, it means the value currently on the stack is not the one getting the operation
+    //done on it
+    if(expression.value.rightVal.isDefined && (expression.value.rightVal.get.isInstanceOf[arrayLengthExpression] || expression.value.rightVal.get.isInstanceOf[arrayIndexExpression] || expression.value.rightVal.get.isInstanceOf[methodFunctionCallExpression])){
+      expression.value.rightVal.get match
+        case x: arrayLengthExpression =>
+          visitArrayLengthExpressionNoVisitTail(x, a, b)
+          a.visitInsn(Opcodes.ISUB)
+          //now visit the operation that MAY be done on the tail after this
+          visitExpressionOpt(x.operation, a, b)
+        case x: arrayIndexExpression =>
+          visitArrayIndexExpressionNoTail(x, a, b)
+          a.visitInsn(Opcodes.ISUB)
+          //now visit the operation that MAY be done on the tail after this
+          visitExpressionOpt(x.operation, a, b)
+        case x: methodFunctionCallExpression =>
+          //method
+          visitMethodFunctionCallExpressionNoTailVisit(x, a, b)
+          var curMethodTail = x.operation
+          while (curMethodTail.isDefined && curMethodTail.get.isInstanceOf[methodFunctionCallExpression]) {
+            visitMethodFunctionCallExpressionNoTailVisit(curMethodTail.get.asInstanceOf[methodFunctionCallExpression], a, b)
+            curMethodTail = curMethodTail.get.asInstanceOf[methodFunctionCallExpression].operation
+          }
+          //all method calls have now been chained together, now just make sure it is not followed by an array index or length call
+          curMethodTail match
+            case Some(value) =>
+              value match
+                case x: arrayLengthExpression =>
+                  visitArrayLengthExpressionNoVisitTail(x, a, b)
+                  a.visitInsn(Opcodes.ISUB)
+                  //now visit the operation that MAY be done on the tail after this
+                  visitExpressionOpt(x.operation, a, b)
+                case x: arrayIndexExpression =>
+                  visitArrayIndexExpressionNoTail(x, a, b)
+                  a.visitInsn(Opcodes.ISUB)
+                  //now visit the operation that MAY be done on the tail after this
+                  visitExpressionOpt(x.operation, a, b)
+                case _ => //for all other cases, just call the visitExpressionTailFunction
+                  a.visitInsn(Opcodes.ISUB)
+                  visitExpressionTail(curMethodTail, a, b)
+
+
+            case None => //do nothing if there is no other tails
+    }else{
+      a.visitInsn(Opcodes.ISUB)
+      visitExpressionTail(expression.value.rightVal, a, b)
+    }
   }
 
   override def visitMultiplyExpression(expression: multiplyExpression, a: MethodVisitor, b: Unit): Unit = {
     visitTerminalExpression(expression.value.leftVal, a)
-    a.visitInsn(Opcodes.IMUL)
-    visitExpressionTail(expression.value.rightVal, a, b)
+    //immediately visit the expression tail if it is any of the following expressions, it means the value currently on the stack is not the one getting the operation
+    //done on it
+    if (expression.value.rightVal.isDefined && (expression.value.rightVal.get.isInstanceOf[arrayLengthExpression] || expression.value.rightVal.get.isInstanceOf[arrayIndexExpression] || expression.value.rightVal.get.isInstanceOf[methodFunctionCallExpression])) {
+      expression.value.rightVal.get match
+        case x: arrayLengthExpression =>
+          visitArrayLengthExpressionNoVisitTail(x, a, b)
+          a.visitInsn(Opcodes.IMUL)
+          //now visit the operation that MAY be done on the tail after this
+          visitExpressionOpt(x.operation, a, b)
+        case x: arrayIndexExpression =>
+          visitArrayIndexExpressionNoTail(x, a, b)
+          a.visitInsn(Opcodes.IMUL)
+          //now visit the operation that MAY be done on the tail after this
+          visitExpressionOpt(x.operation, a, b)
+        case x: methodFunctionCallExpression =>
+          //method
+          visitMethodFunctionCallExpressionNoTailVisit(x, a, b)
+          var curMethodTail = x.operation
+          while(curMethodTail.isDefined && curMethodTail.get.isInstanceOf[methodFunctionCallExpression]){
+            visitMethodFunctionCallExpressionNoTailVisit(curMethodTail.get.asInstanceOf[methodFunctionCallExpression], a, b)
+            curMethodTail = curMethodTail.get.asInstanceOf[methodFunctionCallExpression].operation
+          }
+          //all method calls have now been chained together, now just make sure it is not followed by an array index or length call
+          curMethodTail match
+            case Some(value) =>
+              value match
+                case x: arrayLengthExpression =>
+                  visitArrayLengthExpressionNoVisitTail(x, a, b)
+                  a.visitInsn(Opcodes.IMUL)
+                  //now visit the operation that MAY be done on the tail after this
+                  visitExpressionOpt(x.operation, a, b)
+                case x: arrayIndexExpression =>
+                  visitArrayIndexExpressionNoTail(x, a, b)
+                  a.visitInsn(Opcodes.IMUL)
+                  //now visit the operation that MAY be done on the tail after this
+                  visitExpressionOpt(x.operation, a, b)
+                case _ => //for all other cases, just call the visitExpressionTailFunction
+                  a.visitInsn(Opcodes.IMUL)
+                  visitExpressionTail(curMethodTail, a, b)
+
+
+            case None => //do nothing if there is no other tails
+    } else {
+      a.visitInsn(Opcodes.IMUL)
+      visitExpressionTail(expression.value.rightVal, a, b)
+    }
+  }
+
+  def visitArrayLengthExpressionNoVisitTail(expression: arrayLengthExpression, a: MethodVisitor, b: Unit): Unit = {
+    // Push the array length
+    a.visitInsn(Opcodes.ARRAYLENGTH)
   }
 
   override def visitArrayLengthExpression(expression: arrayLengthExpression, a: MethodVisitor, b: Unit): Unit = {
     // Push the array length
     a.visitInsn(Opcodes.ARRAYLENGTH)
+    visitExpressionOpt(expression.operation, a, b)
+  }
+
+  def visitArrayIndexExpressionNoTail(expression: arrayIndexExpression, a: MethodVisitor, b: Unit): Unit = {
+    visit(expression.value, a)
+    a.visitInsn(Opcodes.IALOAD)
   }
 
   override def visitArrayIndexExpression(expression: arrayIndexExpression, a: MethodVisitor, b: Unit): Unit = {
     visit(expression.value, a)
     a.visitInsn(Opcodes.IALOAD)
+    visitExpressionOpt(expression.operation, a, b)
+  }
+
+  def visitMethodFunctionCallExpressionNoTailVisit(expression: methodFunctionCallExpression, a: MethodVisitor, b: Unit): Unit = {
+    //put all the parameters of the method call on the stack
+    for (param <- expression.params) {
+      visit(param, a)
+    }
+    //make the signature
+    var methodSignature: String = "("
+    for (param <- expression.paramTypes)
+      methodSignature = methodSignature.concat(convertToASMType(param))
+
+    methodSignature = methodSignature.concat(")")
+
+
+    methodSignature = methodSignature.concat(convertToASMType(expression.returnType))
+
+    if (methodSignature.equals("()")) {
+      methodSignature = null
+    }
+
+    a.visitMethodInsn(Opcodes.INVOKEVIRTUAL, AST_Grammar.varTypeToString(expression.classType), expression.funcName.name, methodSignature, false)
   }
 
   override def visitMethodFunctionCallExpression(expression: methodFunctionCallExpression, a: MethodVisitor, b: Unit): Unit = {
