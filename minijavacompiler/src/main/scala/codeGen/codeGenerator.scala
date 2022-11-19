@@ -139,16 +139,14 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
           methodSignature = null
         }
 
-        println(methodSignature)
+//        println(methodSignature)
         val mmw = cw.visitMethod(Opcodes.ACC_PUBLIC, curMethod.get.methodName.name, methodSignature, null, null)
         mmw.visitCode()
         val methodStartLabel = new Label()
         val methodEndLabel = new Label()
         curMethodParamAmount = curMethod.get.params.length
         for ((variable, index) <- curMethod.get.variables.zipWithIndex) {
-          println(convertToASMType(AST_Grammar.getVarType(variable.get.typeval)))
-          //println("Var Index: " + index)
-          val valIndex= index+curMethodParamAmount+1
+//          println(convertToASMType(AST_Grammar.getVarType(variable.get.typeval)))
           mmw.visitLocalVariable(variable.get.name.name, convertToASMType(AST_Grammar.getVarType(variable.get.typeval)), null, methodStartLabel, methodEndLabel, index+curMethodParamAmount+1)
         }
 
@@ -171,6 +169,7 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
       fos.write(cw.toByteArray)
       fos.close()
     }
+    println(goal.main.className.name + ".java successfully compiled!")
   }
 
   override def visitIdentifier(identifier: identifier, a: MethodVisitor): Unit = {
@@ -237,19 +236,19 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
     //this is nearly identical to the visitIdentifierExpression method except we are using the store opcode now
     if(statement.idVal.isLocal && statement.idVal.isParameter){
       visit(statement.value, a)
-      println(statement.idVal.name)
-      println(statement.idVal.variableType)
+//      println(statement.idVal.name)
+//      println(statement.idVal.variableType)
       a.visitIntInsn(getStoreInsn(statement.idVal.variableType), statement.idVal.paramIndex.get)
     }else if (statement.idVal.isLocal){
       visit(statement.value, a)
-      println(statement.idVal.name)
-      println(statement.idVal.variableType)
+//      println(statement.idVal.name)
+//      println(statement.idVal.variableType)
       a.visitIntInsn(getStoreInsn(statement.idVal.variableType),statement.idVal.paramIndex.get+curMethodParamAmount)
     }else{
       a.visitIntInsn(Opcodes.ALOAD, 0)
       visit(statement.value, a)
-      println(statement.idVal.name)
-      println(statement.idVal.variableType)
+//      println(statement.idVal.name)
+//      println(statement.idVal.variableType)
       a.visitFieldInsn(Opcodes.PUTFIELD, statement.idVal.parentName, statement.idVal.name, convertToASMType(statement.idVal.variableType))
     }
 
@@ -459,28 +458,4 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
         0
   }
 
-}
-
-object codeGenerator{
-  def main(args: Array[String]): Unit ={
-
-    //just a little test
-    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES)
-    val className = "Test"
-    cw.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, className, null, "java/lang/Object", null)
-    val mmw = cw.visitMethod(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null)
-    mmw.visitCode()
-    mmw.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;")
-    mmw.visitLdcInsn('b')
-    mmw.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(C)V", false)
-    mmw.visitInsn(Opcodes.RETURN)
-    mmw.visitEnd()
-    mmw.visitMaxs(-1, -1)
-    cw.visitEnd()
-
-    val fos = new FileOutputStream(f"$className.class")
-    fos.write(cw.toByteArray)
-    fos.close()
-
-  }
 }
