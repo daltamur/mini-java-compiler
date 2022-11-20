@@ -1,6 +1,6 @@
 class codeGenTest {
     public static void main(String[] a) {
-        System.out.println(new codeGenTestOtherClass().getThis().getZero() + 15 * 9 * (8-new codeGenTestOtherClass().getThis().getThis().getThis().getArray().length+9) - 17);
+        System.out.println(5*5*5-8+5);
     }
 }
 

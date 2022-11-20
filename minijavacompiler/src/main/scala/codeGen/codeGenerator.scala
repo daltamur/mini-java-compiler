@@ -352,6 +352,16 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
   //we need to look at the next value's operation and if it is a multiplication operation, we need to perform all of those operations
   //first and then either subtract or add
 
+  def iterateThroughMultiplicationChain(expression: Option[expressionTail], a: MethodVisitor): Unit = {
+    if(expression.isDefined && expression.get.isInstanceOf[multiplyExpression]){
+      //we have a multiplicaiton chain, iterate through it so that it gets performed before any other operation
+      //throw the expression terminal on the stack here
+      a.visitInsn(Opcodes.IMUL)
+      //get the next arithmentic operation here
+      //do the recursive call here
+    }
+  }
+
   override def visitAddExpression(expression: addExpression, a: MethodVisitor, b: Unit): Unit = {
     visitTerminalExpression(expression.value.leftVal, a)
     //immediately visit the expression tail if it is any of the following expressions, it means the value currently on the stack is not the one getting the operation
@@ -362,6 +372,7 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
         case x: arrayLengthExpression =>
           visitArrayLengthExpressionNoVisitTail(x, a, b)
           //check for multiplication chain here
+          iterateThroughMultiplicationChain(x.operation, a)
           a.visitInsn(Opcodes.IADD)
           //now visit the operation that MAY be done on the tail after this
           visitExpressionOpt(x.operation, a, b)
@@ -403,6 +414,7 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
 
             case None => //do nothing if there is no other tails
     } else {
+      //check for multiplication chain here
       a.visitInsn(Opcodes.IADD)
       visitExpressionTail(expression.value.rightVal, a, b)
     }
@@ -463,6 +475,7 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
       a.visitInsn(Opcodes.ISUB)
       visitExpressionTail(expression.value.rightVal, a, b)
     }
+  }
 
   def checkForMultiplicationChain(expression: Option[expressionTail], a: MethodVisitor): Unit = {
     //if we hit this function, the expression tail is only ever going to be addition, subtraction, or multiplication,
