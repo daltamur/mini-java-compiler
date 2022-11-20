@@ -1,6 +1,6 @@
 class codeGenTest {
     public static void main(String[] a) {
-        System.out.println(5 + new codeGenTestOtherClass().getThis().getThis().getThis().getArray().length - 5);
+        System.out.println(new codeGenTestOtherClass().getThis().getZero() + 15 * 9 * (8-new codeGenTestOtherClass().getThis().getThis().getThis().getArray().length+9) - 17);
     }
 }
 
@@ -19,7 +19,7 @@ class codeGenGrandparent{
     }
 
     public int[] getArray(){
-        return new int[5];
+        return new int[new int[10].length - 2 + new int[15].length +2];
     }
 }
 

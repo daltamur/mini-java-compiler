@@ -356,15 +356,18 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
     visitTerminalExpression(expression.value.leftVal, a)
     //immediately visit the expression tail if it is any of the following expressions, it means the value currently on the stack is not the one getting the operation
     //done on it
+    //make sure to perform any multiplication chains before calling the IADD function
     if (expression.value.rightVal.isDefined && (expression.value.rightVal.get.isInstanceOf[arrayLengthExpression] || expression.value.rightVal.get.isInstanceOf[arrayIndexExpression] || expression.value.rightVal.get.isInstanceOf[methodFunctionCallExpression])) {
       expression.value.rightVal.get match
         case x: arrayLengthExpression =>
           visitArrayLengthExpressionNoVisitTail(x, a, b)
+          //check for multiplication chain here
           a.visitInsn(Opcodes.IADD)
           //now visit the operation that MAY be done on the tail after this
           visitExpressionOpt(x.operation, a, b)
         case x: arrayIndexExpression =>
           visitArrayIndexExpressionNoTail(x, a, b)
+          //check for multiplication chain here
           a.visitInsn(Opcodes.IADD)
           //now visit the operation that MAY be done on the tail after this
           visitExpressionOpt(x.operation, a, b)
@@ -382,15 +385,18 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
               value match
                 case x: arrayLengthExpression =>
                   visitArrayLengthExpressionNoVisitTail(x, a, b)
+                  //check for multiplication chain here
                   a.visitInsn(Opcodes.IADD)
                   //now visit the operation that MAY be done on the tail after this
                   visitExpressionOpt(x.operation, a, b)
                 case x: arrayIndexExpression =>
                   visitArrayIndexExpressionNoTail(x, a, b)
+                  //check for multiplication chain here
                   a.visitInsn(Opcodes.IADD)
                   //now visit the operation that MAY be done on the tail after this
                   visitExpressionOpt(x.operation, a, b)
                 case _ => //for all other cases, just call the visitExpressionTailFunction
+                  //check for multiplication chain here
                   a.visitInsn(Opcodes.IADD)
                   visitExpressionTail(curMethodTail, a, b)
 
@@ -406,15 +412,18 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
     visitTerminalExpression(expression.value.leftVal, a)
     //immediately visit the expression tail if it is any of the following expressions, it means the value currently on the stack is not the one getting the operation
     //done on it
+    //make sure to perform any multiplication chains before calling the ISUB function
     if(expression.value.rightVal.isDefined && (expression.value.rightVal.get.isInstanceOf[arrayLengthExpression] || expression.value.rightVal.get.isInstanceOf[arrayIndexExpression] || expression.value.rightVal.get.isInstanceOf[methodFunctionCallExpression])){
       expression.value.rightVal.get match
         case x: arrayLengthExpression =>
           visitArrayLengthExpressionNoVisitTail(x, a, b)
+          //check for multiplication chain here
           a.visitInsn(Opcodes.ISUB)
           //now visit the operation that MAY be done on the tail after this
           visitExpressionOpt(x.operation, a, b)
         case x: arrayIndexExpression =>
           visitArrayIndexExpressionNoTail(x, a, b)
+          //check for multiplication chain here
           a.visitInsn(Opcodes.ISUB)
           //now visit the operation that MAY be done on the tail after this
           visitExpressionOpt(x.operation, a, b)
@@ -432,24 +441,34 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
               value match
                 case x: arrayLengthExpression =>
                   visitArrayLengthExpressionNoVisitTail(x, a, b)
+                  //check for multiplication chain here
                   a.visitInsn(Opcodes.ISUB)
                   //now visit the operation that MAY be done on the tail after this
                   visitExpressionOpt(x.operation, a, b)
                 case x: arrayIndexExpression =>
                   visitArrayIndexExpressionNoTail(x, a, b)
+                  //check for multiplication chain here
                   a.visitInsn(Opcodes.ISUB)
                   //now visit the operation that MAY be done on the tail after this
                   visitExpressionOpt(x.operation, a, b)
                 case _ => //for all other cases, just call the visitExpressionTailFunction
+                  //check for multiplication chain here
                   a.visitInsn(Opcodes.ISUB)
                   visitExpressionTail(curMethodTail, a, b)
 
 
             case None => //do nothing if there is no other tails
     }else{
+      //check for multiplication chain here
       a.visitInsn(Opcodes.ISUB)
       visitExpressionTail(expression.value.rightVal, a, b)
     }
+
+  def checkForMultiplicationChain(expression: Option[expressionTail], a: MethodVisitor): Unit = {
+    //if we hit this function, the expression tail is only ever going to be addition, subtraction, or multiplication,
+    //so we will account for that in our match function
+
+
   }
 
   override def visitMultiplyExpression(expression: multiplyExpression, a: MethodVisitor, b: Unit): Unit = {
