@@ -1,6 +1,8 @@
 class codeGenTest {
     public static void main(String[] a) {
-        System.out.println(5*5*5-8+5);
+        {
+            System.out.println(new codeGenTestOtherClass().doAction(0));
+        }
     }
 }
 
@@ -26,8 +28,30 @@ class codeGenGrandparent{
 class  codeGenParent extends codeGenGrandparent{}
 
 class codeGenTestOtherClass extends codeGenParent{
+    int testInt;
     public codeGenTestOtherClass getThis(){
         return this;
+    }
+
+    public int doAction(int i){
+        int x;
+        if(i<10){
+            testInt = i;
+            System.out.println(testInt);
+            x = this.doAction(i+1);
+        }else{
+            testInt = i;
+        }
+        return testInt;
+    }
+
+    public int getTestInt(){
+        return testInt;
+    }
+
+    public int changeInt(int x){
+        testInt = x;
+        return 0;
     }
 
 }

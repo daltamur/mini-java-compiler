@@ -2,12 +2,9 @@ package codeGen
 import AST_Grammar.{addExpression, andExpression, arrayAssignStatement, arrayIndexExpression, arrayLengthExpression, assignStatement, blockStatement, booleanExpression, characterExpression, compExpression, dataType, expression, expressionTail, expressionValue, goal, identifier, identifierExpression, ifStatement, integerExpression, klass, mainClass, method, methodFunctionCallExpression, multiplyExpression, negatedExpression, newArrayExpression, newClassInstanceExpression, operation, parenthesizedExpression, printStatement, subtractExpression, thisExpression, variableDecs, whileStatement}
 import org.objectweb.asm
 import org.objectweb.asm.{ClassWriter, Label, MethodVisitor, Opcodes}
-
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 import scala.collection.mutable.ListBuffer
-
-//6 more things to implement, let's pray to god it works
 class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
   private var curMethodParamAmount: Integer = -1
   private var curClassName: String = ""
@@ -165,6 +162,7 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
         mmw.visitEnd()
       }
       cw.visitEnd()
+      //optimization step happens somewhere here
       val fos = new FileOutputStream(f"compiledPrograms/${goal.main.className.name}/$className.class")
       fos.write(cw.toByteArray)
       fos.close()
@@ -292,7 +290,19 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
   }
 
   override def visitCharacterExpression(expression: characterExpression, a: MethodVisitor): Unit = {
-    a.visitLdcInsn(expression.value.charAt(1))
+    if(expression.value.length == 3) {
+      a.visitLdcInsn(expression.value.charAt(1))
+    }else if (expression.value.length == 4){
+      //this means we have one of the new line characters
+      expression.value.substring(1, expression.value.length-1) match
+        case ("\\n") => a.visitLdcInsn('\n')
+        case "\\t"=> a.visitLdcInsn('\t')
+        case "\\b"=> a.visitLdcInsn('\b')
+        case "\\f"=> a.visitLdcInsn('\f')
+        case "\\r"=> a.visitLdcInsn('\r')
+        case "\\\\"=> a.visitLdcInsn('\\')
+        case "\\'"=> a.visitLdcInsn('\'')
+    }
   }
 
   override def visitIdentiferExpression(expression: identifierExpression, a: MethodVisitor): Unit = {
@@ -352,14 +362,54 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
   //we need to look at the next value's operation and if it is a multiplication operation, we need to perform all of those operations
   //first and then either subtract or add
 
-  def iterateThroughMultiplicationChain(expression: Option[expressionTail], a: MethodVisitor): Unit = {
-    if(expression.isDefined && expression.get.isInstanceOf[multiplyExpression]){
-      //we have a multiplicaiton chain, iterate through it so that it gets performed before any other operation
-      //throw the expression terminal on the stack here
-      a.visitInsn(Opcodes.IMUL)
-      //get the next arithmentic operation here
-      //do the recursive call here
+  def iterateThroughArrayAndFunctionCalls(expression: Option[expressionTail], a: MethodVisitor, b: Unit): Option[expressionTail] = {
+    if(expression.isDefined && (expression.get.isInstanceOf[arrayLengthExpression] || expression.get.isInstanceOf[arrayIndexExpression] || expression.get.isInstanceOf[methodFunctionCallExpression])){
+      expression.get match
+        case x: arrayLengthExpression =>
+          visitArrayLengthExpressionNoVisitTail(x, a, b)
+          iterateThroughArrayAndFunctionCalls(x.operation, a, b)
+        case x: arrayIndexExpression =>
+          visitArrayIndexExpressionNoTail(x, a, b)
+          iterateThroughArrayAndFunctionCalls(x.operation, a, b)
+        case x: methodFunctionCallExpression =>
+          //method
+          visitMethodFunctionCallExpressionNoTailVisit(x, a, b)
+          var curMethodTail = x.operation
+          while (curMethodTail.isDefined && curMethodTail.get.isInstanceOf[methodFunctionCallExpression]) {
+            visitMethodFunctionCallExpressionNoTailVisit(curMethodTail.get.asInstanceOf[methodFunctionCallExpression], a, b)
+            curMethodTail = curMethodTail.get.asInstanceOf[methodFunctionCallExpression].operation
+          }
+          //all method calls have now been chained together, now just make sure it is not followed by an array index or length call
+          curMethodTail match
+            case Some(value) =>
+              value match
+                case x: arrayLengthExpression =>
+                  visitArrayLengthExpressionNoVisitTail(x, a, b)
+                  iterateThroughArrayAndFunctionCalls(x.operation, a, b)
+                case x: arrayIndexExpression =>
+                  visitArrayIndexExpressionNoTail(x, a, b)
+                  iterateThroughArrayAndFunctionCalls(x.operation, a, b)
+                case _ =>
+                  iterateThroughArrayAndFunctionCalls(x.operation, a, b)
+
+
+            case None => iterateThroughArrayAndFunctionCalls(x.operation, a, b)
+    }else{
+      expression
     }
+  }
+
+  def iterateThroughMultiplicationChain(expression: Option[expressionTail], a: MethodVisitor, b: Unit): Option[expressionTail] = {
+    if(expression.isDefined && expression.get.isInstanceOf[multiplyExpression]){
+      //we have a multiplication chain, iterate through it so that it gets performed before any other operation
+      val currentOperation = expression.get.asInstanceOf[multiplyExpression]
+      visitTerminalExpression(currentOperation.value.leftVal, a)
+      //iterate past method and array functionality here
+      val nextOp = iterateThroughArrayAndFunctionCalls(currentOperation.value.rightVal, a, b)
+      a.visitInsn(Opcodes.IMUL)
+      return iterateThroughMultiplicationChain(nextOp, a, b)
+    }
+    expression
   }
 
   override def visitAddExpression(expression: addExpression, a: MethodVisitor, b: Unit): Unit = {
@@ -372,16 +422,17 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
         case x: arrayLengthExpression =>
           visitArrayLengthExpressionNoVisitTail(x, a, b)
           //check for multiplication chain here
-          iterateThroughMultiplicationChain(x.operation, a)
+          val nextOp =iterateThroughMultiplicationChain(x.operation, a, b)
           a.visitInsn(Opcodes.IADD)
           //now visit the operation that MAY be done on the tail after this
-          visitExpressionOpt(x.operation, a, b)
+          visitExpressionTail(nextOp, a, b)
         case x: arrayIndexExpression =>
           visitArrayIndexExpressionNoTail(x, a, b)
           //check for multiplication chain here
+          val nextOp = iterateThroughMultiplicationChain(x.operation, a, b)
           a.visitInsn(Opcodes.IADD)
           //now visit the operation that MAY be done on the tail after this
-          visitExpressionOpt(x.operation, a, b)
+          visitExpressionTail(nextOp, a, b)
         case x: methodFunctionCallExpression =>
           //method
           visitMethodFunctionCallExpressionNoTailVisit(x, a, b)
@@ -397,26 +448,30 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
                 case x: arrayLengthExpression =>
                   visitArrayLengthExpressionNoVisitTail(x, a, b)
                   //check for multiplication chain here
+                  val nextOp = iterateThroughMultiplicationChain(x.operation, a, b)
                   a.visitInsn(Opcodes.IADD)
                   //now visit the operation that MAY be done on the tail after this
-                  visitExpressionOpt(x.operation, a, b)
+                  visitExpressionTail(nextOp, a, b)
                 case x: arrayIndexExpression =>
                   visitArrayIndexExpressionNoTail(x, a, b)
                   //check for multiplication chain here
+                  val nextOp = iterateThroughMultiplicationChain(x.operation, a, b)
                   a.visitInsn(Opcodes.IADD)
                   //now visit the operation that MAY be done on the tail after this
-                  visitExpressionOpt(x.operation, a, b)
+                  visitExpressionTail(nextOp, a, b)
                 case _ => //for all other cases, just call the visitExpressionTailFunction
                   //check for multiplication chain here
+                  val nextOp = iterateThroughMultiplicationChain(curMethodTail, a, b)
                   a.visitInsn(Opcodes.IADD)
-                  visitExpressionTail(curMethodTail, a, b)
+                  visitExpressionTail(nextOp, a, b)
 
 
             case None => //do nothing if there is no other tails
     } else {
       //check for multiplication chain here
+      val nextOp = iterateThroughMultiplicationChain(expression.value.rightVal, a, b)
       a.visitInsn(Opcodes.IADD)
-      visitExpressionTail(expression.value.rightVal, a, b)
+      visitExpressionTail(nextOp, a, b)
     }
   }
 
@@ -430,15 +485,17 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
         case x: arrayLengthExpression =>
           visitArrayLengthExpressionNoVisitTail(x, a, b)
           //check for multiplication chain here
+          val nextOp = iterateThroughMultiplicationChain(x.operation, a, b)
           a.visitInsn(Opcodes.ISUB)
           //now visit the operation that MAY be done on the tail after this
-          visitExpressionOpt(x.operation, a, b)
+          visitExpressionTail(nextOp, a, b)
         case x: arrayIndexExpression =>
           visitArrayIndexExpressionNoTail(x, a, b)
           //check for multiplication chain here
+          val nextOp = iterateThroughMultiplicationChain(x.operation, a, b)
           a.visitInsn(Opcodes.ISUB)
           //now visit the operation that MAY be done on the tail after this
-          visitExpressionOpt(x.operation, a, b)
+          visitExpressionTail(nextOp, a, b)
         case x: methodFunctionCallExpression =>
           //method
           visitMethodFunctionCallExpressionNoTailVisit(x, a, b)
@@ -454,34 +511,31 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
                 case x: arrayLengthExpression =>
                   visitArrayLengthExpressionNoVisitTail(x, a, b)
                   //check for multiplication chain here
+                  val nextOp = iterateThroughMultiplicationChain(x.operation, a, b)
                   a.visitInsn(Opcodes.ISUB)
                   //now visit the operation that MAY be done on the tail after this
-                  visitExpressionOpt(x.operation, a, b)
+                  visitExpressionTail(nextOp, a, b)
                 case x: arrayIndexExpression =>
                   visitArrayIndexExpressionNoTail(x, a, b)
                   //check for multiplication chain here
+                  val nextOp = iterateThroughMultiplicationChain(x.operation, a, b)
                   a.visitInsn(Opcodes.ISUB)
                   //now visit the operation that MAY be done on the tail after this
-                  visitExpressionOpt(x.operation, a, b)
+                  visitExpressionTail(nextOp, a, b)
                 case _ => //for all other cases, just call the visitExpressionTailFunction
                   //check for multiplication chain here
+                  val nextOp = iterateThroughMultiplicationChain(curMethodTail, a, b)
                   a.visitInsn(Opcodes.ISUB)
-                  visitExpressionTail(curMethodTail, a, b)
+                  visitExpressionTail(nextOp, a, b)
 
 
             case None => //do nothing if there is no other tails
     }else{
       //check for multiplication chain here
+      val nextOp = iterateThroughMultiplicationChain(expression.value.rightVal, a, b)
       a.visitInsn(Opcodes.ISUB)
-      visitExpressionTail(expression.value.rightVal, a, b)
+      visitExpressionTail(nextOp, a, b)
     }
-  }
-
-  def checkForMultiplicationChain(expression: Option[expressionTail], a: MethodVisitor): Unit = {
-    //if we hit this function, the expression tail is only ever going to be addition, subtraction, or multiplication,
-    //so we will account for that in our match function
-
-
   }
 
   override def visitMultiplyExpression(expression: multiplyExpression, a: MethodVisitor, b: Unit): Unit = {

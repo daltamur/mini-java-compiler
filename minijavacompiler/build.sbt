@@ -13,6 +13,7 @@ lazy val root = project
 libraryDependencies ++= Seq(
   "org.antlr" % "antlr4-runtime" % "4.10.1",
   "org.antlr" % "stringtemplate" % "3.2",
-  "org.ow2.asm" % "asm" % "9.4"
+  "org.ow2.asm" % "asm" % "9.4",
+  "org.soot-oss" % "soot" % "4.2.1"
 )
 

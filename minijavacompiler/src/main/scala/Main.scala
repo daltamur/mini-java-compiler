@@ -66,10 +66,6 @@ object Main {
 
           //Code Generation
           generateCode(programAST,fileLocation)
-
-
-          //Code Optimization
-
         }else{
           println("ERROR: No file found at " + fileLocation)
         }
@@ -77,7 +73,7 @@ object Main {
         println("ERROR: Please give a filename with a '.java' extension.")
       }
     } else {
-      println("ERROR: Please only give one filename argument to the compiler.")
+      println("ERROR: Please give ONE filename argument to the compiler.")
     }
 
   def parse(fileLocation: String): miniJavaParser = {
