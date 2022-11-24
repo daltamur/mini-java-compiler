@@ -153,7 +153,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Tree Visitor Test") {
-    val parser = parse("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/miniJavaSiteTests/TreeVisitorWithChar.java")
+    val parser = parse("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/miniJavaSiteTests/TreeVisitor.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
