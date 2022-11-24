@@ -1,7 +1,7 @@
 class codeGenTest {
     public static void main(String[] a) {
         {
-            System.out.println(new codeGenTestOtherClass().doAction(0));
+            System.out.println(7+8*47-(new int[new int[5].length-2].length*4+7)*234-9);
         }
     }
 }
