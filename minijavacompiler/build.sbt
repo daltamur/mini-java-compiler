@@ -8,8 +8,13 @@ lazy val root = project
 
     scalaVersion := scala3Version,
     assemblyJarName in assembly := "miniJavaCompiler.jar",
+    assemblyMergeStrategy in assembly := {
+      case PathList("META-INF", _*) => MergeStrategy.discard
+      case _ => MergeStrategy.first
+    },
     libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test
   )
+
 libraryDependencies ++= Seq(
   "org.antlr" % "antlr4-runtime" % "4.10.1",
   "org.antlr" % "stringtemplate" % "3.2",

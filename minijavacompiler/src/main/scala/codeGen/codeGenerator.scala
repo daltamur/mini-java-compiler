@@ -302,6 +302,7 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
         case "\\r"=> a.visitLdcInsn('\r')
         case "\\\\"=> a.visitLdcInsn('\\')
         case "\\'"=> a.visitLdcInsn('\'')
+        case "\\\""=> a.visitLdcInsn('\"')
     }
   }
 
