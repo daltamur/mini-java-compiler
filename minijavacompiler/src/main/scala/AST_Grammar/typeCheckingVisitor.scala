@@ -305,13 +305,15 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     }else if(a.getParentTable.get.checkIfVarIDExists(arrayID.name)){
       statement.idVal.parentName = a.getParentTable.get.getName
       IDType = a.getParentTable.get.getVariableVal(arrayID.name).get.asInstanceOf[variableVal].varValue
+      statement.idVal.variableType = IDType
     }else{
       //try and get it in the global context
-      val globalCheck = checkExtendedClassesForVar(arrayID.name, a)
+      val globalCheck = checkExtendedClassesForVar(arrayID.name, a.getParentTable.get)
       globalCheck match {
         case result: varValResult =>
           statement.idVal.parentName = a.getParentTable.get.getName
           IDType = result.varVal
+          statement.idVal.variableType = IDType
         case _ =>
       }
     }

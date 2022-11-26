@@ -104,6 +104,36 @@ class CodeGenerationTests extends munit.FunSuite {
     main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/ArrayTest.java"))
     testOutput("ArrayTest", "0\n1\n2\n3\n4\n0\n")
   }
+  test("Array Variable Overload Output Test") {
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/ArrayVariableOverloadTest.java"))
+    testOutput("ArrayVariableOverloadTest", "0\n1\n2\n3\n4\n0\n1\n2\n3\n4\n0\n")
+  }
+
+  test("Array Parameter Output Test") {
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/ArrayParameterTest.java"))
+    testOutput("ArrayParameterTest", "0\n1\n2\n3\n4\n0\n")
+  }
+
+  test("Array Instance Var Output Test") {
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/ArrayInstanceVarTest.java"))
+    testOutput("ArrayInstanceVarTest", "0\n1\n2\n3\n4\n0\n")
+  }
+
+  test("Array From Parent Output Test") {
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/ArrayFromParentTest.java"))
+    testOutput("ArrayFromParentTest", "0\n1\n2\n3\n4\n0\n")
+  }
+
+  test("Array From Grandparent Output Test") {
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/ArrayFromGrandparentTest.java"))
+    testOutput("ArrayFromGrandparentTest", "0\n1\n2\n3\n4\n0\n")
+  }
+
+  test("Array From Method Output Test") {
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/ArrayFromMethod.java"))
+    testOutput("ArrayFromMethod", "1000\n")
+  }
+
 
 
 
