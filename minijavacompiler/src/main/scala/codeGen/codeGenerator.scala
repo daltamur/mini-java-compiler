@@ -168,6 +168,7 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
       fos.close()
     }
     println(goal.main.className.name + ".java successfully compiled!")
+    println("Find it at " + System.getProperty("user.dir") + "/compilerPrograms/"+goal.main.className.name)
   }
 
   override def visitIdentifier(identifier: identifier, a: MethodVisitor): Unit = {

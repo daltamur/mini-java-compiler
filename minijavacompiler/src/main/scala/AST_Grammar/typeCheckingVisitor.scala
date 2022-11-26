@@ -297,6 +297,10 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
     var IDType:varType = null
     if (a.checkIfVarIDExists(arrayID.name)) {
       IDType = a.getVariableVal(arrayID.name).get.asInstanceOf[variableVal].varValue
+      statement.idVal.isParameter = a.getVariableVal(statement.idVal.name).get.asInstanceOf[variableVal].isMethodParam
+      statement.idVal.isLocal = true
+      statement.idVal.paramIndex = Some(a.getVariableVal(statement.idVal.name).get.asInstanceOf[variableVal].variableIndex)
+      statement.idVal.variableType = IDType
       //now the class context
     }else if(a.getParentTable.get.checkIfVarIDExists(arrayID.name)){
       statement.idVal.parentName = a.getParentTable.get.getName

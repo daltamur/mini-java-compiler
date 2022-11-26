@@ -100,6 +100,11 @@ class CodeGenerationTests extends munit.FunSuite {
     testOutput("MethodWithParentTypeParams", "200\n")
   }
 
+  test("Array Test Output Test"){
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/ArrayTest.java"))
+    testOutput("ArrayTest", "0\n1\n2\n3\n4\n0\n")
+  }
+
 
 
 
