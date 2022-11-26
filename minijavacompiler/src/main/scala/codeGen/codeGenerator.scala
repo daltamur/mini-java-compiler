@@ -167,8 +167,33 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
       fos.write(cw.toByteArray)
       fos.close()
     }
+//    println("....................................................................................................\n" +
+//      "..............................::....................................................................\n" +
+//      "..............................~^....................................................................\n" +
+//      "............................:~!:....................................................................\n" +
+//      "..........................:~!!:.....................................................................\n" +
+//      "........................^~!~:.:::...................................................................\n" +
+//      "......................^!7~:.^~:.....................................................................\n" +
+//      ".....................~7~:.:!7:......................Mini............................................\n" +
+//      ".....................!7:..:77^......................................................................\n" +
+//      ".....................:!~...^77^.................^~^.................................................\n" +
+//      "......................:^^:..:7!................:5PJ.................................................\n" +
+//      "................:~~::.......:^.......:~?~......:5PJ...::^~~~^:..:^^:.....^^:.::^~~~^:..:::::........\n" +
+//      "................~?J77!!!~~~~!!!!!!~:...J5:.....:5PJ..:?????J5Y!.:JPJ....~PP~.7J???J557.:^^~~........\n" +
+//      "..................^!~:^^^^^^^^:::....:!J~......:5PJ.........?P5:.^PP7...JPJ........!PP^.............\n" +
+//      ".................:!J?777777777777:.:^~^........:5PJ...^!????YP5:..7P5^.^PP^..:!????JPP^.............\n" +
+//      "....................^~:::^^::::................:5PJ..7P5~:::?P5:..:YPJ.JP7..~5P!^::!PP^.............\n" +
+//      ".............^~~:..:?YJ????????^......:........:5PJ..JPY^:^~YP5:...~PPYPJ...7P5~::~?PP^.............\n" +
+//      "............~YPJ~^::::::^^^^::::::^^~7^........:5P?..:7JYJ?7~??:....7JJ?:...:7JYJ?7~?J^.............\n" +
+//      ".............:^!!777777!!!!!!!!!!!!!!~~^.......!PY^.................................................\n" +
+//      "...................:^^^^^~~^~~~~~~^^^::.......:7?:..................................................\n" +
+//      "....................................................................................................\n" +
+//      "....................................................................................................\n" +
+//      "....................................................................................................\n" +
+//      "....................................................................................................\n" +
+//      "....................................................................................................")
     println(goal.main.className.name + ".java successfully compiled!")
-    println("Find it at " + System.getProperty("user.dir") + "/compilerPrograms/"+goal.main.className.name)
+    println("Find it at " + System.getProperty("user.dir") + "/compiledPrograms/"+goal.main.className.name)
   }
 
   override def visitIdentifier(identifier: identifier, a: MethodVisitor): Unit = {
@@ -468,7 +493,7 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
                   visitExpressionTail(nextOp, a, b)
 
 
-            case None => //do nothing if there is no other tails
+            case None => a.visitInsn(Opcodes.IADD)
     } else {
       //check for multiplication chain here
       val nextOp = iterateThroughMultiplicationChain(expression.value.rightVal, a, b)
@@ -531,7 +556,7 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
                   visitExpressionTail(nextOp, a, b)
 
 
-            case None => //do nothing if there is no other tails
+            case None => a.visitInsn(Opcodes.ISUB)
     }else{
       //check for multiplication chain here
       val nextOp = iterateThroughMultiplicationChain(expression.value.rightVal, a, b)
@@ -583,7 +608,7 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
                   visitExpressionTail(curMethodTail, a, b)
 
 
-            case None => //do nothing if there is no other tails
+            case None =>  a.visitInsn(Opcodes.IMUL)
     } else {
       a.visitInsn(Opcodes.IMUL)
       visitExpressionTail(expression.value.rightVal, a, b)

@@ -5,7 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="192cc344-ef27-4c82-b890-90e70c6e074f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/minijavacompiler/testFiles/codeGenTests/AddMethodCall.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/minijavacompiler/testFiles/codeGenTests/ArrLengthAdd.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/minijavacompiler/testFiles/codeGenTests/ArrLengthMult.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/minijavacompiler/testFiles/codeGenTests/ArrLengthSub.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/minijavacompiler/testFiles/codeGenTests/CharDemo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/minijavacompiler/testFiles/codeGenTests/MethodArrAdd.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/minijavacompiler/testFiles/codeGenTests/MethodArrMult.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/minijavacompiler/testFiles/codeGenTests/MethodArrSub.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/minijavacompiler/testFiles/codeGenTests/MultMethodCall.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/minijavacompiler/testFiles/codeGenTests/OOPMethodArr.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/minijavacompiler/testFiles/codeGenTests/SubMethodCall.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/codeGen/codeGenerator.scala" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/src/main/scala/codeGen/codeGenerator.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/test/scala/CodeGenerationTests.scala" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/src/test/scala/CodeGenerationTests.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,6 +128,7 @@
       <workItem from="1665866228286" duration="760000" />
       <workItem from="1666010355267" duration="106000" />
       <workItem from="1666010465988" duration="72000" />
+      <workItem from="1669499998384" duration="1343000" />
     </task>
     <servers />
   </component>

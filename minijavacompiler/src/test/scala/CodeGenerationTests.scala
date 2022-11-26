@@ -50,7 +50,7 @@ class CodeGenerationTests extends munit.FunSuite {
     testOutput("IfBranch", "1\n0\n")
   }
 
-  test("Char Test Output Test") {
+  test("Char Special Character Test") {
     main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/CharTest.java"))
     testOutput("CharTest", "\n\n\\\n\t\n\n\b\n\"\n\'\n\f\n")
   }
@@ -134,7 +134,59 @@ class CodeGenerationTests extends munit.FunSuite {
     testOutput("ArrayFromMethod", "1000\n")
   }
 
+  test("Add Method Call Output Test") {
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/AddMethodCall.java"))
+    testOutput("AddMethodCall", "3\n")
+  }
+  test("Array length Add Output Test") {
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/ArrLengthAdd.java"))
+    testOutput("ArrLengthAdd", "15\n")
+  }
 
+  test("Array length Multiply Output Test") {
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/ArrLengthMult.java"))
+    testOutput("ArrLengthMult", "50\n")
+  }
+
+  test("Array length Subtract Output Test") {
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/ArrLengthSub.java"))
+    testOutput("ArrLengthSub", "-5\n")
+  }
+
+  test("Method Array Add Test") {
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/MethodArrAdd.java"))
+    testOutput("MethodArrAdd", "10\n")
+  }
+
+  test("Method Array Sub Test") {
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/MethodArrSub.java"))
+    testOutput("MethodArrSub", "0\n")
+  }
+
+  test("Method Array Multiply Test") {
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/MethodArrMult.java"))
+    testOutput("MethodArrMult", "25\n")
+  }
+
+  test("Method Multiply Test") {
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/MultMethodCall.java"))
+    testOutput("MultMethodCall", "2\n")
+  }
+
+  test("Order of Operations With Methods & Array Lengths Test") {
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/OOPMethodArr.java"))
+    testOutput("OOPMethodArr", "105\n")
+  }
+
+  test("Method Subtract Test") {
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/SubMethodCall.java"))
+    testOutput("SubMethodCall", "-1\n")
+  }
+
+  test("Char Demo Test") {
+    main(Array("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/testFiles/codeGenTests/CharDemo.java"))
+    testOutput("CharDemo", "q\nQ\nw\nW\ne\nE\nr\nR\nt\nT\ny\nY\nu\nU\ni\nI\no\nO\np\nP\na\nA\ns\nS\nd\nD\nf\nF\ng\nG\nh\nH\nj\nJ\nk\nK\nl\nL\nz\nZ\nx\nX\nc\nC\nv\nV\nb\nB\nn\nN\nm\nM\n0\n)\n1\n!\n2\n@\n3\n#\n4\n$\n5\n%\n6\n^\n7\n&\n8\n*\n9\n(\n`\n~\n-\n_\n=\n+\n[\n{\n]\n}\n;\n:\n\"\n,\n<\n.\n>\n/\n?\n")
+  }
 
 
 
