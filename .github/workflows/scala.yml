@@ -32,7 +32,7 @@ jobs:
       run: sudo apt-get install antlr4
     - name: Build ANTLR Files
       working-directory: ./minijavacompiler/src/main/scala/parseTreeFiles
-      run: antlr4 grammarOutput/miniJava.g4 -visitor && javac -classpath /usr/share/java/antlr4-runtime.jar miniJava*.java && ls
+      run: antlr4 grammarOutput/miniJava.g4 -visitor && javac -classpath /usr/share/java/antlr4-runtime.jar grammarOutput/miniJava*.java && ls
     - name: Run tests
       working-directory: ./minijavacompiler
       run: sbt test
