@@ -13,6 +13,7 @@ lazy val root = project
       case _ => MergeStrategy.first
     },
     libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test
+    unm
   )
 
 libraryDependencies ++= Seq(
