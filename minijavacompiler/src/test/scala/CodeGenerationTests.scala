@@ -11,7 +11,7 @@ class CodeGenerationTests extends munit.FunSuite {
   }
 
   test("Binary Tree Output Test") {
-    main(Array(System.getProperty("user.dir") + "/testFiles/miniJavaSiteTests/BinaryTree.java"))
+    main(Array(System.getProperty("user.dir") + "/testFiles/miniJavaSiteTests/BinaryTree.jav"))
     testOutput("BinaryTree", "16\n100000000\n8\n16\n4\n8\n12\n14\n16\n20\n24\n28\n1\n1\n1\n0\n1\n4\n8\n14\n16\n20\n24\n28\n0\n0\n")
   }
 
