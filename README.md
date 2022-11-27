@@ -24,15 +24,15 @@
 
 Welcome to this Mini Java Compiler!\
 ____________________________________\
-This Compiler uses: \n
--ANTLR for Parsing. Learn about ANTLR at https://www.antlr.org/ \
--Java ASM for code generation. Learn more about ASM at https://asm.ow2.io/ \
-I used this handy Intellij Plugin to analyze JVM bytecode when writing this compiler: https://plugins.jetbrains.com/plugin/16970-byte-code-analyzer \
+This Compiler uses: \
+-ANTLR for Parsing. Learn about ANTLR at: https://www.antlr.org/ \
+-Java ASM for code generation. Learn more about ASM at: https://asm.ow2.io/ \
+-I used this handy Intellij Plugin to analyze JVM bytecode when writing this compiler: https://plugins.jetbrains.com/plugin/16970-byte-code-analyzer \
 ____________________________________ \
-Learn about how to write in Mini Java at https://www.cambridge.org/resources/052182060X/ \
-This version of Mini Java also supports characters and will print them out \
-View the source code for this compiler at https://github.com/daltamur/mini-java-compiler \
-To compile a Java file that follows the rules of MiniJava, run this program with the file location as a command line argument\
+-Learn about how to write in Mini Java at: https://www.cambridge.org/resources/052182060X/ \
+-This version of Mini Java also supports characters and will print them out \
+-View the source code for this compiler at: https://github.com/daltamur/mini-java-compiler \
+-To compile a Java file that follows the rules of MiniJava, run this program with the file location as a command line argument\
 \
 \
 \
