@@ -29,7 +29,7 @@ jobs:
         cache: 'sbt'
     - name: Download ANTLR
       working-directory: ./minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput
-      run: sudo apt-get install antlr4 && antlr4 miniJava.g4 -visitor && javac miniJava*.java
+      run: sudo apt-get install antlr4
     - name: Build ANTLR Files
       working-directory: ./minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput
       run: antlr4 miniJava.g4 -visitor && javac miniJava*.java
