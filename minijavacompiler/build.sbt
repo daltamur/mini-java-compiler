@@ -3,11 +3,11 @@ val scala3Version = "3.2.0"
 lazy val root = project
   .in(file("."))
   .settings(
-    name := "miniJavaCompiler",
+    name := "mjavac",
     version := "0.1.0-SNAPSHOT",
 
     scalaVersion := scala3Version,
-    assemblyJarName in assembly := "miniJavaCompiler.jar",
+    assemblyJarName in assembly := "mjavac.jar",
     assemblyMergeStrategy in assembly := {
       case PathList("META-INF", _*) => MergeStrategy.discard
       case _ => MergeStrategy.first
