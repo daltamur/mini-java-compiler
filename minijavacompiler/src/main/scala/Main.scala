@@ -138,7 +138,7 @@ object Main {
 
   def generateCode(GoalNode: (Option[ASTNode], Boolean), sourcePath: String): Unit ={
     //if we get here, we can assume that there does indeed exist a goal
-    //AST node, no need to do pattern matching
+    //AST node, no need to do pattern matching.
     val codeGenerator = new codeGenerator
     codeGenerator.visitGoal(GoalNode._1.get.asInstanceOf[AST_Grammar.goal], sourcePath)
   }
