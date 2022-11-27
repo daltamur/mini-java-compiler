@@ -163,7 +163,8 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
       }
       cw.visitEnd()
       //optimization step happens somewhere here
-      val fos = new FileOutputStream(f"compiledPrograms/${goal.main.className.name}/$className.class")
+      val compiledPath = "compiledPrograms/"+goal.main.className.name+"/"+className+".class"
+      val fos = new FileOutputStream(compiledPath)
       fos.write(cw.toByteArray)
       fos.close()
     }
