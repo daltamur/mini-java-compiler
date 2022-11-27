@@ -12,7 +12,9 @@ lazy val root = project
       case PathList("META-INF", _*) => MergeStrategy.discard
       case _ => MergeStrategy.first
     },
-    libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test
+    libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test,
+    javaSource in Compile := file("/home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput")
+
   )
 
 libraryDependencies ++= Seq(
