@@ -38,7 +38,7 @@ jobs:
       run: ls
     - name: Recompile SBT
       working-directory: ./minijavacompiler
-      run: sbt clean cleanFiles && sbt compile
+      run: sbt compile -explain
     - name: Run tests
       working-directory: ./minijavacompiler
       run: sbt test
