@@ -5,7 +5,7 @@ import AST_Grammar.symbolTableBuilder
 
 class TypeCheckingTests extends munit.FunSuite {
   test("Binary Search Test") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/miniJavaSiteTests/BinarySearch.java")
+    val parser = parse("testFiles/miniJavaSiteTests/BinarySearch.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -27,7 +27,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Binary Tree Test"){
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/miniJavaSiteTests/BinaryTree.java")
+    val parser = parse("testFiles/miniJavaSiteTests/BinaryTree.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
@@ -48,7 +48,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("BubbleSort Test") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/miniJavaSiteTests/BubbleSort.java")
+    val parser = parse("testFiles/miniJavaSiteTests/BubbleSort.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
@@ -69,7 +69,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Factorial Test") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/miniJavaSiteTests/Factorial.java")
+    val parser = parse("testFiles/miniJavaSiteTests/Factorial.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
@@ -90,7 +90,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Linear Search Test") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/miniJavaSiteTests/LinearSearch.java")
+    val parser = parse("testFiles/miniJavaSiteTests/LinearSearch.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
@@ -111,7 +111,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Linked List Test") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/miniJavaSiteTests/LinkedList.java")
+    val parser = parse("testFiles/miniJavaSiteTests/LinkedList.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
@@ -132,7 +132,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("QuickSort Test") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/miniJavaSiteTests/QuickSort.java")
+    val parser = parse("testFiles/miniJavaSiteTests/QuickSort.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
@@ -153,7 +153,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Tree Visitor Test") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/miniJavaSiteTests/TreeVisitor.java")
+    val parser = parse("testFiles/miniJavaSiteTests/TreeVisitor.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
@@ -173,7 +173,7 @@ class TypeCheckingTests extends munit.FunSuite {
     assert(statementTypeChecker.getCurError.isEmpty)
   }
   test("Array Length Fail Test") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/arrayLengthFail.java")
+    val parser = parse("testFiles/typeCheckingTests/arrayLengthFail.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
@@ -194,7 +194,7 @@ class TypeCheckingTests extends munit.FunSuite {
     println(statementTypeChecker.getCurError.get.errorVal)
   }
   test("Array Length Fail Test") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/ArrayRightSideInvalidIndex.java")
+    val parser = parse("testFiles/typeCheckingTests/ArrayRightSideInvalidIndex.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
@@ -216,7 +216,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Boolean 1 Fail Test") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/Boolean1Invalid.java")
+    val parser = parse("testFiles/typeCheckingTests/Boolean1Invalid.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
@@ -238,7 +238,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Boolean 2 Fail Test") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/Boolean2Invalid.java")
+    val parser = parse("testFiles/typeCheckingTests/Boolean2Invalid.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
@@ -260,7 +260,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Circular Inheritance 1 Fail Test") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/circularInheritance1.java")
+    val parser = parse("testFiles/typeCheckingTests/circularInheritance1.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
@@ -277,7 +277,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Circular Inheritance 2 Fail Test") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/circularInheritance2.java")
+    val parser = parse("testFiles/typeCheckingTests/circularInheritance2.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
@@ -294,7 +294,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Circular Inheritance 3 Fail Test") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/circularInheritance3.java")
+    val parser = parse("testFiles/typeCheckingTests/circularInheritance3.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
@@ -311,7 +311,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Circular Inheritance 3V1 Fail Test") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/circularInheritance3v1.java")
+    val parser = parse("testFiles/typeCheckingTests/circularInheritance3v1.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
@@ -328,7 +328,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Class ALready Defined Fail Test") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/classAlreadyDefined.java")
+    val parser = parse("testFiles/typeCheckingTests/classAlreadyDefined.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
@@ -341,7 +341,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("If Condition Not Boolean") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/ifCondNotBoolean.java")
+    val parser = parse("testFiles/typeCheckingTests/ifCondNotBoolean.java")
     //make the ast
     val programAST = buildAST(parser)
     //do the checks
@@ -363,7 +363,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Inherited Assignment") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/inheritedAssignment.java")
+    val parser = parse("testFiles/typeCheckingTests/inheritedAssignment.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -385,7 +385,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Inherited Assignment Fail") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/inheritedAssignmentInvalid.java")
+    val parser = parse("testFiles/typeCheckingTests/inheritedAssignmentInvalid.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -408,7 +408,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Inherited Method 1") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/inheritedMethod1.java")
+    val parser = parse("testFiles/typeCheckingTests/inheritedMethod1.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -430,7 +430,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Inherited Return 1") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/invalidReturn1.java")
+    val parser = parse("testFiles/typeCheckingTests/invalidReturn1.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -453,7 +453,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Inherited Return 2") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/invalidReturn2.java")
+    val parser = parse("testFiles/typeCheckingTests/invalidReturn2.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -476,7 +476,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Inherited Method 2") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/inheritedMethod2.java")
+    val parser = parse("testFiles/typeCheckingTests/inheritedMethod2.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -498,7 +498,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Inherited Method 3") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/inheritedMethod3.java")
+    val parser = parse("testFiles/typeCheckingTests/inheritedMethod3.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -520,7 +520,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Inherited Method Params Simple") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/inheritedMethodParamsSimple.java")
+    val parser = parse("testFiles/typeCheckingTests/inheritedMethodParamsSimple.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -542,7 +542,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Inherited Method Params Hard") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/inheritedMethodParamsHard.java")
+    val parser = parse("testFiles/typeCheckingTests/inheritedMethodParamsHard.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -564,7 +564,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Inherited Return Type") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/inheritedReturnType.java")
+    val parser = parse("testFiles/typeCheckingTests/inheritedReturnType.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -586,7 +586,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Int array ID invalid") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/intArrayInvalidID.java")
+    val parser = parse("testFiles/typeCheckingTests/intArrayInvalidID.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -609,7 +609,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Int array ID index") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/intArrayInvalidIndex.java")
+    val parser = parse("testFiles/typeCheckingTests/intArrayInvalidIndex.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -632,7 +632,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Int array value invalid") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/intArrayInvalidValue.java")
+    val parser = parse("testFiles/typeCheckingTests/intArrayInvalidValue.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -655,7 +655,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Invalid Boolean") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/invalidBoolean.java")
+    val parser = parse("testFiles/typeCheckingTests/invalidBoolean.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -677,7 +677,7 @@ class TypeCheckingTests extends munit.FunSuite {
     println(statementTypeChecker.getCurError.get.errorVal)
   }
   test("Invalid Class Type") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/invalidClassType.java")
+    val parser = parse("testFiles/typeCheckingTests/invalidClassType.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -699,7 +699,7 @@ class TypeCheckingTests extends munit.FunSuite {
     println(statementTypeChecker.getCurError.get.errorVal)
   }
   test("Invalid Extended Class") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/invalidExtendedClass.java")
+    val parser = parse("testFiles/typeCheckingTests/invalidExtendedClass.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -717,7 +717,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Invalid Inherited Method") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/invalidInheritedMethod.java")
+    val parser = parse("testFiles/typeCheckingTests/invalidInheritedMethod.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -740,7 +740,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Invalid Inherited Method Return Type") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/invalidInheritedReturnType.java")
+    val parser = parse("testFiles/typeCheckingTests/invalidInheritedReturnType.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -763,7 +763,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Invalid Inherited Method Parameter Type") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/invalidMethodParamType.java")
+    val parser = parse("testFiles/typeCheckingTests/invalidMethodParamType.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -779,7 +779,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Invalid Inherited Method Return Type") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/invalidMethodReturnType.java")
+    val parser = parse("testFiles/typeCheckingTests/invalidMethodReturnType.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -802,7 +802,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Invalid Negated Boolean Type") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/invalidNegatedBoolean.java")
+    val parser = parse("testFiles/typeCheckingTests/invalidNegatedBoolean.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -825,7 +825,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Invalid New Int") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/invalidNewInt.java")
+    val parser = parse("testFiles/typeCheckingTests/invalidNewInt.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -848,7 +848,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Invalid Print") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/invalidPrint.java")
+    val parser = parse("testFiles/typeCheckingTests/invalidPrint.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -870,7 +870,7 @@ class TypeCheckingTests extends munit.FunSuite {
     println(statementTypeChecker.getCurError.get.errorVal)
   }
   test("Method Already Defined") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/methodAlreadyDefined.java")
+    val parser = parse("testFiles/typeCheckingTests/methodAlreadyDefined.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -884,7 +884,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Method Overload") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/methodOverloadExample.java")
+    val parser = parse("testFiles/typeCheckingTests/methodOverloadExample.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -906,7 +906,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Math Invalid") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/multiplicationAdditionSubtractionInvalid.java")
+    val parser = parse("testFiles/typeCheckingTests/multiplicationAdditionSubtractionInvalid.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -928,7 +928,7 @@ class TypeCheckingTests extends munit.FunSuite {
     println(statementTypeChecker.getCurError.get.errorVal)
   }
   test("Math Valid") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/multiplicationAdditionSubtractionTest.java")
+    val parser = parse("testFiles/typeCheckingTests/multiplicationAdditionSubtractionTest.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -951,7 +951,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Invalid Int Size Type") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/newIntArrayInvalidSize.java")
+    val parser = parse("testFiles/typeCheckingTests/newIntArrayInvalidSize.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -973,7 +973,7 @@ class TypeCheckingTests extends munit.FunSuite {
     println(statementTypeChecker.getCurError.get.errorVal)
   }
   test("Valid Class Type Type") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/validClassType.java")
+    val parser = parse("testFiles/typeCheckingTests/validClassType.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -995,7 +995,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Valid Method Param Type") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/validMethodParamType.java")
+    val parser = parse("testFiles/typeCheckingTests/validMethodParamType.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -1017,7 +1017,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Var Check 1") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/varCheck1.java")
+    val parser = parse("testFiles/typeCheckingTests/varCheck1.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -1039,7 +1039,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Var Check 2") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/varCheck2.java")
+    val parser = parse("testFiles/typeCheckingTests/varCheck2.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -1061,7 +1061,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Var Check 3") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/varCheck3.java")
+    val parser = parse("testFiles/typeCheckingTests/varCheck3.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -1083,7 +1083,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Var Check Fail") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/varCheckFail.java")
+    val parser = parse("testFiles/typeCheckingTests/varCheckFail.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -1105,7 +1105,7 @@ class TypeCheckingTests extends munit.FunSuite {
     println(statementTypeChecker.getCurError.get.errorVal)
   }
   test("Var Already Defined Class Scope") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/variableAlreadyDefinedClassScope.java")
+    val parser = parse("testFiles/typeCheckingTests/variableAlreadyDefinedClassScope.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -1119,7 +1119,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Var Already Defined Method Scope") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/variableAlreadyDefinedMethodScope.java")
+    val parser = parse("testFiles/typeCheckingTests/variableAlreadyDefinedMethodScope.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -1132,7 +1132,7 @@ class TypeCheckingTests extends munit.FunSuite {
     println(symbolTableBuilder.getError.get.errorVal)
   }
   test("Var Already Defined Method Scope 2") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/variableAlreadyDefinedMethodScope2.java")
+    val parser = parse("testFiles/typeCheckingTests/variableAlreadyDefinedMethodScope2.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -1145,7 +1145,7 @@ class TypeCheckingTests extends munit.FunSuite {
     println(symbolTableBuilder.getError.get.errorVal)
   }
   test("Weird Array") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/weirdArray.java")
+    val parser = parse("testFiles/typeCheckingTests/weirdArray.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -1166,7 +1166,7 @@ class TypeCheckingTests extends munit.FunSuite {
     assert(statementTypeChecker.getCurError.isEmpty)
   }
   test("While Condition Not Boolean") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/typeCheckingTests/WhileCondNotBoolean.java")
+    val parser = parse("testFiles/typeCheckingTests/WhileCondNotBoolean.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)
@@ -1189,7 +1189,7 @@ class TypeCheckingTests extends munit.FunSuite {
   }
 
   test("Chained Methods") {
-    val parser = parse(System.getProperty("user.dir") + "/testFiles/testFile.java")
+    val parser = parse("testFiles/testFile.java")
     //make the ast
     val programAST = buildAST(parser)
     assertEquals(programAST._2, false)

@@ -125,7 +125,7 @@ class CodeGenerationTests extends munit.FunSuite {
   }
 
   test("Array From Grandparent Output Test") {
-    main(Array("testFiles/codeGenTests/ArrayFromGrandparentTest.java"))
+    main(Array("testFiles/codeGenTests/ArrayFromGrandparent.java"))
     testOutput("ArrayFromGrandparentTest", "0\n1\n2\n3\n4\n0\n")
   }
 
