@@ -35,7 +35,7 @@ jobs:
       run: antlr4 miniJava.g4 -visitor && javac -classpath /usr/share/java/antlr4-runtime.jar miniJava*.java
     - name: Recompile SBT
       working-directory: ./minijavacompiler
-      run: sbt clean clean-files && sbt compile
+      run: sbt clean && sbt compile
     - name: Run tests
       working-directory: ./minijavacompiler
       run: sbt test
