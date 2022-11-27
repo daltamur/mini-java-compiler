@@ -31,8 +31,8 @@ jobs:
       working-directory: ./minijavacompiler/src/main/scala/parseTreeFiles
       run: sudo apt-get install antlr4 && sudo apt install rsync
     - name: Build ANTLR Files
-      working-directory: ./minijavacompiler/src/main/scala/parseTreeFiles
-      run: antlr4 grammarOutput/miniJava.g4 -visitor && javac -classpath /usr/share/java/antlr4-runtime.jar grammarOutput/miniJava*.java
+      working-directory: ./minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput
+      run: antlr4 miniJava.g4 -visitor && javac -classpath /usr/share/java/antlr4-runtime.jar miniJava*.java
     - name: Recompile SBT
       working-directory: ./minijavacompiler
       run: sbt compile
