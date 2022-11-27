@@ -27,6 +27,9 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: 'sbt'
+    - name: Build ANTLR Files
+      working-directory: ./minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput
+      run: antlr4 miniJava.g4 -visitor && javac miniJava*.java
     - name: Run tests
       working-directory: ./minijavacompiler
       run: sbt test
