@@ -32,7 +32,7 @@ jobs:
       run: sudo apt-get install antlr4 && sudo apt install rsync
     - name: Build ANTLR Files
       working-directory: ./minijavacompiler/src/main/scala/parseTreeFiles
-      run: antlr4 grammarOutput/miniJava.g4 -visitor && javac -classpath /usr/share/java/antlr4-runtime.jar grammarOutput/miniJava*.java && cp -a grammarOutput/. . && rm grammarOutput/* && rsync -a . grammarOutput && find . -maxdepth 1 -type f -exec rm "{}" \; && cp grammarOutput/MiniJavaVisitor.scala . && cp grammarOutput/errorListener.scala . && rm grammarOutput/MiniJavaVisitor.scala && rm grammarOutput/errorListener.scala
+      run: antlr4 grammarOutput/miniJava.g4 -visitor && javac -classpath /usr/share/java/antlr4-runtime.jar grammarOutput/miniJava*.java && cp -a grammarOutput/. . && rm grammarOutput/* && rsync -a . grammarOutput && find . -maxdepth 1 -type f -exec rm "{}" \; && cp grammarOutput/MiniJavaVisitor.scala . && cp grammarOutput/errorListener.scala . && rm grammarOutput/MiniJavaVisitor.scala && rm grammarOutput/errorListener.scala && ls
     - name: Run tests
       working-directory: ./minijavacompiler
       run: sbt test
