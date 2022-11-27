@@ -37,7 +37,7 @@ jobs:
       working-directory: ./minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput
       run: ls
     - name: Recompile SBT
-      working-directory: ./minijavacompiler
+      working-directory: ./minijavacompiler/src
       run: sbt compile -explain
     - name: Run tests
       working-directory: ./minijavacompiler
