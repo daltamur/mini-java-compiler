@@ -1,6 +1,5 @@
-package parseTreeFiles.grammarOutput;// Generated from miniJava.g4 by ANTLR 4.10.1
+package grammarOutput;// Generated from miniJava.g4 by ANTLR 4.10.1
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
-import parseTreeFiles.grammarOutput.miniJavaParser;
 
 /**
  * This interface defines a complete generic visitor for a parse tree produced

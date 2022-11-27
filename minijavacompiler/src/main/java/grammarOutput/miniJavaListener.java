@@ -1,4 +1,4 @@
-package parseTreeFiles.grammarOutput;// Generated from miniJava.g4 by ANTLR 4.10.1
+package grammarOutput;// Generated from miniJava.g4 by ANTLR 4.10.1
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**

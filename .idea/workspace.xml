@@ -5,7 +5,60 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="192cc344-ef27-4c82-b890-90e70c6e074f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/scala.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/scala.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaBaseListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaBaseVisitor.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaLexer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$AddExpressionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$AndexpressionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$ArrayAssignStatementContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$ArrayIndexCallContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$ArrayIndexContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$ArrayLengthCallContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$AssignStatementContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$BlockStatementContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$BoolValContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$BooleanExpressionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$BooleanTypeContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$CharTypeContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$CharacterExpressionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$ClassDeclarationContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$CompareExpressionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$ExpressionAndContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$ExpressionCompContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$ExpressionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$ExpressionTailContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$ExpressionTailOpsContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$ExpressionTerminalContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$ExpressionValueContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$FunctionVallExpressionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$GetArrayLengthContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$GoalContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$IdentifierExpressionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$IdentifierTypeContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$IfStatementContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$IntTypeContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$IntegerArrayTypeContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$IntegerExpressionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$MainClassContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$MethodDeclarationContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$MethodFuncCallContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$MultiplyExpressionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$NegatedExpressionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$NewArrayExpressionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$NewClassExpressionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$NoExpressionTailContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$OperatorExpressionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$ParenthesizedExpressionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$PrintStatementContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$StatementContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$SubtractExpressionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$ThisKeywordContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$TypeContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$VarDeclarationContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser$WhileStatementContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaParser.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput/miniJavaVisitor.class" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

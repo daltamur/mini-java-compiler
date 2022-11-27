@@ -1,8 +1,8 @@
 import AST_Grammar.{ASTNode, symbolTable, symbolTableBuilder, typeCheckingVisitor}
 import codeGen.codeGenerator
+import grammarOutput.{miniJavaLexer, miniJavaParser}
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream, ParserRuleContext}
 import org.antlr.v4.runtime.tree.{ErrorNode, ParseTree, ParseTreeListener, ParseTreeWalker, TerminalNode}
-import parseTreeFiles.grammarOutput.{miniJavaLexer, miniJavaParser}
 import parseTreeFiles.{MiniJavaVisitor, errorListener}
 
 import java.io.File
