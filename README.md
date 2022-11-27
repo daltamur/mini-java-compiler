@@ -32,4 +32,8 @@ ____________________________________ \
 Learn about how to write in Mini Java at https://www.cambridge.org/resources/052182060X/ \
 This version of Mini Java also supports characters and will print them out \
 View the source code for this compiler at https://github.com/daltamur/mini-java-compiler \
-To compile a Java file that follows the rules of MiniJava, run this program with the file location as a command line argument \
+To compile a Java file that follows the rules of MiniJava, run this program with the file location as a command line argument\
+\
+\
+\
+^This is the output of the compiler when you run without arguments!
