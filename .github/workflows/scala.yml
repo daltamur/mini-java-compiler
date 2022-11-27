@@ -32,7 +32,10 @@ jobs:
       run: sudo apt-get install antlr4 && sudo apt install rsync
     - name: Build ANTLR Files
       working-directory: ./minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput
-      run: antlr4 miniJava.g4 -visitor && javac -classpath /usr/share/java/antlr4-runtime.jar miniJava*.java && ls
+      run: antlr4 miniJava.g4 -visitor && javac -classpath /usr/share/java/antlr4-runtime.jar miniJava*.java
+    - name: LS grammarOutput
+      working-directory: ./minijavacompiler/src/main/scala/parseTreeFiles/grammarOutput
+      run: ls
     - name: Recompile SBT
       working-directory: ./minijavacompiler
       run: sbt clean && sbt compile
