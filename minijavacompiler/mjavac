@@ -1,0 +1,2 @@
+#!/bin/bash    
+java -jar /home/dominic/IdeaProjects/miniJavaCompiler/minijavacompiler/target/scala-3.2.0/mjavac.jar "$@"
