@@ -19,5 +19,4 @@ class MethodRunner{
         return returned;
     }
     
-    
 }

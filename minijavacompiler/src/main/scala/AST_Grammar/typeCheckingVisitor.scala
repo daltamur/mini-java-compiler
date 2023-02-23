@@ -399,8 +399,10 @@ class typeCheckingVisitor extends ASTVisitor[symbolTable, typeCheckResult] {
           returnedVal.asInstanceOf[hasErrorResult].errorVal = true
 
     }
-    if(returnedVal.isInstanceOf[varValResult]) {
-      expression.variableType = returnedVal.asInstanceOf[varValResult].varVal
+    returnedVal match {
+      case result: varValResult =>
+        expression.variableType = result.varVal
+      case _ =>
     }
     returnedVal
   }

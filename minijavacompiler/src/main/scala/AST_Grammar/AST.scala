@@ -38,7 +38,7 @@ case class character() extends dataType
 case class identifierType(name: identifier) extends dataType
 
 //statement cases
-sealed trait statement() extends ASTNode
+sealed class statement() extends ASTNode
 
 case class blockStatement(statements: List[statement]) extends statement
 
@@ -60,7 +60,7 @@ case class expression(leftVal: compExpression, rightVal: Option[andExpression]) 
 }
 case class compExpression(value: expressionValue, optVal: Option[compExpression], line:Integer, index:Integer) extends ASTNode
 case class andExpression(leftVal:Option[expression]) extends ASTNode
-sealed trait expressionTerminal() extends ASTNode
+sealed class expressionTerminal() extends ASTNode
 case class thisExpression(line: Integer, index: Integer) extends expressionTerminal
 case class booleanExpression(value: Boolean, line: Integer, index: Integer) extends expressionTerminal
 case class integerExpression(value: Integer, line: Integer, index: Integer) extends expressionTerminal
@@ -76,9 +76,9 @@ case class newClassInstanceExpression(classType: identifier, line: Integer, inde
 case class negatedExpression(value: expressionValue, line: Integer, index: Integer) extends expressionTerminal
 case class parenthesizedExpression(value: expression, line: Integer, index: Integer) extends expressionTerminal
 
-sealed trait expressionTail() extends ASTNode
+sealed class expressionTail() extends ASTNode
 
-sealed trait operation() extends expressionTail
+sealed class operation() extends expressionTail
 case class addExpression(value: expressionValue) extends operation
 case class subtractExpression(value: expressionValue) extends operation
 case class multiplyExpression(value: expressionValue) extends operation
@@ -104,19 +104,19 @@ sealed trait symbolTableVal
 def getVarType(dType: dataType): varType = {
   dType match
     case x: identifierType => classType(x.name.name)
-    case x: intArray => intArrayType()
-    case x: boolean => booleanType()
-    case x: integer => integerType()
-    case x: character => characterType()
+    case _: intArray => intArrayType()
+    case _: boolean => booleanType()
+    case _: integer => integerType()
+    case _: character => characterType()
 }
 
 def varTypeToString(vType: varType): String = {
   vType match
     case x: classType => x.clazz
-    case x: intArrayType => "int[]"
-    case x: booleanType => "boolean"
-    case x: integerType => "int"
-    case x: characterType => "char"
+    case _: intArrayType => "int[]"
+    case _: booleanType => "boolean"
+    case _: integerType => "int"
+    case _: characterType => "char"
 }
 sealed trait varType extends symbolTableVal
 case class intArrayType() extends varType

@@ -657,8 +657,6 @@ class codeGenerator extends AST_Grammar.ASTVisitor [MethodVisitor, Unit]{
     a.visitMethodInsn(Opcodes.INVOKEVIRTUAL, AST_Grammar.varTypeToString(expression.classType), expression.funcName.name, methodSignature, false)
 
     visitExpressionTail(expression.operation, a , b)
-
-
   }
 
   override def visitNoTail(previousExpressionVal: Unit): Unit = {

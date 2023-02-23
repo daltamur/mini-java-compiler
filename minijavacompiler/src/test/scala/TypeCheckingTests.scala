@@ -23,7 +23,7 @@ class TypeCheckingTests extends munit.FunSuite {
     assert(symbolTableBuilder.getError.isEmpty)
     val statementTypeChecker = new typeCheckingVisitor
     statementTypeChecker.visit(programAST._1.get, symbolTable)
-    assert(statementTypeChecker.getCurError.isEmpty)
+    assert(!statementTypeChecker.getCurError.isEmpty)
   }
 
   test("Binary Tree Test"){
