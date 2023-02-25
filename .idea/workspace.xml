@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="192cc344-ef27-4c82-b890-90e70c6e074f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/scala.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/scala.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/minijavacompiler/src/test/scala/TypeCheckingTests.scala" beforeDir="false" afterPath="$PROJECT_DIR$/minijavacompiler/src/test/scala/TypeCheckingTests.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -125,6 +127,7 @@
       <workItem from="1669627113786" duration="591000" />
       <workItem from="1677172308863" duration="1432000" />
       <workItem from="1677255137824" duration="80000" />
+      <workItem from="1677257706890" duration="4622000" />
     </task>
     <servers />
   </component>
